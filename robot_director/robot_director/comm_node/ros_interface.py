@@ -159,36 +159,11 @@ class RosInterface(Node):  # , Interface): #Keep this order (Node then Interface
 
         return converted
 
-    def update_data_continuous(self, name: str, dataType: data_type, get_data_callback, rate: float):
-        """
 
-        :param name:
-        :param dataType: string (should be an enum) that is used in publish_data
-        :param get_data_callback: returned format should be the one corresponding to type_msg and must be parsable in publish_data
-        :param rate: times per second
-        :return:
-        """
-        ros_type = get_ros_type(dataType)
-        #if ros_type != TFMessage:
-        publisher = self.create_publisher(ros_type, name, 10)  # le 10 est arbitraire et fait référence à un "QoS setting", voir ici https://docs.ros2.org/foxy/api/rclpy/api/node.html#rclpy.node.Node.create_publisher
-        #else:
-            #publisher = self.tfBroadcaster
-        for i in self.publishers:
-            print(i.topic)
-
-        callback_timer = lambda: self.publish_data(dataType, publisher, get_data_callback)
-        self.create_timer(rate, callback_timer)
-
-    def publish_data(self, dataType, publisher, get_data_callback):
-        msg = self.convert_to_type_ros(get_data_callback())
-        """
-        if type(msg) == TFMessage:
-            print(msg)
-            for x in msg.transforms:
-                print(type(x))
-            publisher.sendTransform(msg)
-        else:
-        """
+    def send_data(self, data: data_type):
+        ros_type = get_ros_type(data)
+        msg = self.convert_to_type_ros(data)
+        #TODO : find publisher linked to this ros_type, and publish through it
         publisher.publish(msg)
         # self.get_logger().info('Publishing: "%s"' % msg.data)
         # self.get_logger().info('Publishing: twist data')
@@ -196,7 +171,6 @@ class RosInterface(Node):  # , Interface): #Keep this order (Node then Interface
 
     def register_msg_callback(self, name: str, dataType:data_type, set_data_callback):
         """
-
         :param name:
         :param dataType:
         :param set_data_callback: parameters of this function callback must be the same as the one used to instantiate the dataType
@@ -216,18 +190,6 @@ class RosInterface(Node):  # , Interface): #Keep this order (Node then Interface
         )
         self.get_logger().info('subscribing from robotSim : ' + name)
 
-    def read_data(self, request, response):
-        # execute request, and do response
-        pass
-
-    """
-    Recevoir dans un action si on doit déclencher ou stopper ou changer le rate 
-    d'un publisher
-    """
-
-
-def send_garbage_data():
-    return randint(1, 10)
 
 
 def main(args=None):

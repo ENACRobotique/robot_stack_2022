@@ -5,17 +5,25 @@ from time import sleep
 
 class Robot():
     """
-    store the data used by serial & ros
+    forward data between two interfaces, intended between serial and ROS.
+    Currently, it also allow to store data (but it's useless as the data is sent ASAP).
     Design consideration :
         we consider that the node run fast enough so that the ros_interface use its timestamp when sending data instead of timestamping when serial was received
-    """
-    def __init__(self):
-        self.pos = data_types.PositionOriented(0, 0, 0)
 
-    def set_odom(self, data: data_types.PositionOriented):
+    """
+    def __init__(self, ser: serial_enac, ros: ros_enac):
+        self.pos = data_types.PositionOriented(0, 0, 0) #x, y, theta | mm, mm, rad
+        self.speed = (0, 0) #vx, vz | m/s, rad/s
+        self.ser = ser
+        self.ros = ros
+
+    def send_odom_to_ros(self, data: data_types.PositionOriented):
         self.pos = data
-    def get_odom(self):
-        return self.pos
+        self.ros.send_data(self.pos)
+
+    def send_speed_to_ser(self, data: data_types.Speed):
+        self.speed = data
+        self.ser.send_data(self.speed)
 
 def main(args=None):
     """
@@ -35,17 +43,18 @@ def main(args=None):
     #region initializations
     ser = serial_enac.SerialInterface(port, baudrate=baudrate, timeout=rate) #we use the pyserial timeout (time to spend blocking and reading the serial port) to loop at a certain rate
     ros = ros_enac.RosInterface(robotName)
-
-    #Interraction from ROS side :
-    #ros.update_data_continuous('/odom', data_types.PositionOrientedTimed, get_odom, 30)
-    #ros.register_msg_callback('/cmd_vel', data_types.Speed, set_speed)
+    robot = Robot(ser, ros)
+    #TODO : move interraction to a param file, so it will be easier with 2 robots
+    #Interraction - reception from ROS side :
+    ros.register_msg_callback('/cmd_vel', data_types.Speed, robot.send_speed_to_ser)
     #ros.register_msg_callback('/cmd_actuator', data_types.Actuator, set_actuator)
     #ros.register_msg_callback('/score', int, set_score)
 
-    #Interraction from embedded microcontroller side:
-    #ser.update_data_continuous('o', data_types.PositionOriented, get_odom, 30)
-    #ser.register_msg_callback('s', data_types.Speed, set_speed)
-    #ser.register_msg_callback('a', data_types.Actuator, set_actuator)
+    #Interraction - reception from embedded microcontroller side:
+    #Direction : embedded -> python script
+    ser.register_msg_callback('o', data_types.PositionOriented, robot.send_odom_to_ros)
+    #ser.register_msg_callback('a', data_types.Actuator, robot.send_actuator_to_ros) #actuator state
+
 
     ser.start()
     ros.start()
