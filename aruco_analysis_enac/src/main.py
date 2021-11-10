@@ -45,7 +45,7 @@ class FramePublisher(Node):
         # coordinates from the message and set the z coordinate to 0
         t.transform.translation.x = msg.x
         t.transform.translation.y = msg.y
-        t.transform.translation.z = 0.0
+        t.transform.translation.z = 0.0 
 
         # For the same reason, turtle can only rotate around one axis
         # and this why we set rotation in x and y to 0 and obtain
