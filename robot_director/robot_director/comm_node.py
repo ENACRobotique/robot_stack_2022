@@ -1,7 +1,7 @@
-import robot_director.comm_node.data_types as data_types
-import robot_director.comm_node.serial_interface as serial_enac #pour éviter que quelqu'un cherche des infos sur serial alors que la doc existe pas
-import robot_director.comm_node.ros_interface as ros_enac
-from time import sleep
+import robot_director.comm.data_types as data_types
+import robot_director.serial_interface as serial_enac #pour éviter que quelqu'un cherche des infos sur serial alors que la doc existe pas
+import robot_director.comm.ros_interface as ros_enac
+
 
 class Robot():
     """
@@ -29,7 +29,7 @@ def main(args=None):
     """
     entry points for ros
     """
-
+    print("beggiing comm_node initialization parameters ")
     #region parameters
     #TODO : transform these into ros parameters (yaml file?)
     robotName = "robot_test"
@@ -67,3 +67,4 @@ def main(args=None):
         ser.process_com()
         #sleep(rate)
     #endregion
+

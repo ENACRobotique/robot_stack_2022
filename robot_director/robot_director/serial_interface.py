@@ -1,5 +1,5 @@
-from robot_director.comm_node.interface import Interface
-import robot_director.comm_node.data_types as data_type
+import robot_director.comm.data_types as data_type
+from robot_director.comm.interface import Interface
 import serial
 from typing import Type
 
