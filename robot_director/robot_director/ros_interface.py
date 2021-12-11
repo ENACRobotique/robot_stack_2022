@@ -109,15 +109,22 @@ class RosInterface(Node):  # , Interface): #Keep this order (Node then Interface
 
     def update_param_callback(self):
         self.get_logger().info(str(self.get_parameter('test_int').get_parameter_value().integer_value)) #nouvelle valeur
+        #serial.send_data('Ki_speed', self.get_parameter('Ki_speed'))
         #TODO :renvoyer au serial tous les paramètres
 
     def __init__(self, node_name="robotSim"):  # TODO : add args
         rclpy.init()  # (args=args)
         super().__init__(node_name)
+        self.declare_parameter('Ki_speed', 0.0)
+        self.declare_parameter('Kp_speed', 3.0)
+        self.declare_parameter('Kd_speed', 0.0)
+        self.declare_parameter('Ki_omega', 0.0)
+        self.declare_parameter('Kp_omega', 0.0)
+        self.declare_parameter('Kd_omega', 0.0)
+        self.declare_parameter('rad_to_meter', 0.01114084601) #70mm -> 0.07/2π
 
-        self.declare_parameter('test_int', 3)
         self.add_on_set_parameters_callback(self.set_param_callback)
-        #self._parameters_callbacks.append(self.set_param_callback)
+        self.update_param_callback()
 
         self.tfBroadcaster = TransformBroadcaster(self)
 
