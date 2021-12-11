@@ -7,6 +7,7 @@ from nav_msgs.msg import Odometry
 from tf2_msgs.msg import TFMessage
 from tf2_ros import TransformBroadcaster
 
+from rcl_interfaces.msg import SetParametersResult
 
 import robot_sim_enac.interface
 from robot_sim_enac.data_types import data_type, PositionOriented, Speed, PositionOrientedTimed, StrMsg
@@ -101,12 +102,27 @@ class RosInterface(Node):  # , Interface): #Keep this order (Node then Interface
         converting data_type to ros2 equivalent types and passing the required additionnal datas(timestamp for example)
         Manage also tf2 broadcast (broadcast is a little different that the other ones)
     """
+    def set_param_callback(self, args):
+        self.get_logger().info(str(self.get_parameter('test_int').get_parameter_value().integer_value)) #ancienne valeur
+        self.executor.create_task(self.update_param_callback)
+        return SetParametersResult(successful=True) #module rcl_interfaces.msg
+
+    def update_param_callback(self):
+        self.get_logger().info(str(self.get_parameter('test_int').get_parameter_value().integer_value)) #nouvelle valeur
+        #TODO :renvoyer au serial tous les paramètres
 
     def __init__(self, node_name="robotSim"):  # TODO : add args
         rclpy.init()  # (args=args)
-        print("rclpy initiated in ros_interface !")
         super().__init__(node_name)
+
+        self.declare_parameter('test_int', 3)
+        self.add_on_set_parameters_callback(self.set_param_callback)
+        #self._parameters_callbacks.append(self.set_param_callback)
+
         self.tfBroadcaster = TransformBroadcaster(self)
+
+        print("rclpy initiated in ros_interface !")
+
 
     def start(self, args=None):
         pass

@@ -1,14 +1,16 @@
-import robot_director.comm.data_types as data_types
-import robot_director.serial_interface as serial_enac #pour éviter que quelqu'un cherche des infos sur serial alors que la doc existe pas
-import robot_director.comm.ros_interface as ros_enac
+#import robot_director.comm.data_types as data_types
+#import robot_director.serial_interface as serial_enac #pour éviter que quelqu'un cherche des infos sur serial alors que la doc existe pas
+import robot_director.ros_interface as ros_enac
 
-
+""""""
 class Robot():
     """
     forward data between two interfaces, intended between serial and ROS.
     Currently, it also allow to store data (but it's useless as the data is sent ASAP).
     Design consideration :
         we consider that the node run fast enough so that the ros_interface use its timestamp when sending data instead of timestamping when serial was received
+
+    """
 
     """
     def __init__(self, ser: serial_enac, ros: ros_enac):
@@ -24,12 +26,14 @@ class Robot():
     def send_speed_to_ser(self, data: data_types.Speed):
         self.speed = data
         self.ser.send_data(self.speed)
+    """
+
 
 def main(args=None):
     """
     entry points for ros
     """
-    print("beggiing comm_node initialization parameters ")
+
     #region parameters
     #TODO : transform these into ros parameters (yaml file?)
     robotName = "robot_test"
@@ -41,7 +45,17 @@ def main(args=None):
     #endregion
 
     #region initializations
-    ser = serial_enac.SerialInterface(port, baudrate=baudrate, timeout=rate) #we use the pyserial timeout (time to spend blocking and reading the serial port) to loop at a certain rate
+
+    #region temporaire
+
+    ros = ros_enac.RosInterface(robotName)
+    #ros.add_on_set_parameters_callback(ros.set_param_callback)
+    ros.get_logger().info(str(ros._parameters_callbacks))
+    #ros.create_timer()
+
+
+    #endregion
+    """ser = serial_enac.SerialInterface(port, baudrate=baudrate, timeout=rate) #we use the pyserial timeout (time to spend blocking and reading the serial port) to loop at a certain rate
     ros = ros_enac.RosInterface(robotName)
     robot = Robot(ser, ros)
     #TODO : move interraction to a param file, so it will be easier with 2 robots
@@ -58,13 +72,13 @@ def main(args=None):
 
     ser.start()
     ros.start()
-
+    """
     #endregion
 
     #region loop
     while True:
         ros.process_com()
-        ser.process_com()
+        """ser.process_com() """
         #sleep(rate)
     #endregion
 
