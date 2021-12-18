@@ -1,45 +1,18 @@
+from aruco_analysis_enac.aruco_calculations import quaternion_from_euler, euler_from_quaternion
 from geometry_msgs.msg import TransformStamped, _pose, _transform
 from ros2_aruco_interfaces.msg import _aruco_markers
-from tf2_msgs.msg import TFMessage
 from std_msgs.msg import Header
 
 import rclpy
 from rclpy.node import Node
 from tf2_ros import TransformBroadcaster
 
-import math
 import aruco_analysis_enac.aruco_calculations as calc
 
 Pose = _pose.Pose
 Transform = _transform.Transform
 ArucoMarkers = _aruco_markers.ArucoMarkers
 
-
-def quaternion_from_euler(roll, pitch, yaw):
-    """
-    Converts euler roll, pitch, yaw to quaternion (w in last place)
-    quat = [x, y, z, w]
-    Bellow should be replaced when porting for ROS 2 Python tf_conversions is done.
-    """
-    cy = math.cos(yaw * 0.5)
-    sy = math.sin(yaw * 0.5)
-    cp = math.cos(pitch * 0.5)
-    sp = math.sin(pitch * 0.5)
-    cr = math.cos(roll * 0.5)
-    sr = math.sin(roll * 0.5)
-
-    q = [0] * 4
-    q[0] = cy * cp * cr + sy * sp * sr
-    q[1] = cy * cp * sr - sy * sp * cr
-    q[2] = sy * cp * sr + cy * sp * cr
-    q[3] = sy * cp * cr - cy * sp * sr
-
-    return q
-
-def euler_from_quaternion(x,y,z,q):
-    #TODO!!!
-    e = [0]*3
-    return e
 
 def add_arucos_known(*arucos):
     # [ID_ARUCO, xPos, yPos, zPos, xQuat, yQuat, zQuat, wQuat]
