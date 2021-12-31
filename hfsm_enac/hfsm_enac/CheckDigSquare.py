@@ -2,7 +2,7 @@ import logging
 
 from hfsm_enac.hfsm_enac import ros_sensors
 
-from hfsm_enac.hfsm_enac.hfsm import StateMachine, TaskSM
+from hfsm_enac.hfsm_enac.hfsm import State
 import hfsm_enac.hfsm_enac.ros_actuators as actuators
 import hfsm_enac.hfsm_enac.conditions as conditions
 
@@ -16,7 +16,7 @@ def has_overshoot_y(isComingLeft, maxPosition):
     else:
         return False
 
-class CheckDigSquare(TaskSM):
+class CheckDigSquare(State):
     def __init__(self, name, initialPosition, initialOrientation, endMaxPosition, nextSquare = None):
         super().__init__(name, )
         self.isComingLeft = True if initialPosition.x < endMaxPosition.x else False
