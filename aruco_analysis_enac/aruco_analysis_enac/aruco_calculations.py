@@ -38,8 +38,8 @@ class Pose:
         self.yaw = yaw
 
 def get_camera_position(arucoRef : Pose):
-    x = arucoRef.x
-    y = arucoRef.y
+    x = -arucoRef.x
+    y = -arucoRef.y
     z = arucoRef.z
     roll = arucoRef.roll
     pitch = arucoRef.pitch
