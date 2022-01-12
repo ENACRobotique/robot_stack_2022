@@ -20,7 +20,8 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'tf_transform = aruco_analysis_enac.main:main'
+            'tf_transform = aruco_analysis_enac.main:main',
+            'detect_aruco = aruco_analysis_enac.detect_aruco:main',
         ],
     },
 )
