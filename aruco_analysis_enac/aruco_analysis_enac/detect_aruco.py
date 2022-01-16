@@ -8,57 +8,76 @@ from cv_bridge import CvBridge
 from rclpy.qos import qos_profile_sensor_data
 from sensor_msgs.msg import CameraInfo
 from sensor_msgs.msg import Image
-from geometry_msgs.msg import PoseArray, Pose
+from geometry_msgs.msg import Vector3
+from interfaces_enac.msg import _fiducials_poses
+
+FidPoses = _fiducials_poses.FiducialsPoses
 
 class ArucoNode(node.Node):
     def __init__(self):
         super().__init__('detect_aruco')
         self.bridge = CvBridge()
 
+        self.declare_parameter('debug_mode', True)
+        self.debug_mode = self.get_parameter('debug_mode').get_parameter_value().bool_value
+
+        self.get_logger().info(f"debug mode : {self.debug_mode}")
         self.info_sub = self.create_subscription(CameraInfo,
             '/camera/camera_info',
             self.info_callback,
             qos_profile_sensor_data)
-        print("bbb")
-    
+
         self.create_subscription(Image, '/camera/image_raw',
             self.image_callback, qos_profile_sensor_data)
 
-        self.markers_pub = self.create_publisher(Image, 'arucos', 10)
-    
+        self.markers_pose_pub = self.create_publisher(FidPoses, 'aruco_poses', qos_profile_sensor_data)
+        if self.debug_mode:
+            self.markers_image_pub = self.create_publisher(Image, 'aruco_pictures', 10)
+
     def info_callback(self, info_msg):
-        print("a")
         self.info_msg = info_msg
         self.intrinsic_mat = np.reshape(np.array(self.info_msg.k), (3, 3))
         self.distortion = np.array(self.info_msg.d)
-        # Assume that camera parameters will remain the same...
+
+        self.get_logger().debug('info from camera has been added : ')
+        self.get_logger().debug(info_msg)
+        # Assume that camera parameters will remain the same
         self.destroy_subscription(self.info_sub)
 
     def image_callback(self, img_msg):
         cv_image = self.bridge.imgmsg_to_cv2(img_msg,
             desired_encoding='mono8')
-
-        #ajout d'axes
         dict = cv2.aruco.Dictionary_get(cv2.aruco.DICT_4X4_1000)
+
         (corners, ids, rejected) = cv2.aruco.detectMarkers(cv_image, dict)
-        print(corners)
-        img_with_markers = cv2.aruco.drawDetectedMarkers(cv_image, corners, ids)
-        img_ros = self.bridge.cv2_to_imgmsg(img_with_markers, encoding="8UC1")
-        img_ros.header.frame_id="default_cam"
-        print(img_ros.header)
-        self.markers_pub.publish(img_ros)
 
+        # pose estimation
         try:
-            print("aaa")
-            #poste estimation
             rvecs, tvecs, _ = cv2.aruco.estimatePoseSingleMarkers(corners,0.07, self.intrinsic_mat, self.distortion)
-            print(rvecs)
-            print(tvecs)
-            print(_)
-        except:
-            print("pb info cam")
+            print(f"pose estimation for arucos : \n rvecs : {rvecs} \n tvecs : {tvecs}")
 
-                # parameters=arucoParams)
+            pose_msg = FidPoses()
+            pose_msg.header = img_msg.header
+            pose_msg.marker_ids = ids
+            pose_msg.rvecs = []
+            pose_msg.tvecs = []
+
+            for rvec in rvecs:
+                pose_msg.rvecs.append(Vector3(x=rvec[0], y=rvec[1], z=rvec[2]))
+            for tvec in tvecs:
+                pose_msg.tvecs.append(Vector3(x=tvec[0], y=tvec[1], z=tvec[2]))
+
+            self.markers_pose_pub.publish(pose_msg)
+        except:
+            self.get_logger().info("detect_aruco can't estimate pose due to missing camera infos")
+
+        if self.debug_mode:
+            # self.get_logger().debug(f"aruco_detected : {corners} id, rejected)
+            img_with_markers = cv2.aruco.drawDetectedMarkers(cv_image, corners, ids)
+            img_ros = self.bridge.cv2_to_imgmsg(img_with_markers, encoding="8UC1")
+            img_ros.header.frame_id = "default_cam"
+            print(img_ros.header)
+            self.markers_image_pub.publish(img_ros)
 
 def main():
     rclpy.init()

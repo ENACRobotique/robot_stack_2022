@@ -28,6 +28,7 @@ find_package(std_msgs REQUIRED)
 
 rosidl_generate_interfaces(interfaces_enac
   "msg/ObjectMarked.msg"
+  "msg/FiducialsPoses.msg"
   DEPENDENCIES builtin_interfaces geometry_msgs std_msgs
  )
 
