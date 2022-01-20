@@ -1,4 +1,4 @@
-from cv2 import cv2
+import cv2
 import numpy as np
 
 import rclpy
@@ -55,8 +55,9 @@ class ArucoNode(node.Node):
         try:
             rvecs, tvecs, _ = cv2.aruco.estimatePoseSingleMarkers(corners,0.07, self.intrinsic_mat, self.distortion)
             print(f"pose estimation for arucos : \n rvecs : {rvecs} \n tvecs : {tvecs}")
-
             pose_msg = FidPoses()
+            self.get_logger().info(str(ids))
+
             pose_msg.header = img_msg.header
             pose_msg.marker_ids = ids
             pose_msg.rvecs = []
@@ -66,11 +67,12 @@ class ArucoNode(node.Node):
                 pose_msg.rvecs.append(Vector3(x=rvec[0], y=rvec[1], z=rvec[2]))
             for tvec in tvecs:
                 pose_msg.tvecs.append(Vector3(x=tvec[0], y=tvec[1], z=tvec[2]))
+            
 
+            self.get_logger().info(pose_msg)
             self.markers_pose_pub.publish(pose_msg)
-        except:
+        except Exception as e:
             self.get_logger().info("detect_aruco can't estimate pose due to missing camera infos")
-
         if self.debug_mode:
             # self.get_logger().debug(f"aruco_detected : {corners} id, rejected)
             img_with_markers = cv2.aruco.drawDetectedMarkers(cv_image, corners, ids)
