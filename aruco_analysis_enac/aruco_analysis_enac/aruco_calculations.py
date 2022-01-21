@@ -56,5 +56,6 @@ def table_pos_from_camera(arucoPosition: Pose, cameraPosition: Pose):
     camera Position : relative to table
     """
     return arucoPosition
+    
 
 
