@@ -54,7 +54,7 @@ class ArucoNode(node.Node):
         # pose estimation
         try:
             rvecs, tvecs, _ = cv2.aruco.estimatePoseSingleMarkers(corners,0.07, self.intrinsic_mat, self.distortion)
-            print(f"pose estimation for arucos : \n rvecs : {rvecs} \n tvecs : {tvecs}")
+            print(f"pose estimation for arucos : \n {ids}, rvecs : {rvecs} \n tvecs : {tvecs}")
 
             pose_msg = FidPoses()
             pose_msg.header = img_msg.header
