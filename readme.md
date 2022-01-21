@@ -1,7 +1,7 @@
 # To build :
 ```
-docker build . -f enac_dependencies.Dockerfile -t enac_robotique/enac_ros
-docker build . -f enac_base.Dockerfile -t enac_robotique/enac_base
+docker build . -f enac_dependencies.Dockerfile -t enacrobotique/enac-ros
+docker build . -f enac_base.Dockerfile -t enacrobotique/enac-base
 ```
 
 # To run - No GUI :
