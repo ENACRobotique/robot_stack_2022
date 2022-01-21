@@ -1,4 +1,4 @@
-FROM enac_robotique/enac_ros:latest
+FROM enacrobotique/enac-ros:latest
 
 SHELL [ "/bin/bash" , "-c" ]
 

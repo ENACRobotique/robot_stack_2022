@@ -16,7 +16,7 @@ RUN apt-get install -y python3-colcon-common-extensions
 
 RUN apt-get install -y cmake gcc g++ build-essential
 
-RUN apt-get install ros-galactic-v4l2-camera
+RUN apt-get install -y ros-galactic-v4l2-camera
 
 # RUN mkdir /driver_ws &&\
 #     cd driver_ws &&\
