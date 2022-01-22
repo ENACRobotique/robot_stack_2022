@@ -23,7 +23,8 @@ RUN apt install -y python3-opencv
 
 RUN apt install -y ros-galactic-cv-bridge
 
-RUN apt install -y ros-galactic-navigation2
+# disabled due to taking ~600 mo
+# RUN apt install -y ros-galactic-navigation2
 
 #install camera tools
 
@@ -33,7 +34,7 @@ RUN apt-get install -y ros-galactic-v4l2-camera
 #adding build tools but removing them just after
 #fix from 22 jan 2022
 
-RUN sudo apt-get install cmake libblkid-dev e2fslibs-dev libboost-all-dev libaudit-dev &&\
+RUN sudo apt-get install -y cmake libblkid-dev e2fslibs-dev libboost-all-dev libaudit-dev &&\
     source /opt/ros/galactic/setup.bash &&\
     mkdir /driver_ws &&\
     cd driver_ws &&\
