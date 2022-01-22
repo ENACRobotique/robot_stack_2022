@@ -6,9 +6,9 @@ docker build . -f enac_base.Dockerfile -t enacrobotique/enac-base
 
 # To run - No GUI :
 ```
-docker run -it --net=host enac_robotique/enac_base bash --volume PATH/TO/ROBOT_STACK_2022:/enac_ws/src
+docker run -it --net=host enacrobotique/enac-base bash --volume PATH/TO/ROBOT_STACK_2022:/enac_ws/src
 ```
-docker run -it --net=host --volume D:\Sync\Code\Robotique\CDR2022\robot_stack_2022:/enac_ws/src  enac_robotique/enac_base bash
+docker run -it --net=host --volume D:\Sync\Code\Robotique\CDR2022\robot_stack_2022:/enac_ws/src  enacrobotique/enac-base bash
 
 # To run - GUI Linux :
 
@@ -43,7 +43,11 @@ Launch Xlaunch, with these config :
 
 **TODO : faire pas que pour mon PC**
 
-docker run -it --rm --net=host --gpus all --env="NVIDIA_DRIVER_CAPABILITIES=all" --env="DISPLAY=172.29.208.1:0.0" --env="QT_X11_NO_MITSHM=1" --env="LIBGL_ALWAYS_INDIRECT=0" --volume D:\Sync\Code\Robotique\CDR2022\robot_stack_2022:/enac_ws/src --volume "C:\Users\Jonathan\Downloads\Aruco data":/enac_ws/bag enac_robotique/enac_base bash
+ipconfig
+
+obtenir l'addresse IP WSL
+
+docker run -it --rm --net=host --gpus all --env="NVIDIA_DRIVER_CAPABILITIES=all" --env="DISPLAY=172.29.208.1:0.0" --env="QT_X11_NO_MITSHM=1" --env="LIBGL_ALWAYS_INDIRECT=0" --volume D:\Sync\Code\Robotique\CDR2022\robot_stack_2022:/enac_ws/src --volume "C:\Users\Jonathan\Downloads\Aruco data":/enac_ws/bag enacrobotique/enac-base bash
 
 En cas de soucis avec les GUI : vérifier les drivers de la carte graphique (du pc sous windows)
 
