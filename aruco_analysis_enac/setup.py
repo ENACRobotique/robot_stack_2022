@@ -23,8 +23,8 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'aruco_pose_estimation = aruco_analysis_enac.aruco_pose_estimation:main',
             'detect_aruco = aruco_analysis_enac.detect_aruco:main',
+            'analysis_aruco = aruco_analysis_enac.analysis_aruco:main'
         ],
     },
 )

@@ -37,6 +37,10 @@ class Pose:
         self.pitch = pitch
         self.yaw = yaw
 
+    def __str__(self):
+        return f"Pos : {self.x:.2f} {self.y:.2f} {self.z:.2f} \n \
+            Rotation : {self.roll:.2f} {self.pitch:.2f} {self.yaw:.2f} \n"
+
 def get_camera_position(arucoRef : Pose):
     x = -arucoRef.x
     y = -arucoRef.y
