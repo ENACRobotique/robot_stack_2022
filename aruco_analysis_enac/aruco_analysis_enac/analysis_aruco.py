@@ -30,10 +30,13 @@ class ArucoAnalysis(Node):
         self.object_poses_publisher = self.create_publisher(Aruco, 'object_poses', 10)
         self.create_timer(movingArucoRate, self.object_poses_publisher)
 
-
+    
     def __handle_arucos(self, aruco_poses):
-        #Analysis is done in two steps : first, we determine camera position, then we analyse the "free" aruco, the one we don't know their position on the table
-
+        """Analysis is done in two steps
+        first, we determine camera position, then we analyse the "free" aruco, the one we don't know their position on the table
+        Args:
+            aruco_poses ([type]): [description]
+        """
         now = aruco_poses.header.stamp
         aurcosIdsIndex = [] #not reference
         cameraPoseEnac = None
