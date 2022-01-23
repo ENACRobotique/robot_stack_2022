@@ -1,8 +1,6 @@
 from setuptools import setup
-import os
-from glob import glob
 
-package_name = 'aruco_analysis_enac'
+package_name = 'robot_nav_enac'
 
 setup(
     name=package_name,
@@ -12,7 +10,6 @@ setup(
         ('share/ament_index/resource_index/packages',
             ['resource/' + package_name]),
         ('share/' + package_name, ['package.xml']),
-        ('share/' + package_name, glob('launch/*.launch.py'))
     ],
     install_requires=['setuptools'],
     zip_safe=True,
@@ -23,8 +20,6 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'aruco_pose_estimation = aruco_analysis_enac.aruco_pose_estimation:main',
-            'detect_aruco = aruco_analysis_enac.detect_aruco:main',
         ],
     },
 )
