@@ -17,7 +17,9 @@ class ArucoAnalysis(Node):
         if arucoStorage:
             self.arucosStorage = arucoStorage
         else:
-            self.arucosStorage = ArucosStorage()
+            self.arucosStorage = ArucosStorage(
+                [calc.Aruco(42, 0.15, 0.10, 0.0)], 
+                'map')
 
         self.aruco_poses = self.create_subscription(
             ArucoMarkers,
@@ -41,7 +43,7 @@ class ArucoAnalysis(Node):
         aurcosIdsIndex = [] #not reference
         cameraPoseEnac = None
         for i, id in enumerate(aruco_poses.marker_ids):
-            if id in self.arucosStorage.get_reference_ids():
+            if id in self.arucosStorage.reference_ids:
                 pose = fiducial_to_enac_pose(aruco_poses.tvecs[i], aruco_poses.rvecs[i])
                 cameraPoseEnac = calc.get_camera_position(pose) #TODO : faire une fusion de données, là on se contente de prendre le dernier
                 self.get_logger().info(

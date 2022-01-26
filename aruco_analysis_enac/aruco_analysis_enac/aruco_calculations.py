@@ -27,7 +27,12 @@ def euler_from_quaternion(x,y,z,q):
     e = [0]*3
     return e
 
-
+class Aruco:
+    def __init__(self, id:int, x:float, y:float, z:float) -> None:
+        self.id = id
+        self.x = x
+        self.y = y
+        self.z = z
 class Pose:
     def __init__(self, x,y,z, roll, pitch, yaw):
         self.x = x
