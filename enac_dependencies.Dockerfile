@@ -39,8 +39,13 @@ RUN sudo apt-get install -y cmake libblkid-dev e2fslibs-dev libboost-all-dev lib
     mkdir /driver_ws &&\
     cd driver_ws &&\
     mkdir src &&\
-    cd src &&\
-    git clone -b ros2 https://github.com/jonathanTIE/image_pipeline &&\
+    cd src &&\ 
+    #fix 2 
+    git clone -b ros2 https://github.com/ros-perception/image_pipeline &&\
+    cd image_pipeline &&\
+    git checkout 6257bda1449a6a9ffb918f05f0b92ffbfee6a623 &&\
+    cd .. &&\
+    # git clone -b ros2 https://github.com/jonathanTIE/image_pipeline &&\
     git clone -b ros2 https://github.com/ros-perception/vision_opencv &&\
     cd .. &&\
     colcon build --packages-up-to camera_calibration &&\
@@ -48,6 +53,7 @@ RUN sudo apt-get install -y cmake libblkid-dev e2fslibs-dev libboost-all-dev lib
     sudo apt-get autoremove -y &&\
     rm -rf src
     
+RUN sudo apt install -y libcanberra-gtk-module libcanberra-gtk3-module
 #install gui elements - add ~200MB
 
 RUN apt install -y ros-galactic-rviz2 ros-galactic-rviz-default-plugins

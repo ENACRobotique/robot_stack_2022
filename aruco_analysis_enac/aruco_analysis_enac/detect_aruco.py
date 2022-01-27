@@ -11,6 +11,8 @@ from sensor_msgs.msg import Image
 from geometry_msgs.msg import Vector3
 from interfaces_enac.msg import _fiducials_poses
 
+from aruco_analysis_enac.aruco_calculations import rotation
+
 FidPoses = _fiducials_poses.FiducialsPoses
 
 class ArucoNode(node.Node):
@@ -24,15 +26,16 @@ class ArucoNode(node.Node):
 
         self.get_logger().info(f"debug mode : {self.debug_mode}")
         self.info_sub = self.create_subscription(CameraInfo,
-            '/camera/camera_info',
+            'camera_info', #'/camera/camera_info',
             self.info_callback,
             qos_profile_sensor_data)
 
-        self.create_subscription(Image, '/camera/image_raw',
+        self.create_subscription(Image, '/image_raw',  #'/camera/image_raw',
             self.image_callback, qos_profile_sensor_data)
 
         self.markers_pose_pub = self.create_publisher(FidPoses, 'aruco_poses', qos_profile_sensor_data)
         if self.debug_mode:
+            print("debug 2")
             self.markers_image_pub = self.create_publisher(Image, 'aruco_pictures', 10)
 
     def info_callback(self, info_msg):
@@ -56,8 +59,16 @@ class ArucoNode(node.Node):
 
         (corners, ids, rejected) = cv2.aruco.detectMarkers(cv_image, dict)
 
-        #self.get_logger().info("aaaaa")
-        #self.get_logger().info(str((self.get_clock().now()-timeTaken)))
+        """"   
+        rvecsCamera, tvecsCamera = [], []
+        print(corners)
+        try:
+            for i in range(len(tvecs)):
+                rvecsCamera.append(rotation(-rvecs[i][0], -rvecs[i][1], -rvecs[i][2], tvecs[i]))
+                tvecsCamera.append([-tvecs[i][0], tvecs[i][1], tvecs[i][2]])
+        except:
+            print("exception 223233242")
+        """    
         
         # pose estimation
         if len(ids) >= 1:
