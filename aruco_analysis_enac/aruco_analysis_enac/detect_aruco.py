@@ -21,7 +21,7 @@ class ArucoNode(node.Node):
         self.bridge = CvBridge()
         self.info_msg = None #set on /camera_info/ topic
 
-        self.declare_parameter('debug_mode', True)
+        self.declare_parameter('debug_mode', False)
         self.debug_mode = self.get_parameter('debug_mode').get_parameter_value().bool_value
 
         self.get_logger().info(f"debug mode : {self.debug_mode}")
@@ -49,6 +49,7 @@ class ArucoNode(node.Node):
         self.destroy_subscription(self.info_sub)
 
     def image_callback(self, img_msg):
+        timeTaken = self.get_clock().now()
         if self.info_msg == None:
             return
 
@@ -58,9 +59,7 @@ class ArucoNode(node.Node):
 
         (corners, ids, rejected) = cv2.aruco.detectMarkers(cv_image, dict)
 
-        # pose estimation
-        rvecs, tvecs, _ = cv2.aruco.estimatePoseSingleMarkers(corners,0.07, self.intrinsic_mat, self.distortion)
-        
+        """"   
         rvecsCamera, tvecsCamera = [], []
         print(corners)
         try:
@@ -69,36 +68,40 @@ class ArucoNode(node.Node):
                 tvecsCamera.append([-tvecs[i][0], tvecs[i][1], tvecs[i][2]])
         except:
             print("exception 223233242")
-
-        print(f"pose estimation for arucos : \n rvecs : {rvecs} \n tvecs : {tvecs}")
-        print(rvecsCamera)
-        print(tvecsCamera)
+        """    
         
-        """
-        pose_msg = FidPoses()
-        self.get_logger().info(str(ids))
+        # pose estimation
+        if len(ids) >= 1:
+            rvecs, tvecs, _ = cv2.aruco.estimatePoseSingleMarkers(corners,0.07, self.intrinsic_mat, self.distortion)
+            self.get_logger().debug(f"pose estimation for arucos : \n rvecs : {rvecs} \n tvecs : {tvecs}")
+            msg_ids = []
+            for id in ids:
+                msg_ids.append(int(id))
 
-        pose_msg.header = img_msg.header
-        pose_msg.marker_ids = ids
-        pose_msg.rvecs = []
-        pose_msg.tvecs = []
+            #self.get_logger().info("bbbbb")
+            #self.get_logger().info(str((self.get_clock().now()-timeTaken)))
 
-        for rvec in rvecs:
-            pose_msg.rvecs.append(Vector3(x=rvec[0], y=rvec[1], z=rvec[2]))
-        for tvec in tvecs:
-            pose_msg.tvecs.append(Vector3(x=tvec[0], y=tvec[1], z=tvec[2]))
-        
+            pose_msg = FidPoses()
+            pose_msg.header = img_msg.header
+            pose_msg.marker_ids = msg_ids
+            pose_msg.rvecs = []
+            pose_msg.tvecs = []
+            for rvec in rvecs.tolist():
+                pose_msg.rvecs.append(Vector3(x=rvec[0][0], y=rvec[0][1], z=rvec[0][2]))
+            for tvec in tvecs.tolist():
+                pose_msg.tvecs.append(Vector3(x=tvec[0][0], y=tvec[0][1], z=tvec[0][2]))
 
-        self.get_logger().info(pose_msg)
-        self.markers_pose_pub.publish(pose_msg)
-"""
-        if self.debug_mode:
-            # self.get_logger().debug(f"aruco_detected : {corners} id, rejected)
-            img_with_markers = cv2.aruco.drawDetectedMarkers(cv_image, corners, ids)
-            img_ros = self.bridge.cv2_to_imgmsg(img_with_markers, encoding="8UC1")
-            img_ros.header.frame_id = "default_cam"
-            print(img_ros.header)
-            self.markers_image_pub.publish(img_ros)
+            self.markers_pose_pub.publish(pose_msg)
+
+            if self.debug_mode:
+                # self.get_logger().debug(f"aruco_detected : {corners} id, rejected)
+                img_with_markers = cv2.aruco.drawDetectedMarkers(cv_image, corners, ids)
+                img_ros = self.bridge.cv2_to_imgmsg(img_with_markers, encoding="8UC1")
+                img_ros.header = img_msg.header
+                self.markers_image_pub.publish(img_ros)
+            #self.get_logger().info(str((self.get_clock().now()-timeTaken)))
+        else:
+            self.get_logger().info("ids not detected")
 
 def main():
     rclpy.init()
