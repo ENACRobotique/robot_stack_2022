@@ -10,7 +10,7 @@ RUN mkdir /enac_ws &&\
     mkdir bag &&\
     cd src
 
-COPY ../. /enac_ws/src
+COPY . /enac_ws/src
 
 VOLUME [ "/enac_ws/src" , "/enac_ws/bag"]
 
