@@ -42,24 +42,24 @@ RUN apt-get install -y ros-galactic-v4l2-camera
 #adding build tools but removing them just after
 #fix from 22 jan 2022
 
-RUN sudo apt-get install -y cmake libblkid-dev e2fslibs-dev libboost-all-dev libaudit-dev &&\
-    source /opt/ros/galactic/setup.bash &&\
-    mkdir /driver_ws &&\
-    cd driver_ws &&\
-    mkdir src &&\
-    cd src &&\ 
-    #fix 2 
-    git clone -b ros2 https://github.com/ros-perception/image_pipeline &&\
-    cd image_pipeline &&\
-    git checkout 6257bda1449a6a9ffb918f05f0b92ffbfee6a623 &&\
-    cd .. &&\
-    # git clone -b ros2 https://github.com/jonathanTIE/image_pipeline &&\
-    git clone -b ros2 https://github.com/ros-perception/vision_opencv &&\
-    cd .. &&\
-    colcon build --packages-up-to camera_calibration &&\
-    sudo apt-get remove -y libblkid-dev e2fslibs-dev libboost-all-dev libaudit-dev &&\
-    sudo apt-get autoremove -y &&\
-    rm -rf src
+#RUN sudo apt-get install -y cmake libblkid-dev e2fslibs-dev libboost-all-dev libaudit-dev &&\
+#    source /opt/ros/galactic/setup.bash &&\
+#    mkdir /driver_ws &&\
+#    cd driver_ws &&\
+#    mkdir src &&\
+#    cd src &&\ 
+#    #fix 2 
+#    git clone -b ros2 https://github.com/ros-perception/image_pipeline &&\
+#    cd image_pipeline &&\
+#    git checkout 6257bda1449a6a9ffb918f05f0b92ffbfee6a623 &&\
+#    cd .. &&\
+#    # git clone -b ros2 https://github.com/jonathanTIE/image_pipeline &&\
+#    git clone -b ros2 https://github.com/ros-perception/vision_opencv &&\
+#    cd .. &&\
+#    colcon build --packages-up-to camera_calibration &&\
+#    sudo apt-get remove -y libblkid-dev e2fslibs-dev libboost-all-dev libaudit-dev &&\
+#    sudo apt-get autoremove -y &&\
+#    rm -rf src
     
 RUN sudo apt install -y libcanberra-gtk-module libcanberra-gtk3-module
 #install gui elements - add ~200MB
