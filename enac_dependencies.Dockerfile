@@ -21,10 +21,6 @@ RUN apt-get install -y cmake gcc g++ build-essential
 
 RUN apt-get install -y python3-pip
 
-#install python packages
-
-RUN pip install pyserial
-
 #install visual/image processing tools
 
 RUN apt install -y python3-opencv
