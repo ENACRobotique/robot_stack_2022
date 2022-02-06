@@ -2,6 +2,7 @@ import rclpy
 from rclpy.node import Node
 from tf2_ros import TransformBroadcaster
 from rclpy.qos import qos_profile_sensor_data
+from diagnostic_msgs.msg import DiagnosticArray, DiagnosticStatus, KeyValue
 
 
 import aruco_analysis_enac.aruco_calculations as calc
@@ -14,6 +15,9 @@ class ArucoAnalysis(Node):
 
     def __init__(self, arucoStorage = None, name='aruco_analysis', fixedArucoRate=1.0, movingArucoRate=0.1):
         super().__init__(name)
+
+        self.declare_parameter('debug_mode', False)
+        self.debug_mode = self.get_parameter('debug_mode').get_parameter_value().bool_value
 
         if arucoStorage:
             self.arucosStorage = arucoStorage
@@ -34,7 +38,12 @@ class ArucoAnalysis(Node):
         #self.object_poses_publisher = self.create_publisher(Aruco, 'object_poses', 10)
         #self.create_timer(movingArucoRate, self.object_poses_publisher)
 
-    
+        if self.debug_mode:
+            self.diagostics = self.create_publisher(
+                DiagnosticArray,
+                '/diagnostics',
+                10
+            )
     def __handle_arucos(self, aruco_poses):
         """Analysis is done in two steps
         first, we determine camera position, then we analyse the "free" aruco, the one we don't know their position on the table
@@ -56,6 +65,7 @@ class ArucoAnalysis(Node):
 
         if cameraPoseEnac == None:
             self.get_logger().info("missing reference aruco, can't estimate pose ! ")
+            self.__send_diagnostics(DiagnosticStatus.ERROR, "missing reference aruco")
             return 
         for i in aurcosIdsIndex:
             marker_id = aruco_poses.marker_ids[i]
@@ -64,6 +74,20 @@ class ArucoAnalysis(Node):
             self.get_logger().info(
                 f"{marker_id} is located on table at {table_pose}"
             )
+
+    def __send_diagnostics(self, level, msg_txt):
+        msg = DiagnosticArray()
+        reference = DiagnosticStatus()
+        reference.level = level
+        reference.name = "analysis_aruco"
+        reference.message = msg_txt
+        reference.hardware_id = "camera"
+        values = KeyValue()
+        values.key = "acceptable aruco reference ids"
+        values.value = '<h3>'+ str(self.arucosStorage.reference_ids) + '</h3>'
+        reference.values = [values]
+        msg.status = [reference]
+        self.diagostics.publish(msg)
 
     def publish_arucos(self):
         pass
