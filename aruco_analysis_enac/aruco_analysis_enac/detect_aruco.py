@@ -36,7 +36,7 @@ class ArucoNode(node.Node):
         self.markers_pose_pub = self.create_publisher(FidPoses, 'aruco_poses', qos_profile_sensor_data)
         if self.debug_mode:
             print("debug 2")
-            self.markers_image_pub = self.create_publisher(Image, 'aruco_pictures', 10)
+            self.markers_image_pub = self.create_publisher(Image, 'aruco_pictures', qos_profile_sensor_data)
 
     def info_callback(self, info_msg):
         self.info_msg = info_msg
@@ -90,13 +90,17 @@ class ArucoNode(node.Node):
                 pose_msg.rvecs.append(Vector3(x=rvec[0][0], y=rvec[0][1], z=rvec[0][2]))
             for tvec in tvecs.tolist():
                 pose_msg.tvecs.append(Vector3(x=tvec[0][0], y=tvec[0][1], z=tvec[0][2]))
-
+            print(img_msg.header.stamp)
             self.markers_pose_pub.publish(pose_msg)
+            print("test")
 
             if self.debug_mode:
                 # self.get_logger().debug(f"aruco_detected : {corners} id, rejected)
                 img_with_markers = cv2.aruco.drawDetectedMarkers(cv_image, corners, ids)
-                img_ros = self.bridge.cv2_to_imgmsg(img_with_markers, encoding="8UC1")
+                original_width = img_with_markers.shape[1]
+                resized_height = 144
+                resized = cv2.resize(img_with_markers, [original_width, resized_height], interpolation = cv2.INTER_AREA)
+                img_ros = self.bridge.cv2_to_imgmsg(resized, encoding="8UC1")
                 img_ros.header = img_msg.header
                 self.markers_image_pub.publish(img_ros)
             #self.get_logger().info(str((self.get_clock().now()-timeTaken)))

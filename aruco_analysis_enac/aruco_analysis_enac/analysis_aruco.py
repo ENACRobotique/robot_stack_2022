@@ -1,36 +1,38 @@
 import rclpy
 from rclpy.node import Node
 from tf2_ros import TransformBroadcaster
+from rclpy.qos import qos_profile_sensor_data
 
-from interfaces_enac.msg import _aruco_markers
 
 import aruco_analysis_enac.aruco_calculations as calc
-from aruco_storage import ArucosStorage
+from aruco_analysis_enac.aruco_storage import ArucosStorage
+from interfaces_enac.msg import _fiducials_poses
 
-ArucoMarkers = _aruco_markers.ArucoMarkers
+FidPoses = _fiducials_poses.FiducialsPoses
 
 class ArucoAnalysis(Node):
 
     def __init__(self, arucoStorage = None, name='aruco_analysis', fixedArucoRate=1.0, movingArucoRate=0.1):
-        super().__init__(name=name)
+        super().__init__(name)
 
         if arucoStorage:
             self.arucosStorage = arucoStorage
         else:
             self.arucosStorage = ArucosStorage(
-                [calc.Aruco(42, 0.15, 0.10, 0.0)], 
+                #[calc.Aruco(42, 0.15, 0.10, 0.0)],
+                [calc.Aruco(6, 0.15, 0.10, 0.0)], 
                 'map')
 
         self.aruco_poses = self.create_subscription(
-            ArucoMarkers,
+            FidPoses,
             '/aruco_poses',
             self.__handle_arucos,
-            10
+            qos_profile_sensor_data
         )
 
         #TODO : faire une classe à part pour la gestion des publishers avec 2 rate différents
-        self.object_poses_publisher = self.create_publisher(Aruco, 'object_poses', 10)
-        self.create_timer(movingArucoRate, self.object_poses_publisher)
+        #self.object_poses_publisher = self.create_publisher(Aruco, 'object_poses', 10)
+        #self.create_timer(movingArucoRate, self.object_poses_publisher)
 
     
     def __handle_arucos(self, aruco_poses):
@@ -69,7 +71,7 @@ class ArucoAnalysis(Node):
 
 
 def fiducial_to_enac_pose(tvec, rvec):
-    return calc.Pose(tvec[0], tvec[1], tvec[2], rvec[0], rvec[1], rvec[2])
+    return calc.Pose(tvec.x, tvec.y, tvec.z, rvec.x, rvec.y, rvec.z)
 
 def enac_pose_to_ros_pose(self, timestamp, frame_id:str, poseENAC: calc.Pose):
     transf = TransformStamped()
