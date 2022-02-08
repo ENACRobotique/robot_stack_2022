@@ -1,8 +1,25 @@
-# To build :
+# To build (AMD64 only):
 ```
 docker build . -f enac_dependencies.Dockerfile -t enacrobotique/enac-ros
 docker build . -f enac_base.Dockerfile -t enacrobotique/enac-base
 ```
+
+## To build for AMD64 and ARM64 (raspy included):
+
+Configure the mutliarch container : 
+```
+docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+docker buildx rm builder
+docker buildx create --name builder --driver docker-container --use
+docker buildx inspect --bootstrap
+```
+Then compile :
+```
+sudo docker buildx build --platform linux/amd64,linux/arm64 . -f enac_dependencies.Dockerfile -t enacrobotique/enac-ros --push
+
+sudo docker buildx build --platform linux/amd64,linux/arm64 . -f enac_base.Dockerfile -t enacrobotique/enac-base --push
+```
+
 
 # To run - No GUI :
 ```
@@ -17,7 +34,7 @@ docker run -it --net=host --volume D:\Sync\Code\Robotique\CDR2022\robot_stack_20
 xhost local:root 
 +
 
-docker run -it --net=host -e DISPLAY --volume  /home/robot/ros_aruco/src/robot_stack_2022:/enac_ws/src /home/robot/bag_files:/enac_ws/bag enacrobotique/enac-base bash
+docker run -it --net=host -e DISPLAY --volume /home/robot/ros_aruco/src/robot_stack_2022:/enac_ws/src --volume /home/robot/bag_files:/enac_ws/bag enacrobotique/enac-base bash
  
 docker run -it --net=host \
     --env="DISPLAY" \
