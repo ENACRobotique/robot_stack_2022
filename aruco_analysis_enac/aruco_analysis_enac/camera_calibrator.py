@@ -48,3 +48,55 @@ for fname in images:
         cv2.waitKey(500)
 
 cv2.destroyAllWindows()
+
+
+"""
+     def is_good_sample(self, params, corners, ids, last_frame_corners, last_frame_ids):
+        
+        Returns true if the checkerboard detection described by params should be added to the database.
+        
+        if not self.db:
+            return True
+
+        def param_distance(p1, p2):
+            return sum([abs(a-b) for (a,b) in zip(p1, p2)])
+
+        db_params = [sample[0] for sample in self.db]
+        d = min([param_distance(params, p) for p in db_params])
+        #print "d = %.3f" % d #DEBUG
+        # TODO What's a good threshold here? Should it be configurable?
+        if d <= 0.2:
+            return False
+
+        if self.max_chessboard_speed > 0:
+            if not self.is_slow_moving(corners, ids, last_frame_corners, last_frame_ids):
+                return False
+
+        # All tests passed, image should be good for calibration
+        return True
+
+    _param_names = ["X", "Y", "Size", "Skew"]
+
+    def compute_goodenough(self):
+        if not self.db:
+            return None
+
+        # Find range of checkerboard poses covered by samples in database
+        all_params = [sample[0] for sample in self.db]
+        min_params = all_params[0]
+        max_params = all_params[0]
+        for params in all_params[1:]:
+            min_params = lmin(min_params, params)
+            max_params = lmax(max_params, params)
+        # Don't reward small size or skew
+        min_params = [min_params[0], min_params[1], 0., 0.]
+
+        # For each parameter, judge how much progress has been made toward adequate variation
+        progress = [min((hi - lo) / r, 1.0) for (lo, hi, r) in zip(min_params, max_params, self.param_ranges)]
+        # If we have lots of samples, allow calibration even if not all parameters are green
+        # TODO Awkward that we update self.goodenough instead of returning it
+        self.goodenough = (len(self.db) >= 40) or all([p == 1.0 for p in progress])
+
+        return list(zip(self._param_names, min_params, max_params, progress))
+
+"""
