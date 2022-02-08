@@ -1,5 +1,6 @@
 import math
 import numpy as np
+from aruco_analysis_enac.tf import TFTree, TFNode, Transform
 
 def quaternion_from_euler(roll, pitch, yaw):
     """
@@ -49,6 +50,17 @@ class Pose:
             Rotation : {self.roll} {self.pitch} {self.yaw} \n"
 
 def get_camera_position(arucoRef : Pose):
+    tree = TFTree()
+    ref_transform = Transform.from_position_euler(arucoRef.x,arucoRef.y, arucoRef.z, arucoRef.roll, arucoRef.pitch, arucoRef.yaw)
+    tree.add_transform("ref", "cam", ref_transform)
+    transf = tree.lookup_transform("ref","cam")
+    print("target : ")
+    print(ref_transform.position)
+    print(ref_transform.euler)
+    print(transf.position)
+    print(transf.euler)
+
+    return transf
     """
     #position de la caméra par rapport au marqueur qui sert d'origine
     x = -arucoRef.x
@@ -66,6 +78,19 @@ def get_camera_position(arucoRef : Pose):
     
 
 def table_pos_from_camera(arucoPosition: Pose, cameraPosition: Pose):
+    tree = TFTree()
+    camera_transform = Transform.from_position_euler(cameraPosition.x,cameraPosition.y, cameraPosition.z, cameraPosition.roll, cameraPosition.pitch, cameraPosition.yaw)
+    aruco_transform = Transform.from_position_euler(arucoPosition.x,arucoPosition.y, arucoPosition.z, arucoPosition.roll, arucoPosition.pitch, arucoPosition.yaw)
+    tree.add_transform("ref", "cam", camera_transform)
+    tree.add_transform("cam","moving", aruco_transform)
+    transf = tree.lookup_transform("ref","moving")
+    print("moving : ")
+    print(aruco_transform.position)
+    print(aruco_transform.euler)
+    print(transf.position)
+    print(transf.euler)
+
+    return transf
     """
     return aruco position on table from camera position on table, using only one aruco code as reference
     arucoPosition : relative to camera

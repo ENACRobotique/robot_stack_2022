@@ -1,3 +1,4 @@
+#!/bin/ash
 # to use on raspberry pi, without GUI
 # WILL add nav2
 #add usb_cam_driver
@@ -5,24 +6,32 @@
 #galactic version from ~ 7 jan 2022
 # https://hub.docker.com/layers/ros/library/ros/galactic-ros-base/images/sha256-d52ee1b0d65d7df83a4897c39568d6a450a10d76c330450c90ae0e79e4c0d2a8?context=explore
 #FROM ros@sha256:d52ee1b0d65d7df83a4897c39568d6a450a10d76c330450c90ae0e79e4c0d2a8
-FROM ros:galactic-ros-base
+FROM ros:galactic-ros-base 
 LABEL Name=robotstack2022 Version=0.1
+
+ARG TARGETPLATFORM
 
 SHELL [ "/bin/bash" , "-c" ]
 
 #install build tools
 
-RUN apt-get update && apt-get install -y git
-
-RUN apt-get install -y python3-colcon-common-extensions
+RUN apt-get install -y git python3-colcon-common-extensions
 
 RUN apt-get install -y cmake gcc g++ build-essential
 
 #install python tools
-
-RUN apt-get install -y python3-pip
-
 RUN apt-get update
+
+#RUN if [ "$TARGETPLATFORM" = "linux/arm64" ]; \
+#    then mv /var/cache/apt/archives/python* /tmp; \
+#    then apt install --reinstall python3; \
+#    fi
+RUN dpkg --configure -a 
+
+
+RUN apt-get install -y python3-setuptools &&\
+    python3 -m easy_install install pip &&\
+    python3 -m pip --version
 
 #install visual/image processing tools
 

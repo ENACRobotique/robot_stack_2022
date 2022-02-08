@@ -4,3 +4,6 @@ __pycache__
 .idea/robot_stack_2022.iml
 .idea/vcs.xml
 .idea/inspectionProfiles/profiles_settings.xml
+aruco_analysis_enac/aruco_analysis_enac/__pycache__/__init__.cpython-38.pyc
+aruco_analysis_enac/aruco_analysis_enac/__pycache__/aruco_calculations.cpython-38.pyc
+aruco_analysis_enac/aruco_analysis_enac/__pycache__/detect_aruco.cpython-38.pyc
