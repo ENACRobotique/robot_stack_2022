@@ -8,6 +8,11 @@ import aruco_analysis_enac.aruco_calculations as calc
 from aruco_analysis_enac.aruco_storage import ArucosStorage
 from interfaces_enac.msg import _fiducials_poses
 
+from tf2_ros.buffer import Buffer
+from tf2_ros.transform_listener import TransformListener
+from tf2_ros import TransformBroadcaster
+
+
 FidPoses = _fiducials_poses.FiducialsPoses
 
 class ArucoAnalysis(Node):
@@ -33,12 +38,15 @@ class ArucoAnalysis(Node):
             qos_profile_sensor_data
         )
 
+        self.tf_publisher = TransformBroadcaster(self)
+        self.tf_buffer = Buffer()
+        self.listener = TransformListener(self.tf_buffer, self)
         #TODO : faire une classe à part pour la gestion des publishers avec 2 rate différents
         #self.object_poses_publisher = self.create_publisher(Aruco, 'object_poses', 10)
         #self.create_timer(movingArucoRate, self.object_poses_publisher)
 
         if self.debug_mode:
-            self.diagostics = self.create_publisher(
+            self.diagnostics = self.create_publisher(
                 DiagnosticArray,
                 '/diagnostics',
                 10
@@ -54,8 +62,13 @@ class ArucoAnalysis(Node):
         cameraPoseEnac = None
         for i, id in enumerate(aruco_poses.marker_ids):
             if id in self.arucosStorage.reference_ids:
+                cameraPoseEnac = True
+                print(aruco_poses.rvecs[i])
                 pose = fiducial_to_enac_pose(aruco_poses.tvecs[i], aruco_poses.rvecs[i])
-                cameraPoseEnac = calc.get_camera_position(pose) #TODO : faire une fusion de données, là on se contente de prendre le dernier
+                calc.publish_pos_from_reference(self.tf_publisher, now, pose, 'original_camera', 'ref_aruco')
+                #print(self.tf_buffer.lookup_transform('original_camera', 'ref_aruco', now))
+                #print(self.tf_buffer.lookup_transform('ref_aruco', 'original_camera', rclpy.time.Time()), rclpy.Duration(seconds = 0))
+                #cameraPoseEnac = calc.get_camera_position(pose) #TODO : faire une fusion de données, là on se contente de prendre le dernier
                 self.get_logger().info(
                     f"according to reference {id}, camera is at {cameraPoseEnac}"
                 )
@@ -69,10 +82,11 @@ class ArucoAnalysis(Node):
         for i in aurcosIdsIndex:
             marker_id = aruco_poses.marker_ids[i]
             pose = fiducial_to_enac_pose(aruco_poses.tvecs[i], aruco_poses.rvecs[i])
-            table_pose = calc.table_pos_from_camera(pose, cameraPoseEnac)
-            self.get_logger().info(
-                f"{marker_id} is located on table at {table_pose}"
-            )
+
+            #table_pose = calc.table_pos_from_camera(pose, cameraPoseEnac)
+            #self.get_logger().info(
+            #    f"{marker_id} is located on table at {table_pose}"
+            #)
 
     def __send_diagnostics(self, level, msg_txt):
         msg = DiagnosticArray()
@@ -86,7 +100,7 @@ class ArucoAnalysis(Node):
         values.value = '<h3>'+ str(self.arucosStorage.reference_ids) + '</h3>'
         reference.values = [values]
         msg.status = [reference]
-        self.diagostics.publish(msg)
+        self.diagnostics.publish(msg)
 
     def publish_arucos(self):
         pass

@@ -1,33 +1,11 @@
 import math
 import numpy as np
 from aruco_analysis_enac.tf import TFTree, TFNode, Transform
+import aruco_analysis_enac.transformations as tft
+from cv2 import Rodrigues
 
-def quaternion_from_euler(roll, pitch, yaw):
-    """
-    Converts euler roll, pitch, yaw to quaternion (w in last place)
-    quat = [x, y, z, w]
-    Bellow should be replaced when porting for ROS 2 Python tf_conversions is done.
-    """
-    cy = math.cos(yaw * 0.5)
-    sy = math.sin(yaw * 0.5)
-    cp = math.cos(pitch * 0.5)
-    sp = math.sin(pitch * 0.5)
-    cr = math.cos(roll * 0.5)
-    sr = math.sin(roll * 0.5)
+from geometry_msgs.msg import TransformStamped
 
-    q = [0] * 4
-    q[0] = cy * cp * cr + sy * sp * sr
-    q[1] = cy * cp * sr - sy * sp * cr
-    q[2] = sy * cp * sr + cy * sp * cr
-    q[3] = sy * cp * cr - cy * sp * sr
-
-    return q
-
-
-def euler_from_quaternion(x,y,z,q):
-    #TODO!!!
-    e = [0]*3
-    return e
 
 class Aruco:
     def __init__(self, id:int, x:float, y:float, z:float) -> None:
@@ -49,39 +27,73 @@ class Pose:
         return f"Pos : {self.x:.2f} {self.y:.2f} {self.z:.2f} \
             Rotation : {self.roll} {self.pitch} {self.yaw} \n"
 
-def get_camera_position(arucoRef : Pose):
-    tree = TFTree()
-    ref_transform = Transform.from_position_euler(arucoRef.x,arucoRef.y, arucoRef.z, arucoRef.roll, arucoRef.pitch, arucoRef.yaw)
-    tree.add_transform("ref", "cam", ref_transform)
-    transf = tree.lookup_transform("ref","cam")
-    print("target : ")
-    print(ref_transform.position)
-    print(ref_transform.euler)
-    print(transf.position)
-    print(transf.euler)
+def quaternion_from_euler(roll, pitch, yaw):
 
-    return transf
+  qx = np.sin(roll/2) * np.cos(pitch/2) * np.cos(yaw/2) - np.cos(roll/2) * np.sin(pitch/2) * np.sin(yaw/2)
+  qy = np.cos(roll/2) * np.sin(pitch/2) * np.cos(yaw/2) + np.sin(roll/2) * np.cos(pitch/2) * np.sin(yaw/2)
+  qz = np.cos(roll/2) * np.cos(pitch/2) * np.sin(yaw/2) - np.sin(roll/2) * np.sin(pitch/2) * np.cos(yaw/2)
+  qw = np.cos(roll/2) * np.cos(pitch/2) * np.cos(yaw/2) + np.sin(roll/2) * np.sin(pitch/2) * np.sin(yaw/2)
+ 
+  return [qx, qy, qz, qw]
+
+def publish_pos_from_reference(publisher, time, arucoPose, parent, child):
+    trans = TransformStamped()
+    trans.header.stamp = time
+    trans.header.frame_id = parent
+    trans.child_frame_id = child
+    trans.transform.translation.x = float(arucoPose.x)
+    trans.transform.translation.y = float(arucoPose.y)
+    trans.transform.translation.z = float(arucoPose.z)
+    qw, qx, qy, qz = quaternion_from_euler(arucoPose.roll, arucoPose.pitch, arucoPose.yaw)
+    trans.transform.rotation.w = qw
+    trans.transform.rotation.x = qx
+    trans.transform.rotation.y = qy
+    trans.transform.rotation.z = qz
+    publisher.sendTransform(trans)
+
+def get_camera_position(arucoRef : Pose):
+
+    tvec = np.float32([arucoRef.x, arucoRef.y, arucoRef.z])
+    rvec = np.float32([arucoRef.roll, arucoRef.pitch, arucoRef.yaw])
+    tvec.reshape((3,1))
+    rvec.reshape((3,1))
+
+    R, _ = Rodrigues(rvec)
+    R = np.matrix(R).T
+    print(R)
+    invTvec = np.dot(R, np.matrix(-tvec))
+    invRvec, _ = Rodrigues(R)
+    print("target :")
+    print(invTvec)
+    print(invRvec)
+    rot_mat, _ = Rodrigues()
+    rot_mat = np.matrix(rot_mat).T
+    
     """
-    #position de la caméra par rapport au marqueur qui sert d'origine
-    x = -arucoRef.x
-    y = -arucoRef.y
-    z = -arucoRef.z
-    roll = rotation(-arucoRef.roll, 0, 0, [x, y, z]) #x
-    pitch = rotation(0, -arucoRef.pitch, 0, roll) #y
-    yaw = rotation(0, 0, -arucoRef.yaw, pitch) #z
-    #print("calculated rvec :")
-    #print(roll)
-    #print(pitch)
-    #print(yaw)
-    return Pose(x,y,z,roll,pitch,yaw)
+    transform_matrix = np.zeros((4,4), dtype=float)
+    transform_matrix[0:3, 0:3] = rot_mat
+    transform_matrix[0:3, 3] = tvec
+    transform_matrix[3,3] = 1
+    inverted = np.linalg.inv(transform_matrix)
+    invert_rot_mat = inverted[0:3, 0:3]
+
+    tvec = inverted[0:3,3]
+    rvec, _ = Rodrigues(invert_rot_mat)
     """
     
 
-def table_pos_from_camera(arucoPosition: Pose, cameraPosition: Pose):
+    ref_transform = Transform.from_position_euler(arucoRef.x,arucoRef.y, arucoRef.z, arucoRef.roll, arucoRef.pitch, arucoRef.yaw)
+    print(tft.translation_from_matrix(tft.inverse_matrix(ref_transform.matrix)))
+    print("ref")
+    print(ref_transform.position)
+    print(ref_transform.euler)
+    return ref_transform
+    
+
+def table_pos_from_camera(arucoPosition: Pose, cameraPosition: Transform):
     tree = TFTree()
-    camera_transform = Transform.from_position_euler(cameraPosition.x,cameraPosition.y, cameraPosition.z, cameraPosition.roll, cameraPosition.pitch, cameraPosition.yaw)
     aruco_transform = Transform.from_position_euler(arucoPosition.x,arucoPosition.y, arucoPosition.z, arucoPosition.roll, arucoPosition.pitch, arucoPosition.yaw)
-    tree.add_transform("ref", "cam", camera_transform)
+    tree.add_transform("ref", "cam", cameraPosition)
     tree.add_transform("cam","moving", aruco_transform)
     transf = tree.lookup_transform("ref","moving")
     print("moving : ")

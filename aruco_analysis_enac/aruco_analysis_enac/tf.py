@@ -163,7 +163,7 @@ class Transform(object):
 
     @classmethod
     def from_euler(cls, roll=0, pitch=0, yaw=0):
-        return cls.from_position_euler(0, 0, 0, row, pitch, yaw)
+        return cls.from_position_euler(0, 0, 0, roll, pitch, yaw)
 
     @classmethod
     def from_matrix(cls, mat):

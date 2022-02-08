@@ -67,9 +67,13 @@ ipconfig
 
 obtenir l'addresse IP WSL
 
-docker run -it --rm --net=host --gpus all --env="NVIDIA_DRIVER_CAPABILITIES=all" --env="DISPLAY=172.29.208.1:0.0" --env="QT_X11_NO_MITSHM=1" --env="LIBGL_ALWAYS_INDIRECT=0" --volume D:\Sync\Code\Robotique\CDR2022\robot_stack_2022:/enac_ws/src --volume "C:\Users\Jonathan\Downloads\Aruco data":/enac_ws/bag enacrobotique/enac-base bash
+docker run -it --rm --name club_robot --net=host --gpus all --env="NVIDIA_DRIVER_CAPABILITIES=all" --env="DISPLAY=172.29.208.1:0.0" --env="QT_X11_NO_MITSHM=1" --env="LIBGL_ALWAYS_INDIRECT=0" --volume D:\Sync\Code\Robotique\CDR2022\robot_stack_2022:/enac_ws/src --volume "C:\Users\Jonathan\Downloads\Aruco data":/enac_ws/bag enacrobotique/enac-base bash
+
+docker exec -it club_robot bash
+
 
 ros2 bag play /enac_ws/bag/one_marker_1/one_marker_1_0.db3 -l
+
 
 En cas de soucis avec les GUI : vérifier les drivers de la carte graphique (du pc sous windows)
 
