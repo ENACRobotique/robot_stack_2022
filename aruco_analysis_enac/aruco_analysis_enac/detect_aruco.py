@@ -72,7 +72,7 @@ class ArucoNode(node.Node):
         
         # pose estimation
         if len(ids) >= 1:
-            rvecs, tvecs, _ = cv2.aruco.estimatePoseSingleMarkers(corners,0.07, self.intrinsic_mat, self.distortion)
+            rvecs, tvecs, _ = cv2.aruco.estimatePoseSingleMarkers(corners,0.05, self.intrinsic_mat, self.distortion)
             self.get_logger().debug(f"pose estimation for arucos : \n rvecs : {rvecs} \n tvecs : {tvecs}")
             msg_ids = []
             for id in ids:
@@ -92,7 +92,6 @@ class ArucoNode(node.Node):
                 pose_msg.tvecs.append(Vector3(x=tvec[0][0], y=tvec[0][1], z=tvec[0][2]))
             print(img_msg.header.stamp)
             self.markers_pose_pub.publish(pose_msg)
-            print("test")
 
             if self.debug_mode:
                 # self.get_logger().debug(f"aruco_detected : {corners} id, rejected)

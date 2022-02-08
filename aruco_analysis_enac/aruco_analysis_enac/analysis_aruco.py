@@ -1,6 +1,5 @@
 import rclpy
 from rclpy.node import Node
-from tf2_ros import TransformBroadcaster
 from rclpy.qos import qos_profile_sensor_data
 from diagnostic_msgs.msg import DiagnosticArray, DiagnosticStatus, KeyValue
 
@@ -24,7 +23,7 @@ class ArucoAnalysis(Node):
         else:
             self.arucosStorage = ArucosStorage(
                 #[calc.Aruco(42, 0.15, 0.10, 0.0)],
-                [calc.Aruco(6, 0.15, 0.10, 0.0)], 
+                [calc.Aruco(36, 0.15, 0.10, 0.0)], 
                 'map')
 
         self.aruco_poses = self.create_subscription(
