@@ -43,21 +43,27 @@ class Pose:
         self.pitch = pitch
         self.yaw = yaw
 
+    
     def __str__(self):
-        return f"Pos : {self.x:.2f} {self.y:.2f} {self.z:.2f} \n \
-            Rotation : {self.roll:.2f} {self.pitch:.2f} {self.yaw:.2f} \n"
+        return f"Pos : {self.x:.2f} {self.y:.2f} {self.z:.2f} \
+            Rotation : {self.roll} {self.pitch} {self.yaw} \n"
 
 def get_camera_position(arucoRef : Pose):
+    """
+    #position de la caméra par rapport au marqueur qui sert d'origine
     x = -arucoRef.x
     y = -arucoRef.y
-    z = arucoRef.z
-    roll = arucoRef.roll
-    pitch = arucoRef.pitch
-    yaw = arucoRef.yaw
-
-    return arucoRef
-    #return (x, y, z, roll, pitch, yaw)
-    #position de la caméra par rapport au marqueur qui sert d'origine
+    z = -arucoRef.z
+    roll = rotation(-arucoRef.roll, 0, 0, [x, y, z]) #x
+    pitch = rotation(0, -arucoRef.pitch, 0, roll) #y
+    yaw = rotation(0, 0, -arucoRef.yaw, pitch) #z
+    #print("calculated rvec :")
+    #print(roll)
+    #print(pitch)
+    #print(yaw)
+    return Pose(x,y,z,roll,pitch,yaw)
+    """
+    
 
 def table_pos_from_camera(arucoPosition: Pose, cameraPosition: Pose):
     """
@@ -73,7 +79,20 @@ def rotation(theta1,theta2,theta3,v) :
     My = np.array([[math.cos(theta2),0,-math.sin(theta2)],[0,1,0],[math.sin(theta2),0,math.cos(theta2)]])
     Mz = np.array([[math.cos(theta3),-math.sin(theta3),0],[math.sin(theta3), math.cos(theta3),0],[0,0,1]])
     res = np.dot(np.dot(np.dot(Mx,My),Mz),v)
-    return print(res)
+    return res
 
 if __name__ == "__main__":
     print(rotation(math.pi,0,0,[0,1,0]))
+"""
+tvecs:
+- x: -0.2657684973603784
+  y: 0.28864516818472313
+  z: 0.7879794911990743
+rvecs:
+- x: 2.0277491842572615
+  y: 2.0202839337174843
+  z: 0.6653893427159006
+
+  get_camera_position(Pose(-0.26,0.28,0.78, 2.02, 2.02, 0.665))
+
+  """
