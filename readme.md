@@ -17,7 +17,7 @@ docker run -it --net=host --volume D:\Sync\Code\Robotique\CDR2022\robot_stack_20
 xhost local:root 
 +
 
-docker run -it --net=host --volume -e DISPLAY /home/robot/ros_aruco/src/robot_stack_2022:/enac_ws/src  enacrobotique/enac-base bash
+docker run -it --net=host -e DISPLAY --volume  /home/robot/ros_aruco/src/robot_stack_2022:/enac_ws/src /home/robot/bag_files:/enac_ws/bag enacrobotique/enac-base bash
  
 docker run -it --net=host \
     --env="DISPLAY" \
