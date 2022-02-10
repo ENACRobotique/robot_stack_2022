@@ -93,6 +93,8 @@ class ArucoAnalysis(Node):
             )
 
     def __send_diagnostics(self, level, msg_txt):
+        if not hasattr(self, 'diagnostics'):
+            return #not in debug mode
         msg = DiagnosticArray()
         reference = DiagnosticStatus()
         reference.level = level

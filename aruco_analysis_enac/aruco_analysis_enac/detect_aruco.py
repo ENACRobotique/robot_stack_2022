@@ -11,20 +11,21 @@ from sensor_msgs.msg import Image
 from geometry_msgs.msg import Vector3
 from interfaces_enac.msg import _fiducials_poses
 
+
 from aruco_analysis_enac.aruco_calculations import rotation
 
 FidPoses = _fiducials_poses.FiducialsPoses
-
 class ArucoNode(node.Node):
     def __init__(self):
         super().__init__('detect_aruco')
         self.bridge = CvBridge()
         self.info_msg = None #set on /camera_info/ topic
+        self.detectorSettings = None #format - [[[ids], size, resolution], ...]
 
         self.declare_parameter('debug_mode', False)
         self.debug_mode = self.get_parameter('debug_mode').get_parameter_value().bool_value
-
         self.get_logger().info(f"debug mode : {self.debug_mode}")
+
         self.info_sub = self.create_subscription(CameraInfo,
             'camera_info', #'/camera/camera_info',
             self.info_callback,
@@ -37,6 +38,7 @@ class ArucoNode(node.Node):
         if self.debug_mode:
             print("debug 2")
             self.markers_image_pub = self.create_publisher(Image, 'aruco_pictures', qos_profile_sensor_data)
+        #self.detectorService = self.create_service(customArucoDetector, 'custom_aruco_detector', self.custom_detector_cb)
 
     def info_callback(self, info_msg):
         self.info_msg = info_msg
@@ -58,17 +60,6 @@ class ArucoNode(node.Node):
         dict = cv2.aruco.Dictionary_get(cv2.aruco.DICT_4X4_1000)
 
         (corners, ids, rejected) = cv2.aruco.detectMarkers(cv_image, dict)
-
-        """"   
-        rvecsCamera, tvecsCamera = [], []
-        print(corners)
-        try:
-            for i in range(len(tvecs)):
-                rvecsCamera.append(rotation(-rvecs[i][0], -rvecs[i][1], -rvecs[i][2], tvecs[i]))
-                tvecsCamera.append([-tvecs[i][0], tvecs[i][1], tvecs[i][2]])
-        except:
-            print("exception 223233242")
-        """    
         
         # pose estimation
         if len(ids) >= 1:
@@ -77,34 +68,44 @@ class ArucoNode(node.Node):
             msg_ids = []
             for id in ids:
                 msg_ids.append(int(id))
-
-            #self.get_logger().info("bbbbb")
+            self.publish_markers(img_msg.header, msg_ids, rvecs, tvecs)
             #self.get_logger().info(str((self.get_clock().now()-timeTaken)))
 
-            pose_msg = FidPoses()
-            pose_msg.header = img_msg.header
-            pose_msg.marker_ids = msg_ids
-            pose_msg.rvecs = []
-            pose_msg.tvecs = []
-            for rvec in rvecs.tolist():
-                pose_msg.rvecs.append(Vector3(x=rvec[0][0], y=rvec[0][1], z=rvec[0][2]))
-            for tvec in tvecs.tolist():
-                pose_msg.tvecs.append(Vector3(x=tvec[0][0], y=tvec[0][1], z=tvec[0][2]))
-            print(img_msg.header.stamp)
-            self.markers_pose_pub.publish(pose_msg)
-
+            #generate downscaled picture for debug purposes
             if self.debug_mode:
+                self.publish_img(img_msg.header, corners, ids, cv_image, 144)
                 # self.get_logger().debug(f"aruco_detected : {corners} id, rejected)
-                img_with_markers = cv2.aruco.drawDetectedMarkers(cv_image, corners, ids)
-                original_width = img_with_markers.shape[1]
-                resized_height = 144
-                resized = cv2.resize(img_with_markers, [original_width, resized_height], interpolation = cv2.INTER_AREA)
-                img_ros = self.bridge.cv2_to_imgmsg(resized, encoding="8UC1")
-                img_ros.header = img_msg.header
-                self.markers_image_pub.publish(img_ros)
+
             #self.get_logger().info(str((self.get_clock().now()-timeTaken)))
         else:
             self.get_logger().info("ids not detected")
+
+    def custom_detector_cb(self, detector_settings_srv):
+        if self.detectorSettings == None:
+            self.detectorSettings = []
+        self.detectorSettings.append([detector_settings_srv.ids, detector_settings_srv.size, detector_settings_srv.resolution])
+
+    def publish_markers(self, header, ids, rvecs, tvecs):
+        pose_msg = FidPoses()
+        pose_msg.header = header.header
+        pose_msg.marker_ids = ids
+        pose_msg.rvecs = []
+        pose_msg.tvecs = []
+        for rvec in rvecs.tolist():
+            pose_msg.rvecs.append(Vector3(x=rvec[0][0], y=rvec[0][1], z=rvec[0][2]))
+        for tvec in tvecs.tolist():
+            pose_msg.tvecs.append(Vector3(x=tvec[0][0], y=tvec[0][1], z=tvec[0][2]))
+        print(header.header.stamp)
+        self.markers_pose_pub.publish(pose_msg)
+
+    def publish_img(self, header, cv2_img, corners, ids, resize_height=144):
+        img_with_markers = cv2.aruco.drawDetectedMarkers(cv2_img, corners, ids)
+        original_width = img_with_markers.shape[1]
+        resized_height = resize_height
+        resized = cv2.resize(img_with_markers, [original_width, resized_height], interpolation = cv2.INTER_AREA)
+        img_ros = self.bridge.cv2_to_imgmsg(resized, encoding="8UC1")
+        img_ros.header = header
+        self.markers_image_pub.publish(img_ros)
 
 def main():
     rclpy.init()
