@@ -65,10 +65,12 @@ class ArucoAnalysis(Node):
                 cameraPoseEnac = True
                 print(aruco_poses.rvecs[i])
                 pose = fiducial_to_enac_pose(aruco_poses.tvecs[i], aruco_poses.rvecs[i])
+                pose_origin = calc.Pose(0,0,0,0,0,0)
+                calc.publish_pos_from_reference(self.tf_publisher, now, pose_origin, 'origin', 'original_camera')
                 calc.publish_pos_from_reference(self.tf_publisher, now, pose, 'original_camera', 'ref_aruco')
                 #print(self.tf_buffer.lookup_transform('original_camera', 'ref_aruco', now))
                 #print(self.tf_buffer.lookup_transform('ref_aruco', 'original_camera', rclpy.time.Time()), rclpy.Duration(seconds = 0))
-                #cameraPoseEnac = calc.get_camera_position(pose) #TODO : faire une fusion de données, là on se contente de prendre le dernier
+                cameraPoseEnac = calc.get_camera_position(pose) #TODO : faire une fusion de données, là on se contente de prendre le dernier
                 self.get_logger().info(
                     f"according to reference {id}, camera is at {cameraPoseEnac}"
                 )
@@ -82,11 +84,13 @@ class ArucoAnalysis(Node):
         for i in aurcosIdsIndex:
             marker_id = aruco_poses.marker_ids[i]
             pose = fiducial_to_enac_pose(aruco_poses.tvecs[i], aruco_poses.rvecs[i])
+            calc.publish_pos_from_reference(self.tf_publisher, now, pose, 'camera_2', 'aruco_2')
 
-            #table_pose = calc.table_pos_from_camera(pose, cameraPoseEnac)
-            #self.get_logger().info(
-            #    f"{marker_id} is located on table at {table_pose}"
-            #)
+
+            table_pose = calc.table_pos_from_camera(pose, cameraPoseEnac)
+            self.get_logger().info(
+                f"{marker_id} is located on table at {table_pose}"
+            )
 
     def __send_diagnostics(self, level, msg_txt):
         msg = DiagnosticArray()

@@ -52,7 +52,7 @@ def publish_pos_from_reference(publisher, time, arucoPose, parent, child):
     publisher.sendTransform(trans)
 
 def get_camera_position(arucoRef : Pose):
-
+    """
     tvec = np.float32([arucoRef.x, arucoRef.y, arucoRef.z])
     rvec = np.float32([arucoRef.roll, arucoRef.pitch, arucoRef.yaw])
     tvec.reshape((3,1))
@@ -68,7 +68,7 @@ def get_camera_position(arucoRef : Pose):
     print(invRvec)
     rot_mat, _ = Rodrigues()
     rot_mat = np.matrix(rot_mat).T
-    
+    """
     """
     transform_matrix = np.zeros((4,4), dtype=float)
     transform_matrix[0:3, 0:3] = rot_mat
@@ -83,6 +83,9 @@ def get_camera_position(arucoRef : Pose):
     
 
     ref_transform = Transform.from_position_euler(arucoRef.x,arucoRef.y, arucoRef.z, arucoRef.roll, arucoRef.pitch, arucoRef.yaw)
+    b = ref_transform.inverse()
+    print(b.position)
+    print(b.inverse().position)
     print(tft.translation_from_matrix(tft.inverse_matrix(ref_transform.matrix)))
     print("ref")
     print(ref_transform.position)

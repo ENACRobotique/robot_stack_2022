@@ -24,7 +24,7 @@ def generate_launch_description():
         namespace='camera',
         executable='detect_aruco',
         name='detect_aruco',
-        arguments=['--ros-args', '--log-level', 'debug'],
+        #arguments=['--ros-args', '--log-level', 'debug'],
         parameters=[
             {'debug_mode': True},
         ],
