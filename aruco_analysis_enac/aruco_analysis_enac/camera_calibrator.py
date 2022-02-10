@@ -49,6 +49,10 @@ class Calibrator(node.Node):
             cv_image = self.bridge.imgmsg_to_cv2(img_msg,
                 desired_encoding='mono8')
 
+        def take_picture(self, bool_msg):
+            if bool_msg.data == True:
+                self.picture_to_take += 1
+
 
 cv2.destroyAllWindows()
 
