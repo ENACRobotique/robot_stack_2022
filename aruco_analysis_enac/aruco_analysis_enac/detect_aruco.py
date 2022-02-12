@@ -73,7 +73,7 @@ class ArucoNode(node.Node):
 
             #generate downscaled picture for debug purposes
             if self.debug_mode:
-                self.publish_img(img_msg.header, corners, ids, cv_image, 144)
+                self.publish_img(img_msg.header, cv_image, corners, ids, rvecs, tvecs, 144)
                 # self.get_logger().debug(f"aruco_detected : {corners} id, rejected)
 
             #self.get_logger().info(str((self.get_clock().now()-timeTaken)))
@@ -87,7 +87,7 @@ class ArucoNode(node.Node):
 
     def publish_markers(self, header, ids, rvecs, tvecs):
         pose_msg = FidPoses()
-        pose_msg.header = header.header
+        pose_msg.header = header
         pose_msg.marker_ids = ids
         pose_msg.rvecs = []
         pose_msg.tvecs = []
@@ -95,17 +95,21 @@ class ArucoNode(node.Node):
             pose_msg.rvecs.append(Vector3(x=rvec[0][0], y=rvec[0][1], z=rvec[0][2]))
         for tvec in tvecs.tolist():
             pose_msg.tvecs.append(Vector3(x=tvec[0][0], y=tvec[0][1], z=tvec[0][2]))
-        print(header.header.stamp)
+        print(header.stamp)
         self.markers_pose_pub.publish(pose_msg)
 
-    def publish_img(self, header, cv2_img, corners, ids, resize_height=144):
+    def publish_img(self, header, cv2_img, corners, ids, rvecs, tvecs, resize_height=144):
+        print("aa")
         img_with_markers = cv2.aruco.drawDetectedMarkers(cv2_img, corners, ids)
-        original_width = img_with_markers.shape[1]
-        resized_height = resize_height
-        resized = cv2.resize(img_with_markers, [original_width, resized_height], interpolation = cv2.INTER_AREA)
+        for i, rvec in enumerate(rvecs):
+            cv2.aruco.drawAxis(img_with_markers, self.intrinsic_mat, self.distortion, rvec, tvecs[i], 0.1)
+        resize_width = int(resize_height * 16/9)
+        resized = cv2.resize(img_with_markers, (resize_width, resize_height), interpolation = cv2.INTER_AREA)
         img_ros = self.bridge.cv2_to_imgmsg(resized, encoding="8UC1")
         img_ros.header = header
+        print("ccc")
         self.markers_image_pub.publish(img_ros)
+        print("bbb")
 
 def main():
     rclpy.init()

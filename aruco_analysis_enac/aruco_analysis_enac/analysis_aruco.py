@@ -1,3 +1,9 @@
+#TODO : to remove
+import math
+from pytransform3d import rotations as pr
+from pytransform3d import transformations as pt
+from pytransform3d.transform_manager import TransformManager
+
 import rclpy
 from rclpy.node import Node
 from rclpy.qos import qos_profile_sensor_data
@@ -57,20 +63,26 @@ class ArucoAnalysis(Node):
         Args:
             aruco_poses ([type]): [description]
         """
+        tm = TransformManager()
         now = aruco_poses.header.stamp
         aurcosIdsIndex = [] #not reference
         cameraPoseEnac = None
         for i, id in enumerate(aruco_poses.marker_ids):
             if id in self.arucosStorage.reference_ids:
-                cameraPoseEnac = True
+                pose = calc.Pose.from_tvec_rvec(aruco_poses.tvecs[i], aruco_poses.rvecs[i])
+                print("rvec : ")
                 print(aruco_poses.rvecs[i])
-                pose = fiducial_to_enac_pose(aruco_poses.tvecs[i], aruco_poses.rvecs[i])
-                pose_origin = calc.Pose(0,0,0,0,0,0)
-                calc.publish_pos_from_reference(self.tf_publisher, now, pose_origin, 'origin', 'original_camera')
-                calc.publish_pos_from_reference(self.tf_publisher, now, pose, 'original_camera', 'ref_aruco')
-                #print(self.tf_buffer.lookup_transform('original_camera', 'ref_aruco', now))
-                #print(self.tf_buffer.lookup_transform('ref_aruco', 'original_camera', rclpy.time.Time()), rclpy.Duration(seconds = 0))
-                cameraPoseEnac = calc.get_camera_position(pose) #TODO : faire une fusion de données, là on se contente de prendre le dernier
+                MIDDLE = calc.Pose(1.50, 1.0, 0.0, (0,0,0)) #TODO : take from aruco storage
+                cameraPoseEnac = calc.get_camera_position(MIDDLE, pose) #TODO : faire une fusion de données, là on se contente de prendre le dernier
+                
+                #tm.add_transform("camera",'aruco')
+
+                #ax = tm.plot_frames_in("camera", s=0.1)
+                #plt.slow()
+                
+                #calc.publish_pos_from_reference(self.tf_publisher, now, MIDDLE, 'origin', 'middle_map')
+                calc.publish_pos_from_reference(self.tf_publisher, now, cameraPoseEnac, 'camera', 'aruco')
+
                 self.get_logger().info(
                     f"according to reference {id}, camera is at {cameraPoseEnac}"
                 )
@@ -83,14 +95,26 @@ class ArucoAnalysis(Node):
             return 
         for i in aurcosIdsIndex:
             marker_id = aruco_poses.marker_ids[i]
-            pose = fiducial_to_enac_pose(aruco_poses.tvecs[i], aruco_poses.rvecs[i])
-            calc.publish_pos_from_reference(self.tf_publisher, now, pose, 'camera_2', 'aruco_2')
-
+            pose = calc.Pose.from_tvec_rvec(aruco_poses.tvecs[i], aruco_poses.rvecs[i])
 
             table_pose = calc.table_pos_from_camera(pose, cameraPoseEnac)
             self.get_logger().info(
                 f"{marker_id} is located on table at {table_pose}"
             )
+            calc.publish_pos_from_reference(self.tf_publisher, now, pose, 'camera', str(marker_id)+"_camera")
+            calc.publish_pos_from_reference(self.tf_publisher, now, table_pose, 'aruco', str(marker_id)+"_table")
+
+            """
+            if marker_id == 13:
+                for x in range(2):
+                    x_rad = x*math.pi
+                    for y in range(2):
+                        y_rad = y*math.pi
+                        for z in range(2):
+                            z_rad = z*math.pi
+                            transf = pose.transform_offset(x_rad, y_rad, z_rad)
+                            calc.publish_pos_from_reference(self.tf_publisher, now, transf, 'camera', str(marker_id)+"_camera"+str(x)+str(y)+str(z))
+            """
 
     def __send_diagnostics(self, level, msg_txt):
         if not hasattr(self, 'diagnostics'):
@@ -111,28 +135,6 @@ class ArucoAnalysis(Node):
     def publish_arucos(self):
         pass
 
-
-
-def fiducial_to_enac_pose(tvec, rvec):
-    return calc.Pose(tvec.x, tvec.y, tvec.z, rvec.x, rvec.y, rvec.z)
-
-def enac_pose_to_ros_pose(self, timestamp, frame_id:str, poseENAC: calc.Pose):
-    transf = TransformStamped()
-    transf.header = Header()
-    transf.header.stamp = timestamp
-    transf.header.frame_id = 'map'
-    transf.child_frame_id = frame_id
-
-    q = quaternion_from_euler(poseENAC.roll, poseENAC.pitch, poseENAC.yaw)
-    transf.transform = Transform()
-    transf.transform.translation.x = poseENAC.x
-    transf.transform.translation.y = poseENAC.y
-    transf.transform.translation.z = poseENAC.z
-    transf.transform.rotation.x = q[0]
-    transf.transform.rotation.y = q[1]
-    transf.transform.rotation.z = q[2]
-    transf.transform.rotation.w = q[3]
-    return transf
 
 def main():
     rclpy.init()
