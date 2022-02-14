@@ -18,6 +18,7 @@ import glob
 
 import rclpy
 import rclpy.node as node
+from cv_bridge import CvBridge
 from rclpy.qos import qos_profile_sensor_data
 from sensor_msgs.msg import CameraInfo, Image
 from std_msgs.msg import Bool
@@ -26,7 +27,7 @@ class Calibrator(node.Node):
     def __init__(self) -> None:
         super().__init__()
         self.bridge = CvBridge()
-        self.cv2_pictures_taken = []
+        self.folder_pictures_path = self.now() #TODO : check
         self.picture_to_take = 0
         self.criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
 
@@ -38,9 +39,12 @@ class Calibrator(node.Node):
         self.create_subscription(Image, '/image_raw',  #'/camera/image_raw',
             self.image_callback, qos_profile_sensor_data)
 
-        self.create_publisher(Image, '/image_calibration')
+        self.downscale_img_pub = self.create_publisher(Image, '/image_calibration', qos_profile_sensor_data)
 
+        #TODO : convert to services
         self.create_subscrition(Bool, '/calibration_take_picture', self.take_picture, 10)
+
+        self.create_subscrition(Bool, '/generate_calibration_file', self.generate_calibration_file, 10)
 
         def image_callback(self, img_msg):
             if self.info_msg == None:
@@ -48,17 +52,25 @@ class Calibrator(node.Node):
 
             cv_image = self.bridge.imgmsg_to_cv2(img_msg,
                 desired_encoding='mono8')
+            if self.picture_to_take >= 1:
+                self.picture_to_take -= 1
+                cv_image.save() #TODO : save correctly to path
+
+
+            resize_height = 240
+            resize_width = int(resize_height * 16/9)
+            resized = cv2.resize(cv_image, (resize_width, resize_height), interpolation = cv2.INTER_AREA)
+            img_ros = self.bridge.cv2_to_imgmsg(resized, encoding="8UC1")
+            img_ros.header = img_msg.header
+            self.downscale_img_pub.publish(img_ros)
+
 
         def take_picture(self, bool_msg):
             if bool_msg.data == True:
                 self.picture_to_take += 1
 
-
-cv2.destroyAllWindows()
-
-
-"""
-     def is_good_sample(self, params, corners, ids, last_frame_corners, last_frame_ids):
+        """
+        def is_good_sample(self, params, corners, ids, last_frame_corners, last_frame_ids):
         
         Returns true if the checkerboard detection described by params should be added to the database.
         
@@ -106,7 +118,7 @@ cv2.destroyAllWindows()
 
         return list(zip(self._param_names, min_params, max_params, progress))
 
-"""
+
         # prepare object points, like (0,0,0), (1,0,0), (2,0,0) ....,(6,5,0)
         objp = np.zeros((6*7,3), np.float32)
         objp[:,:2] = np.mgrid[0:7,0:6].T.reshape(-1,2)
@@ -114,8 +126,7 @@ cv2.destroyAllWindows()
         # Arrays to store object points and image points from all the images.
         objpoints = [] # 3d point in real world space
         imgpoints = [] # 2d points in image plane.
-        """
-            for fname in images:
+                    for fname in images:
             gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
 
             # Find the chess board corners
@@ -133,11 +144,52 @@ cv2.destroyAllWindows()
         images = glob.glob('*.jpg')
         """
         def generate_calibration_file(self):
+            #https://medium.com/@kennethjiang/calibrate-fisheye-lens-using-opencv-333b05afa0b0
+            #https://stackoverflow.com/questions/50857278/raspicam-fisheye-calibration-with-opencv
+            CHECKERBOARD = (7,7)
+            gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
+            subpix_criteria = (cv2.TERM_CRITERIA_EPS+cv2.TERM_CRITERIA_MAX_ITER, 30, 0.1)
+            calibration_flags = cv2.fisheye.CALIB_RECOMPUTE_EXTRINSIC+cv2.fisheye.CALIB_CHECK_COND+cv2.fisheye.CALIB_FIX_SKEW
+            objpoints = [] # 3d point in real world space
+            imgpoints = [] # 2d points in image plane.
+            objp = np.zeros((1, CHECKERBOARD[0]*CHECKERBOARD[1], 3), np.float32)
+            objp[0,:,:2] = np.mgrid[0:CHECKERBOARD[0], 0:CHECKERBOARD[1]].T.reshape(-1, 2)
+            #TODO : find images from path
+
+            for fname in images:
+                img = cv2.imread(fname)
+                img_shape = img.shape[:2]
+                # Find the chess board corners
+                ret, corners = cv2.findChessboardCorners(gray, CHECKERBOARD, cv2.CALIB_CB_ADAPTIVE_THRESH+cv2.CALIB_CB_FAST_CHECK+cv2.CALIB_CB_NORMALIZE_IMAGE)
+                # If found, add object points, image points (after refining them)
+                if ret == True:
+                    objpoints.append(objp)
+                    cv2.cornerSubPix(gray,corners,(3,3),(-1,-1),subpix_criteria)
+                    imgpoints.append(corners)
+                    
+            N_OK = len(objpoints)
+            K = np.zeros((3, 3))
+            D = np.zeros((4, 1))
+            rvecs = [np.zeros((1, 1, 3), dtype=np.float64) for i in range(N_OK)]
+            tvecs = [np.zeros((1, 1, 3), dtype=np.float64) for i in range(N_OK)]
+            rms, _, _, _, _ = \
+                cv2.fisheye.calibrate(
+                    objpoints,
+                    imgpoints,
+                    gray.shape[::-1],
+                    K,
+                    D,
+                    rvecs,
+                    tvecs,
+                    calibration_flags,
+                    (cv2.TERM_CRITERIA_EPS+cv2.TERM_CRITERIA_MAX_ITER, 30, 1e-6)
+                )
+            #TODO : generate YAML from K and D variables
             pass
 
-        def publish_calibration_picture(self, cv2img):
+        #def publish_calibration_picture(self, cv2img):
             #rosimg = cv2img.
-            pass
+            #pass
 
 def main():
     rclpy.init()

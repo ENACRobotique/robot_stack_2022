@@ -79,7 +79,7 @@ class ArucoAnalysis(Node):
         for i, id in enumerate(aruco_poses.marker_ids):
             if id in self.arucosStorage.reference_ids:
                 pose = calc.Pose.from_tvec_rvec(aruco_poses.tvecs[i], aruco_poses.rvecs[i])
-                MIDDLE = calc.Pose(1.50, 1.0, 0.0, (0,0,0)) #TODO : take from aruco storage
+                MIDDLE = calc.Pose(1.50, 1.0, 0.0, (0,0,0)).transform_offset() #TODO : take from aruco storage
                 cameraPoseEnac = calc.get_camera_position( pose) #TODO : faire une fusion de données, là on se contente de prendre le dernier
                 """
                 tm = TransformManager()
@@ -110,6 +110,7 @@ class ArucoAnalysis(Node):
                 ax.tick_params(axis='z', colors='blue')
                 plt.show()
                 """
+                calc.publish_pos_from_reference(self.tf_publisher, now, MIDDLE, 'origin', 'aruco')
                 calc.publish_pos_from_reference(self.tf_publisher, now, cameraPoseEnac, 'aruco', 'camera')
 
                 self.get_logger().info(

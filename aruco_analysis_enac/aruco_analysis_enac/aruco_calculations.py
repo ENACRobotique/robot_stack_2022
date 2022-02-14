@@ -161,14 +161,6 @@ def table_pos_from_camera(arucoPosition: Pose, cameraPosition: Transform)-> Tran
     transf = Transform.from_matrix(matrix)
     return transf
 
-
-def rotation(theta1,theta2,theta3,v) :
-    Mx = np.array([[1,0,0],[0,math.cos(theta1),-math.sin(theta1)],[0,math.sin(theta1),math.cos(theta1)]])
-    My = np.array([[math.cos(theta2),0,-math.sin(theta2)],[0,1,0],[math.sin(theta2),0,math.cos(theta2)]])
-    Mz = np.array([[math.cos(theta3),-math.sin(theta3),0],[math.sin(theta3), math.cos(theta3),0],[0,0,1]])
-    res = np.dot(np.dot(np.dot(Mx,My),Mz),v)
-    return res
-
 if __name__ == "__main__":
     print(rotation(math.pi,0,0,[0,1,0]))
 """
