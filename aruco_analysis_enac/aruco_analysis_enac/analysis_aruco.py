@@ -1,6 +1,8 @@
 #TODO : to remove
-"""
+
 import math
+import numpy as np
+"""
 import matplotlib.pyplot as plt
 import numpy as np
 from pytransform3d import rotations as pr
@@ -78,8 +80,7 @@ class ArucoAnalysis(Node):
             if id in self.arucosStorage.reference_ids:
                 pose = calc.Pose.from_tvec_rvec(aruco_poses.tvecs[i], aruco_poses.rvecs[i])
                 MIDDLE = calc.Pose(1.50, 1.0, 0.0, (0,0,0)) #TODO : take from aruco storage
-                cameraPoseEnac = calc.get_camera_position(MIDDLE, pose) #TODO : faire une fusion de données, là on se contente de prendre le dernier
-                
+                cameraPoseEnac = calc.get_camera_position( pose) #TODO : faire une fusion de données, là on se contente de prendre le dernier
                 """
                 tm = TransformManager()
                 camera2aruco =  np.eye(4)
@@ -109,8 +110,7 @@ class ArucoAnalysis(Node):
                 ax.tick_params(axis='z', colors='blue')
                 plt.show()
                 """
-                #calc.publish_pos_from_reference(self.tf_publisher, now, MIDDLE, 'origin', 'middle_map')
-                calc.publish_pos_from_reference(self.tf_publisher, now, cameraPoseEnac, 'camera', 'aruco')
+                calc.publish_pos_from_reference(self.tf_publisher, now, cameraPoseEnac, 'aruco', 'camera')
 
                 self.get_logger().info(
                     f"according to reference {id}, camera is at {cameraPoseEnac}"
@@ -125,12 +125,13 @@ class ArucoAnalysis(Node):
         for i in aurcosIdsIndex:
             marker_id = aruco_poses.marker_ids[i]
             pose = calc.Pose.from_tvec_rvec(aruco_poses.tvecs[i], aruco_poses.rvecs[i])
-
             table_pose = calc.table_pos_from_camera(pose, cameraPoseEnac)
             self.get_logger().info(
                 f"{marker_id} is located on table at {table_pose}"
             )
-            calc.publish_pos_from_reference(self.tf_publisher, now, pose, 'camera', str(marker_id)+"_camera")
+            calc.publish_pos_from_reference(self.tf_publisher, now, pose.transform_offset(), 'camera', str(marker_id)+"_camera")
+            calc.publish_pos_from_reference(self.tf_publisher, now, table_pose, 'aruco', str(marker_id)+"_table")
+
             #calc.publish_pos_from_reference(self.tf_publisher, now, table_pose, 'aruco', str(marker_id)+"_table")
 
             """

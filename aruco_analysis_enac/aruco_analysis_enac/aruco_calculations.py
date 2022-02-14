@@ -2,28 +2,11 @@ from functools import cached_property, lru_cache
 import math
 #from aruco_analysis_enac.aruco_storage import aruco_storage
 import numpy as np
-from aruco_analysis_enac.tf import TFTree, TFNode, Transform
+from aruco_analysis_enac.tf import Transform
 import aruco_analysis_enac.transformations as tft
-from cv2 import Rodrigues, decomposeProjectionMatrix
+from cv2 import Rodrigues, composeRT
 
 from geometry_msgs.msg import TransformStamped
-
-def rotationMatrixToEulerAngles(R):
-
-    sy = math.sqrt(R[0,0] * R[0,0] +  R[1,0] * R[1,0])
-
-    singular = sy < 1e-6
-
-    if  not singular :
-        x = math.atan2(R[2,1] , R[2,2])
-        y = math.atan2(-R[2,0], sy)
-        z = math.atan2(R[1,0], R[0,0])
-    else :
-        x = math.atan2(-R[1,2], R[1,1])
-        y = math.atan2(-R[2,0], sy)
-        z = 0
-
-    return np.array([x, y, z])
 class Aruco:
     def __init__(self, id:int, x:float, y:float, z:float) -> None:
         self.id = id
@@ -44,33 +27,66 @@ class Pose:
     def from_tvec_rvec(cls, tvec, rvec):
         return cls(tvec.x, tvec.y, tvec.z, np.float32([rvec.x, rvec.y, rvec.z]))
 
-    @cached_property
-    def transform(self):
+    
         T = (self.x, self.y, self.z)
         R = tft.identity_matrix()
-        rot_3 = Rodrigues(self.rvec)[0]
-        #Why not roll pitch yaw : https://github.com/microsoft/AirSim/issues/1806
-        (yaw, pitch, roll) = rotationMatrixToEulerAngles(rot_3)
-        #roll pitch yaw = (0,1,2) --> (2,1,0)
-        t = Transform.from_position_euler(self.x, self.y, self.z, roll+math.pi, pitch, yaw)
-        
-        """
-        rot_matrix = np.eye(4)
-        rot_matrix[0:3, 0:3] = Rodrigues(self.rvec)[0]
-        quat = tft.quaternion_from_matrix(rot_matrix)
-        print(rot_matrix)
-        t = Transform(self.x, self.y, self.z, quat[0],quat[1], quat[2], quat[3])
-        print(t.euler)
-        """
+        rot_mat = Rodrigues(self.rvec)[0]
+        R[0:3, 0:3] = rot_mat.T
+        t = Transform.from_rot_mat_pos_vec(R, T)
         return t
+    
 
-    def transform_offset(self, xAxis, yAxis, zAxis):
-        rot_3 = Rodrigues(self.rvec)[0]
+    def transform_offset(self, xAxisFlip=False, yAxisFlip=False, zAxisFlip=False, inverseRoll=False, inversePitch=False, inverseYaw=False):
+        """
+        rot_3 = (Rodrigues(self.rvec)[0]).T
         #Why not roll pitch yaw : https://github.com/microsoft/AirSim/issues/1806
         #roll pitch yaw = (0,1,2) --> (2,1,0)
         (yaw, pitch, roll) = rotationMatrixToEulerAngles(rot_3)
         t = Transform.from_position_euler(self.x, self.y, self.z, roll+xAxis, pitch+yAxis, yaw+ zAxis)
         return t
+        """
+        matrix = tft.identity_matrix()
+        #flip 180° around x axis
+        R_flip_x  = np.zeros((3,3), dtype=np.float32)
+        R_flip_x[0,0] = 1.0
+        R_flip_x[1,1] =-1.0
+        R_flip_x[2,2] =-1.0
+
+        R_flip_y  = np.zeros((3,3), dtype=np.float32)
+        R_flip_y[0,0] =-1.0
+        R_flip_y[1,1] =1.0
+        R_flip_y[2,2] =-1.0
+
+        R_flip_z  = np.zeros((3,3), dtype=np.float32)
+        R_flip_z[0,0] =-1.0
+        R_flip_z[1,1] =-1.0
+        R_flip_z[2,2] =1.0
+
+
+
+        tvec = np.matrix([self.x, self.y, self.z])
+        R_tc, _ = Rodrigues(self.rvec)
+        R_tc = R_tc.T
+        if xAxisFlip:
+            R_tc = np.dot(R_tc,R_flip_x)
+        if yAxisFlip:
+            R_tc = np.dot(R_tc,R_flip_y)
+        if zAxisFlip:
+            R_tc = np.dot(R_tc,R_flip_z)
+        matrix[0:3,0:3] = R_tc
+        matrix[0:3, 3] = tvec
+        t = Transform.from_matrix(matrix)
+        return t
+        #tvec = np.matrix([self.x, self.y, self.z])
+        #(yaw, pitch, roll) = tft.euler_from_matrix(R_tc)
+        #if inverseRoll:
+        #    roll = -roll 
+        #if inversePitch:
+        #    pitch = -pitch 
+        #if inverseYaw:
+        #    yaw = -yaw 
+        #t = Transform.from_position_euler(self.x, self.y, self.z, roll+xAxis, pitch+yAxis, yaw+ zAxis)
+
     
     def __str__(self):
         return f"Pos : {self.x:.2f} {self.y:.2f} {self.z:.2f} \
@@ -85,7 +101,7 @@ def quaternion_from_euler(roll, pitch, yaw):
  
   return [qx, qy, qz, qw]
 
-def publish_pos_from_reference(publisher, time, arucoPose, parent, child):
+def publish_pos_from_reference(publisher, time, arucoTransform, parent, child):
     """[summary]
 
     Args:
@@ -99,13 +115,10 @@ def publish_pos_from_reference(publisher, time, arucoPose, parent, child):
     trans.header.stamp = time
     trans.header.frame_id = parent
     trans.child_frame_id = child
-    trans.transform.translation.x = float(arucoPose.x)
-    trans.transform.translation.y = float(arucoPose.y)
-    trans.transform.translation.z = float(arucoPose.z)
-    if type(arucoPose) == Pose:
-        qw, qx, qy, qz = arucoPose.transform.quaternion
-    elif type(arucoPose) == Transform:
-        qw, qx, qy, qz = arucoPose.quaternion
+    trans.transform.translation.x = float(arucoTransform.x)
+    trans.transform.translation.y = float(arucoTransform.y)
+    trans.transform.translation.z = float(arucoTransform.z)
+    qx, qy, qz, qw = arucoTransform.quaternion
     trans.transform.rotation.w = qw
     trans.transform.rotation.x = qx
     trans.transform.rotation.y = qy
@@ -122,19 +135,12 @@ def transform_flip_x(transf: Transform):
         euler[0], euler[1], euler[2]) 
 
 @lru_cache(maxsize=10)
-def get_camera_position(origin_to_aruco: Pose, aruco_to_camera : Pose)-> Transform:
+def get_camera_position(aruco_to_camera : Pose)-> Transform:
     """ 
     return camera position related to origin of the map (bottom left for eurobot)
     """
-    #aruco_to_camera_flipped = transform_flip_x(aruco_to_camera.transform)
-    tree = TFTree()
-    #tree.add_transform("origin", "aruco", origin_to_aruco.transform)
-    #tree.add_transform("aruco", "camera", aruco_to_camera.transform)
-    print("camera as a parent")
-    #print(tree.lookup_transform("camera", "aruco").euler)
-    print("aruco as a parent")
-    #print(tree.lookup_transform("aruco", "camera").euler)
-    return aruco_to_camera.transform #tree.lookup_transform("camera", "aruco")
+
+    return aruco_to_camera.transform_offset().inverse() #tree.lookup_transform("camera", "aruco")
     
     #ref_transform = Transform.from_position_euler(arucoRef.x,arucoRef.y, arucoRef.z, arucoRef.roll, arucoRef.pitch, arucoRef.yaw)
     #print(tft.translation_from_matrix(tft.inverse_matrix(ref_transform.matrix)))
@@ -150,11 +156,9 @@ def table_pos_from_camera(arucoPosition: Pose, cameraPosition: Transform)-> Tran
     arucoPosition : relative to camera
     camera Position : relative to table
     """
-    #transf_aruco = transform_flip_x(arucoPosition.transform)
-    tree = TFTree()
-    tree.add_transform("ref","cam", cameraPosition)
-    tree.add_transform("cam","moving", arucoPosition.transform_offset(0,0,0))
-    transf = tree.lookup_transform("ref","moving")
+
+    matrix = tft.concatenate_matrices(cameraPosition.matrix, arucoPosition.transform_offset().matrix)
+    transf = Transform.from_matrix(matrix)
     return transf
 
 
