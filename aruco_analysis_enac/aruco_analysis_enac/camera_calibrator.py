@@ -29,7 +29,6 @@ class Calibrator(node.Node):
         self.cv2_pictures_taken = []
         self.picture_to_take = 0
         self.criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
-
         self.info_sub = self.create_subscription(CameraInfo,
             'camera_info', #'/camera/camera_info',
             self.info_callback,
