@@ -64,7 +64,6 @@ class Calibrator(node.Node):
             img_ros.header = img_msg.header
             self.downscale_img_pub.publish(img_ros)
 
-
         def take_picture(self, bool_msg):
             if bool_msg.data == True:
                 self.picture_to_take += 1
@@ -190,7 +189,7 @@ class Calibrator(node.Node):
         #def publish_calibration_picture(self, cv2img):
             #rosimg = cv2img.
             #pass
-
+        
 def main():
     rclpy.init()
     node = Calibrator()
