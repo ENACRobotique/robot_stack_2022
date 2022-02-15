@@ -77,6 +77,11 @@ RUN apt-get install -y ros-galactic-v4l2-camera
 #RUN sudo apt install -y ros-galactic-camera-calibration
     
 RUN sudo apt install -y libcanberra-gtk-module libcanberra-gtk3-module
+
+#add connection through rosbridge
+
+RUN apt install -y ros-galactic-rosbridge-suite
+
 #install gui elements - add ~200MB
 
 RUN apt install -y ros-galactic-rviz2 ros-galactic-rviz-default-plugins
