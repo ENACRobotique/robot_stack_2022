@@ -1,0 +1,16 @@
+{
+    "python.autoComplete.extraPaths": [
+        "/enac_ws/build/robot_sim_enac",
+        "/enac_ws/install/robot_sim_enac/lib/python3.8/site-packages",
+        "/enac_ws/build/robot_nav_enac",
+        "/enac_ws/install/robot_nav_enac/lib/python3.8/site-packages",
+        "/enac_ws/build/robot_director",
+        "/enac_ws/install/robot_director/lib/python3.8/site-packages",
+        "/enac_ws/install/interfaces_enac/lib/python3.8/site-packages",
+        "/enac_ws/build/hfsm_enac",
+        "/enac_ws/install/hfsm_enac/lib/python3.8/site-packages",
+        "/enac_ws/build/aruco_analysis_enac",
+        "/enac_ws/install/aruco_analysis_enac/lib/python3.8/site-packages",
+        "/opt/ros/galactic/lib/python3.8/site-packages"
+    ]
+}

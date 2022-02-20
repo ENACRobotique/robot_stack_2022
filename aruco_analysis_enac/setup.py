@@ -24,7 +24,8 @@ setup(
     entry_points={
         'console_scripts': [
             'detect_aruco = aruco_analysis_enac.detect_aruco:main',
-            'analysis_aruco = aruco_analysis_enac.analysis_aruco:main'
+            'analysis_aruco = aruco_analysis_enac.analysis_aruco:main',
+            'camera_calibrator = aruco_analysis_enac.camera_calibrator:main',
         ],
     },
 )

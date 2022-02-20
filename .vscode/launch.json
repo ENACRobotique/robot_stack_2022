@@ -1,6 +1,7 @@
 {
-    "version": "0.2.0",
+    "version": "0.2.1",
     "configurations": [
+        
         {
             "name": "ROS Attach",
             "type": "ros",
@@ -11,7 +12,14 @@
             "type": "python",
             "request": "launch",
             "program": "${file}",
-            "console": "integratedTerminal"
+            "console": "integratedTerminal",
+            "justMyCode": false,
+        },
+        {
+        "name": "ROS: Attach to Python",
+        "type": "ros",
+        "request": "attach",
+        "runtime": "Python",
         },
     ],
     "compounds": []
