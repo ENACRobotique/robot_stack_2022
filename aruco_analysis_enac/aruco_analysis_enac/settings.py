@@ -32,7 +32,7 @@ class ArucosSetting():
         self.arucos = arucos
         pass
 
-    @lru_cache(maxsize=1000)
+    @lru_cache(maxsize=1000) #number of arucos in the dict
     def get_aruco_by_id(self, id:int) -> Aruco:
         """
         Get the aruco with the id given in argument

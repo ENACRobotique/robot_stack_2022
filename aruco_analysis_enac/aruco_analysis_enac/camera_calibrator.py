@@ -14,6 +14,8 @@ générer le yaml standardisé
 import curses
 import numpy as np
 import cv2
+import os
+
 import glob
 
 import rclpy
@@ -22,16 +24,45 @@ from cv_bridge import CvBridge
 from rclpy.qos import qos_profile_sensor_data
 from sensor_msgs.msg import CameraInfo, Image
 from std_msgs.msg import Bool
+from rcl_interfaces.msg import ParameterDescriptor
 
 class Calibrator(node.Node):
     def __init__(self) -> None:
         super().__init__('camera_calibrator')
         self.bridge = CvBridge()
-        #self.folder_pictures_path = self.now() #TODO : check
         self.picture_to_take = 0
         self.criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
         self.info_msg = None
+        print(__file__)
+        self.calibration_folder_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + '/calibration'
+        #get current file path for calibration pictures at the parent and then subfolder called calibration
+        
 
+
+        #ros parameter to get a path string to save pictures
+        self.calibration_relative_path = ParameterDescriptor()
+        self.calibration_relative_path.name = 'save_folder_path'
+        self.calibration_relative_path.description = 'Path to folder where pictures will be saved'
+        self.calibration_relative_path.additional_constraints = 'save_folder_path'
+        self.declare_parameter('calibration_relative_path', 'calib_imgs')
+        self.calibration_folder_path += '/' + self.get_parameter('calibration_relative_path').get_parameter_value().string_value
+        try:
+            os.chdir(self.calibration_folder_path)
+            #chdir to one parent directory above the current one
+        except:
+            os.chdir(os.path.dirname(self.calibration_folder_path))
+            os.mkdir(self.calibration_folder_path)
+            os.chdir(self.calibration_folder_path)
+
+        self.declare_parameter('use_console_input', 
+            False,
+            ParameterDescriptor(description='use console input if set to true (without console output) ' \
+                'instead of inputs from ros topics (calibration_take_picture and generate_aruco file)'))
+
+        self.use_console_input = self.get_parameter('use_console_input').get_parameter_value().bool_value
+        #ros parameter description for use_console_input
+        #pamarater description synthax
+        #https://docs.ros.org/api/rclpy/html/rclpy.html#rclpy.Parameter.get_parameter_value
         self.info_sub = self.create_subscription(CameraInfo,
             'camera_info', #'/camera/camera_info',
             self.info_callback,
@@ -49,6 +80,10 @@ class Calibrator(node.Node):
 
     def info_callback(self, infos):
         #TODO : get camera height and width and other needed settings
+        self.info_msg = True
+        #save cv2 image to png in a folder
+
+        
         pass
 
     def image_callback(self, img_msg):
@@ -56,13 +91,14 @@ class Calibrator(node.Node):
             self.get_logger().info('No camera info received yet')
             return
 
+        #convert image to cv2 and save it in a directory with the image nanosecond timestamp
         cv_image = self.bridge.imgmsg_to_cv2(img_msg,
             desired_encoding='mono8')
         if self.picture_to_take >= 1:
             self.picture_to_take -= 1
-            cv_image.save() #TODO : save correctly to path
+            cv2.imwrite(str(self.get_clock().now().nanoseconds) + '.png', cv_image)
 
-
+        #downscale image and publish it (for debug through wifi from raspberry pi)
         resize_height = 240
         resize_width = int(resize_height * 16/9)
         resized = cv2.resize(cv_image, (resize_width, resize_height), interpolation = cv2.INTER_AREA)
@@ -89,8 +125,11 @@ class Calibrator(node.Node):
         objp[0,:,:2] = np.mgrid[0:CHECKERBOARD[0], 0:CHECKERBOARD[1]].T.reshape(-1, 2)
         #TODO : find images from path
 
-        for fname in images:
-            img = cv2.imread(fname)
+        for filename in os.listdir(self.calibration_folder_path):
+            img = cv2.imread(os.path.join(self.calibration_folder_path + filename))
+            if img == None:
+                self.get_logger().error(f'Could not read image {filename}')
+                continue
             img_shape = img.shape[:2]
             # Find the chess board corners
             ret, corners = cv2.findChessboardCorners(gray, CHECKERBOARD, cv2.CALIB_CB_ADAPTIVE_THRESH+cv2.CALIB_CB_FAST_CHECK+cv2.CALIB_CB_NORMALIZE_IMAGE)
@@ -127,8 +166,7 @@ class Calibrator(node.Node):
 def main():
     rclpy.init()
     node = Calibrator()
-    mode = input("Press '1' to use input from console (without console Output), or '2' to use input from ROS topic (with console output)")
-    if mode == '1':
+    if node.use_console_input:
         while True:
             stdscr = curses.initscr()
             #curses.noecho() # Don't echo key presses
@@ -146,7 +184,7 @@ def main():
 
             finally:
                 curses.endwin()
-    elif mode == '2':
+    else:
         rclpy.spin(node)
             
     node.destroy_node()
