@@ -27,7 +27,8 @@ class Aruco():
         self.expected_mvt = expected_mvt
 
 class ArucosSetting():
-    def __init__(self, arucos: list) -> None:
+    def __init__(self, dataset:int, arucos: list) -> None:
+        self.dataset = dataset
         self.arucos = arucos
         pass
 
@@ -69,7 +70,9 @@ class ArucosSetting():
         corners_by_size = {}
         for i, id in enumerate(ids):
             aruco = self.get_aruco_by_id(id[0])
-            if aruco.expected_mvt in mvt:
+            if aruco == None:
+                logger.error(f'aruco {id[0]} detected on the camera but not present in the settings.py dataset used ({ self.dataset })')
+            elif aruco.expected_mvt in mvt:
                 corners_by_size[aruco.size] = [[corners[i]],[id[0]]]
 
         return corners_by_size
@@ -84,10 +87,12 @@ def generate_aruco_subset(id_begin, id_end, size=0.07, expected_mvt = Movement.M
 #subset 1
 robot_subset_1 = [
     Aruco(42, 0.10, [1.50, 1.0, 0.0], [0.0, 0.0, pi]), #180° rotation of 42 compared to camera (or origin)
+    Aruco(36, 0.07)  
 
 ]
-robot_subset_1.append(generate_aruco_subset(3,6)) #equipe bleue ou qq chose comme ça
-aruco1 = ArucosSetting(robot_subset_1)
+#TODO : test unitaire pour vérifier la validité du subset
+robot_subset_1.extend(generate_aruco_subset(3,6, 0.07, Movement.MOVING)) #equipe bleue ou qq chose comme ça
+aruco1 = ArucosSetting(1, robot_subset_1)
 
 
 #Function to call to get arucos markers subsets using ros_args in detect_aruco for instance

@@ -1,24 +1,18 @@
 from typing import List
 from functools import cached_property
 import cProfile
-
-try:
-    import aruco_analysis_enac.aruco_calculations as calc
-    print(calc)
-except:
-    import aruco_calculations as calc
-    print(calc)
+import aruco_analysis_enac.settings as settings
 
 class ArucosStorage:
     #manage storage & generation of a ObjectMarked message, for arucos
-    def __init__(self,  ref_arucos: calc.Aruco, frame_id="map"):
+    def __init__(self,  ref_arucos: settings.Aruco, frame_id="map"):
         """From pose estimation on a reference frame, store and correlate arucos between frames.
 
         It works only with unique aruco_id for the ones that are fixed to the reference frame.
         It works with non-unique aruco_id for the ones moving in the reference frame.
 
         Args:
-            ref_arucos (calc.Aruco): must be unique id
+            ref_arucos (settings.Aruco): must be unique id
             frame_id (str, optional): The frame of the table/ground used (for tf.transforms). Defaults to "map".
         """
 
@@ -35,7 +29,7 @@ class ArucosStorage:
         return ids
 
     """TODO : BELOW CODE IS NOT DONE """
-    def aruco_pose_update(self, aruco_id: int, position : calc.Pose):
+    def aruco_pose_update(self, aruco_id: int, position): #TODO : add position signature
         if not self._correlate(aruco_id, position):
             probablearuco = self._retrieve_live_object(aruco_id, position)
             if not probablearuco:

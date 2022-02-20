@@ -12,8 +12,6 @@ CAlculer
 générer le yaml standardisé
 """
 import curses
-from time import sleep
-from click import pass_context
 import numpy as np
 import cv2
 import glob
