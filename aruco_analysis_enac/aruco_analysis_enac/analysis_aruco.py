@@ -1,18 +1,3 @@
-#TODO : to remove
-
-import math
-import numpy as np
-"""
-import matplotlib.pyplot as plt
-import numpy as np
-from pytransform3d import rotations as pr
-from pytransform3d import transformations as pt
-from pytransform3d.transform_manager import TransformManager
-from scipy.spatial.transform import Rotation
-#pip install pytransform3d[all,doc,test] 
-#( --ignore-installed)
-"""
-
 import rclpy
 from rclpy.node import Node
 from rclpy.qos import qos_profile_sensor_data
@@ -81,35 +66,7 @@ class ArucoAnalysis(Node):
                 pose = calc.Pose.from_tvec_rvec(aruco_poses.tvecs[i], aruco_poses.rvecs[i])
                 MIDDLE = calc.Pose(1.50, 1.0, 0.0, (0,0,0)).transform_offset() #TODO : take from aruco storage
                 cameraPoseEnac = calc.get_camera_position( pose) #TODO : faire une fusion de données, là on se contente de prendre le dernier
-                """
-                tm = TransformManager()
-                camera2aruco =  np.eye(4)
-                rvec_np = np.array([aruco_poses.rvecs[i].x,aruco_poses.rvecs[i].y, aruco_poses.rvecs[i].z])
-                tvec_np = np.array([aruco_poses.tvecs[i].x,aruco_poses.tvecs[i].y, aruco_poses.tvecs[i].z])
-                print("tvec_np")
-                print(tvec_np)
-                R = Rotation.from_rotvec(rvec_np).as_matrix()
-                camera2aruco[0:3, 0:3] = R
-                camera2aruco[:3,3] = tvec_np
-                print(pr.q_id)
 
-                r = Rotation.from_rotvec(rvec_np).as_quat()
-                print(r)
-                camera2arucoQT = pt.transform_from_pq(
-                    np.hstack((tvec_np, r)))
-                tm.add_transform('camera', 'aruco_bis', camera2aruco)
-                tm.add_transform("camera",'aruco', cameraPoseEnac)
-                tm.add_transform('camera', 'aruco_quat', camera2arucoQT)
-                print(tm.get_transform("camera", "aruco"))
-                print("------------")
-                print(tm.get_transform("aruco", "camera"))
-
-                ax = tm.plot_frames_in("camera", s=0.2)
-                ax.tick_params(axis='x', colors='red')
-                ax.tick_params(axis='y', colors='green')
-                ax.tick_params(axis='z', colors='blue')
-                plt.show()
-                """
                 calc.publish_pos_from_reference(self.tf_publisher, now, MIDDLE, 'origin', 'aruco')
                 calc.publish_pos_from_reference(self.tf_publisher, now, cameraPoseEnac, 'aruco', 'camera')
 

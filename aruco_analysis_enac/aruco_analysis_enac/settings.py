@@ -41,6 +41,13 @@ class ArucosSetting():
                 return aruco
         return None
 
+    def change_mvt_status(self, id:int, mvt:Movement):
+        """
+        Change the movement status of the aruco with the id given in argument
+        Possible usage : for rock when they are moving
+        """
+        self.get_aruco_by_id(id).expected_mvt = mvt
+
     def regroup_corners_by_size(self, corners, ids, logger=None, mvt = Movement.ALL) -> dict:
         """
         Regroup the corners by size for each aruco in order to estimate the pose of the aruco.
