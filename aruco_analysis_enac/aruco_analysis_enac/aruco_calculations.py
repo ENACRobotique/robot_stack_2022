@@ -43,11 +43,13 @@ class Pose:
         R_flip_x[1,1] =-1.0
         R_flip_x[2,2] =-1.0
 
+        #flip 180° around y axis
         R_flip_y  = np.zeros((3,3), dtype=np.float32)
         R_flip_y[0,0] =-1.0
         R_flip_y[1,1] =1.0
         R_flip_y[2,2] =-1.0
 
+        #flip 180° around z axis
         R_flip_z  = np.zeros((3,3), dtype=np.float32)
         R_flip_z[0,0] =-1.0
         R_flip_z[1,1] =-1.0
