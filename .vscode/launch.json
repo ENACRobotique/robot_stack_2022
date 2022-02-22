@@ -1,7 +1,26 @@
 {
-    "name": "Python: Current File",
-    "type": "python",
-    "request": "launch",
-    "program": "${file}",
-    "console": "integratedTerminal"
+    "version": "0.2.1",
+    "configurations": [
+        
+        {
+            "name": "ROS Attach",
+            "type": "ros",
+            "request": "attach",
+        },
+        {
+            "name": "Python: Current File",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+        },
+        {
+        "name": "ROS: Attach to Python",
+        "type": "ros",
+        "request": "attach",
+        "runtime": "Python",
+        },
+    ],
+    "compounds": []
 }

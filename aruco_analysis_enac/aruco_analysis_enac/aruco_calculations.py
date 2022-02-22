@@ -27,15 +27,6 @@ class Pose:
     def from_tvec_rvec(cls, tvec, rvec):
         return cls(tvec.x, tvec.y, tvec.z, np.float32([rvec.x, rvec.y, rvec.z]))
 
-    
-        T = (self.x, self.y, self.z)
-        R = tft.identity_matrix()
-        rot_mat = Rodrigues(self.rvec)[0]
-        R[0:3, 0:3] = rot_mat.T
-        t = Transform.from_rot_mat_pos_vec(R, T)
-        return t
-    
-
     def transform_offset(self, xAxisFlip=False, yAxisFlip=False, zAxisFlip=False, inverseRoll=False, inversePitch=False, inverseYaw=False):
         """
         rot_3 = (Rodrigues(self.rvec)[0]).T
@@ -52,11 +43,13 @@ class Pose:
         R_flip_x[1,1] =-1.0
         R_flip_x[2,2] =-1.0
 
+        #flip 180° around y axis
         R_flip_y  = np.zeros((3,3), dtype=np.float32)
         R_flip_y[0,0] =-1.0
         R_flip_y[1,1] =1.0
         R_flip_y[2,2] =-1.0
 
+        #flip 180° around z axis
         R_flip_z  = np.zeros((3,3), dtype=np.float32)
         R_flip_z[0,0] =-1.0
         R_flip_z[1,1] =-1.0

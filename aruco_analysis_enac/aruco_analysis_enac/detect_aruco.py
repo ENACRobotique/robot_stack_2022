@@ -46,6 +46,7 @@ class ArucoNode(node.Node):
         #self.detectorService = self.create_service(customArucoDetector, 'custom_aruco_detector', self.custom_detector_cb)
 
     def info_callback(self, info_msg):
+        """ """
         self.info_msg = info_msg
         self.intrinsic_mat = np.reshape(np.array(self.info_msg.k), (3, 3))
         self.distortion = np.array(self.info_msg.d)
@@ -76,7 +77,7 @@ class ArucoNode(node.Node):
                     corners_by_size[size][0], size, self.intrinsic_mat, self.distortion)
                 rvecs.append(rvecs_cur_size)
                 tvecs.append(tvecs_cur_size)
-                ids.append(corners_by_size[size][1])
+                ids.append(corners_by_size[size][1][0])
                 self.get_logger().debug(f"pose estimation for arucos : \n rvecs : {rvecs} \n tvecs : {tvecs}")
 
             #print("3"+ str(self.get_clock().now() - timeTaken))
@@ -93,13 +94,13 @@ class ArucoNode(node.Node):
         """ Publish markers pose in a FiducialsPoses message """
         pose_msg = FidPoses()
         pose_msg.header = header
-        pose_msg.marker_ids = ids
+        pose_msg.marker_ids = [int(id) for id in ids]
         pose_msg.rvecs = []
         pose_msg.tvecs = []
-        for rvec in rvecs.tolist():
-            pose_msg.rvecs.append(Vector3(x=rvec[0][0], y=rvec[0][1], z=rvec[0][2]))
-        for tvec in tvecs.tolist():
-            pose_msg.tvecs.append(Vector3(x=tvec[0][0], y=tvec[0][1], z=tvec[0][2]))
+        for rvec in rvecs:
+            pose_msg.rvecs.append(Vector3(x=rvec[0][0][0], y=rvec[0][0][1], z=rvec[0][0][2]))
+        for tvec in tvecs:
+            pose_msg.tvecs.append(Vector3(x=tvec[0][0][0], y=tvec[0][0][1], z=tvec[0][0][2]))
         self.get_logger().info(f"{header.stamp}")
         self.markers_pose_pub.publish(pose_msg)
     def publish_img(self, header, cv2_img, corners, ids, rvecs, tvecs, resize_height=144)->None:
@@ -122,3 +123,6 @@ def main():
 
     node.destroy_node()
     rclpy.shutdown()
+
+if __name__ == "__main__":
+    main()
