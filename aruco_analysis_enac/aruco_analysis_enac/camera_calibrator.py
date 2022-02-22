@@ -31,7 +31,7 @@ class Calibrator(node.Node):
         super().__init__('camera_calibrator')
         self.bridge = CvBridge()
         self.picture_to_take = 0
-        self.criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
+        self.criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.0001)
         self.info_msg = None
         print(__file__)
         self.calibration_folder_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + '/calibration'
@@ -45,7 +45,7 @@ class Calibrator(node.Node):
         self.calibration_relative_path.description = 'Path to folder where pictures will be saved'
         self.calibration_relative_path.additional_constraints = 'save_folder_path'
         self.declare_parameter('calibration_relative_path', 'calib_imgs')
-        self.calibration_folder_path += '/' + self.get_parameter('calibration_relative_path').get_parameter_value().string_value
+        self.calibration_folder_path = self.get_parameter('calibration_relative_path').get_parameter_value().string_value
         try:
             os.chdir(self.calibration_folder_path)
             #chdir to one parent directory above the current one
@@ -99,6 +99,8 @@ class Calibrator(node.Node):
             cv2.imwrite(str(self.get_clock().now().nanoseconds) + '.png', cv_image)
 
         #downscale image and publish it (for debug through wifi from raspberry pi)
+        ret = 1
+        cv2.drawChessboardCorners(cv_image, (9, 7), None, ret)
         resize_height = 240
         resize_width = int(resize_height * 16/9)
         resized = cv2.resize(cv_image, (resize_width, resize_height), interpolation = cv2.INTER_AREA)
@@ -111,8 +113,38 @@ class Calibrator(node.Node):
         if bool_msg.data == True:
             self.picture_to_take += 1
 
-    
-    def generate_calibration_file(self):
+    def generate_calibration_file(self, bool_generate_msg):
+        height = 9
+        width = 7
+        objp = np.zeros((height*width,3), np.float32)
+        objp[:,:2] = np.mgrid[0:width,0:height].T.reshape(-1,2)
+        # Arrays to store object points and image points from all the images.
+        objpoints = [] # 3d point in real world space
+        imgpoints = [] # 2d points in image plane.
+
+        frameSize = None
+        images = glob.glob(self.calibration_folder_path + '/*.png')
+        for fname in images:
+            img = cv2.imread(fname)
+            gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+            # Find the chess board corners
+            ret, corners = cv2.findChessboardCorners(gray, (width,height), None)
+            # If found, add object points, image points (after refining them)
+            if ret == True:
+                objpoints.append(objp)
+                corners2 = cv2.cornerSubPix(gray,corners, (11,11), (-1,-1), self.criteria)
+                imgpoints.append(corners2)
+                # Draw and display the corners
+                #cv2.drawChessboardCorners(img, (7,9, corners2, ret)
+                #cv.imshow('img', img)
+            frameSize = gray.shape[::-1]
+        ret, matrix_camera, dist, rvecs, tvecs = cv2.calibrateCamera(objpoints, imgpoints, frameSize, None, None)
+        print(ret)
+        print(matrix_camera)
+        print("--dist--")
+        print(dist)
+
+    def generate_calibration_file_2(self):
         #https://medium.com/@kennethjiang/calibrate-fisheye-lens-using-opencv-333b05afa0b0
         #https://stackoverflow.com/questions/50857278/raspicam-fisheye-calibration-with-opencv
         CHECKERBOARD = (7,7)

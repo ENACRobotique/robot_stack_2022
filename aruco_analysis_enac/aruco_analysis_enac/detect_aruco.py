@@ -46,6 +46,7 @@ class ArucoNode(node.Node):
         #self.detectorService = self.create_service(customArucoDetector, 'custom_aruco_detector', self.custom_detector_cb)
 
     def info_callback(self, info_msg):
+        """ """
         self.info_msg = info_msg
         self.intrinsic_mat = np.reshape(np.array(self.info_msg.k), (3, 3))
         self.distortion = np.array(self.info_msg.d)

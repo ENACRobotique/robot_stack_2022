@@ -21,6 +21,14 @@ class ArucosStorage:
         if len([aruco.id for aruco in self.ref_arucos]) != len(set([aruco.id for aruco in self.ref_arucos])):
             raise AttributeError("ArucosStorage Error - the same aruco_id has been assigned multiple times on __init__")
 
+    @classmethod
+    def from_subset(cls, subset: int):
+        """
+        Generate an ArucosStorage instance from a subset of arucos.
+        """
+        
+        return cls(settings.get_markers(subset).arucos)
+
     @cached_property 
     def reference_ids(self) -> List[int]: #this is only settable on init of ArucosStorage
         ids = []
