@@ -2,9 +2,18 @@
 https://chev.me/arucogen/
 
 ## calibrer la caméra
-    ros2 run camera_calibration cameracalibrator -s 7x9 -q 0.2 --no-service-check image:=/camera/image camera:=/camera
+lancer la caméra :
+ros2 run v4l2_camera_driver v4l2_camera_node --ros-args -p 'image_size':[1920,1080]
 
- ?? --no-service-checker
+Lancer l'outil de calibration :
+ros2 run aruco_analysis_enac camera_calibrator --ros-args -p use_console_input:=false -p calibration_relative_path:=*PATH*
+
+Sur une IHM (Foxglove studio):
+Publier sur les topics Take picture/generate calibration file
+
+TODO : publier avec les marqueurs l'image downscaled
+TODO : renommer calibration_relative to absolute_path
+
 
  ## utilisation normale
 
