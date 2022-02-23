@@ -82,8 +82,7 @@ class Pose:
 
     
     def __str__(self):
-        return f"Pos : {self.x:.2f} {self.y:.2f} {self.z:.2f} \
-            Rotation : {self.roll} {self.pitch} {self.yaw} \n"
+        return f"Pos : {self.x:.2f} {self.y:.2f} {self.z:.2f} \n"
 
 def quaternion_from_euler(roll, pitch, yaw):
 

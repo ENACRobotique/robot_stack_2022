@@ -34,7 +34,7 @@ class ArucoAnalysis(Node):
             FidPoses,
             '/aruco_poses',
             self.__handle_arucos,
-            qos_profile_sensor_data
+            10
         )
 
         self.tf_publisher = TransformBroadcaster(self)
@@ -75,7 +75,7 @@ class ArucoAnalysis(Node):
                 calc.publish_pos_from_reference(self.tf_publisher, now, cur_cam_pose,
                     calc.str_ref_aruco(id), calc.str_camera(id)
                 )
-
+                self.get_logger().info(f"camera see {id} at {pose}")
                 self.get_logger().info(
                     f"according to reference {id}, camera is at {cur_cam_pose.position}"
                 )
