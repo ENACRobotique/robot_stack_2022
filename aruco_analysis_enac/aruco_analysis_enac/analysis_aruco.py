@@ -1,3 +1,4 @@
+from turtle import position
 import rclpy
 from rclpy.node import Node
 from rclpy.qos import qos_profile_sensor_data
@@ -27,7 +28,7 @@ class ArucoAnalysis(Node):
         self.declare_parameter('subset', 1)
         self.subset = self.get_parameter('subset').get_parameter_value().integer_value
 
-        self.arucosStorage = ArucosStorage.get_subset(self.subset)
+        self.arucosStorage = ArucosStorage.from_subset(self.subset)
 
         self.aruco_poses = self.create_subscription(
             FidPoses,
@@ -59,28 +60,33 @@ class ArucoAnalysis(Node):
 
         now = aruco_poses.header.stamp
         aurcosIdsIndex = [] #not reference
-        cameraPoseEnac = [] #store multiple camera pose estimated from all the reference aruco
+        cam_poses = {} #store multiple camera pose estimated from all the reference aruco
         for i, id in enumerate(aruco_poses.marker_ids):
             if id in self.arucosStorage.reference_ids:
                 pose = calc.Pose.from_tvec_rvec(aruco_poses.tvecs[i], aruco_poses.rvecs[i])
-                MIDDLE = calc.Pose(1.50, 1.0, 0.0, (0,0,0)).transform_offset() #TODO : take from aruco storage
-                position = calc.get_camera_position( pose)
-                cameraPoseEnac.append(position)
+                
+                cur_cam_pose = calc.get_camera_position( pose)
+                cam_poses[id] = cur_cam_pose
+                #TODO : take from aruco storage add middle
+                position_wrt_origin = self.arucosStorage.get_ref_aruco(id)
+                origin = calc.Transform.from_position_euler(*position_wrt_origin.position, *position_wrt_origin.rotation) #unpack position with x,y,z and rotation with  (euler) x,y,z
+                calc.publish_pos_from_reference(self.tf_publisher, now, origin, "origin", calc.str_ref_aruco(id))
 
-                calc.publish_pos_from_reference(self.tf_publisher, now, MIDDLE, 'origin', 'aruco')
-                calc.publish_pos_from_reference(self.tf_publisher, now, position, 'aruco', 'camera')
+                calc.publish_pos_from_reference(self.tf_publisher, now, cur_cam_pose,
+                    calc.str_ref_aruco(id), calc.str_camera(id)
+                )
 
                 self.get_logger().info(
-                    f"according to reference {id}, camera is at {position.position}"
+                    f"according to reference {id}, camera is at {cur_cam_pose.position}"
                 )
             else:
                 aurcosIdsIndex.append(i)
 
-        if cameraPoseEnac == []:
+        if cam_poses == []:
             self.get_logger().info("missing reference aruco, can't estimate pose ! ")
             self.__send_diagnostics(DiagnosticStatus.ERROR, "missing reference aruco")
             return 
-        for i, camera_pose in enumerate(cameraPoseEnac):
+        for cam_ref_id, camera_pose in cam_poses.items():
             for i in aurcosIdsIndex:
                 marker_id = aruco_poses.marker_ids[i]
                 pose = calc.Pose.from_tvec_rvec(aruco_poses.tvecs[i], aruco_poses.rvecs[i])
@@ -88,8 +94,13 @@ class ArucoAnalysis(Node):
                 self.get_logger().info(
                     f"{marker_id} is located on table at {table_pose} according to reference at {camera_pose.position}"
                 )
-                calc.publish_pos_from_reference(self.tf_publisher, now, pose.transform_offset(), 'camera', str(marker_id)+"_camera_"+str(i))
-                calc.publish_pos_from_reference(self.tf_publisher, now, table_pose, 'aruco', str(marker_id)+"_table_"+str(i))
+                calc.publish_pos_from_reference(self.tf_publisher, now, pose.transform_offset(), 
+                    calc.str_camera(cam_ref_id),
+                    calc.str_camera_aruco(cam_ref_id, marker_id)
+                )
+                calc.publish_pos_from_reference(self.tf_publisher, now, table_pose, 
+                calc.str_ref_aruco(cam_ref_id), calc.str_ref_aruco_to_aruco(cam_ref_id, marker_id) 
+                )
 
                 #calc.publish_pos_from_reference(self.tf_publisher, now, table_pose, 'aruco', str(marker_id)+"_table")
 

@@ -154,6 +154,18 @@ def table_pos_from_camera(arucoPosition: Pose, cameraPosition: Transform)-> Tran
     transf = Transform.from_matrix(matrix)
     return transf
 
+def str_camera(aruco_id):
+    return f"camera_{aruco_id}"
+
+def str_ref_aruco(aruco_id):
+    return f"ref_aruco_{aruco_id}"
+
+def str_camera_aruco(ref_id, aruco_id):
+    return f"camera_{ref_id}_aruco_{aruco_id}"
+
+def str_ref_aruco_to_aruco(ref_id, aruco_id):
+    return f"table_{ref_id}_aruco_{aruco_id}"
+
 if __name__ == "__main__":
     print(rotation(math.pi,0,0,[0,1,0]))
 """

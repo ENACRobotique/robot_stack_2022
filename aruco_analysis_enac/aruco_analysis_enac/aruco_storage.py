@@ -1,11 +1,11 @@
 from typing import List
-from functools import cached_property
+from functools import cached_property, lru_cache
 import cProfile
 import aruco_analysis_enac.settings as settings
 
 class ArucosStorage:
     #manage storage & generation of a ObjectMarked message, for arucos
-    def __init__(self,  ref_arucos: settings.Aruco, frame_id="map"):
+    def __init__(self,  arucos: settings.Aruco, frame_id="map"):
         """From pose estimation on a reference frame, store and correlate arucos between frames.
 
         It works only with unique aruco_id for the ones that are fixed to the reference frame.
@@ -17,7 +17,7 @@ class ArucosStorage:
         """
 
         self.frame_id = frame_id
-        self.ref_arucos = ref_arucos
+        self.ref_arucos = arucos
         if len([aruco.id for aruco in self.ref_arucos]) != len(set([aruco.id for aruco in self.ref_arucos])):
             raise AttributeError("ArucosStorage Error - the same aruco_id has been assigned multiple times on __init__")
 
@@ -26,15 +26,22 @@ class ArucosStorage:
         """
         Generate an ArucosStorage instance from a subset of arucos.
         """
-        settings.get_markers(subset)
-        return cls(settings.get_markers(subset))
+        return cls(settings.get_markers(subset).arucos)
 
     @cached_property 
     def reference_ids(self) -> List[int]: #this is only settable on init of ArucosStorage
         ids = []
         for aruco in self.ref_arucos:
-            ids.append(aruco.id)
+            if aruco.expected_mvt == settings.Movement.FIXED:
+                ids.append(aruco.id)
         return ids
+
+    @lru_cache(maxsize=100)
+    def get_ref_aruco(self, id: int) -> settings.Aruco:
+        """ Get the reference aruco. Works only if the reference aruco is unique. """
+        for aruco in self.ref_arucos:
+            if aruco.expected_mvt == settings.Movement.FIXED and aruco.id == id:
+                return aruco
 
     """TODO : BELOW CODE IS NOT DONE """
     def aruco_pose_update(self, aruco_id: int, position): #TODO : add position signature

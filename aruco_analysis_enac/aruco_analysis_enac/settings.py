@@ -62,7 +62,6 @@ class ArucosSetting():
         Returns:
             dict: [description] example : {size: [[corners], [ids]], ... }
         """
-        
         if len(corners) != len(ids):
             logger.error("Error : corners and ids are not the same size")
             return None
