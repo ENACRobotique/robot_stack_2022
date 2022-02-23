@@ -70,14 +70,10 @@ class ArucoNode(node.Node):
             mvt_flag = settings.get_movement_flag(self.frame_counter)
             corners_by_size = self.marker_settings.regroup_corners_by_size(corners, ids, self.get_logger(), mvt_flag)
             ids, rvecs, tvecs = [], [], []
-            print(corners_by_size)
             for size in corners_by_size:
                 #rvecs and tvecs from current treated size
                 rvecs_cur_size, tvecs_cur_size, _ = cv2.aruco.estimatePoseSingleMarkers(
                     corners_by_size[size][0], size, self.intrinsic_mat, self.distortion)
-                print("----ids----")
-                print(ids)
-                print(size)
                 rvecs.append(rvecs_cur_size)
                 tvecs.append(tvecs_cur_size)
                 ids.append(corners_by_size[size][1][0])
