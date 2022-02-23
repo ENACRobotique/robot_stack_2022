@@ -127,13 +127,21 @@ def transform_flip_x(transf: Transform):
         euler[0], euler[1], euler[2]) 
 
 @lru_cache(maxsize=10)
-def get_camera_position(aruco_to_camera : Pose)-> Transform:
+def get_camera_position(origin_to_aruco, aruco_to_camera)-> Transform:
     """ 
     return camera position related to origin of the map (bottom left for eurobot)
     """
-
-    return aruco_to_camera.transform_offset().inverse() #tree.lookup_transform("camera", "aruco")
+    matrix = tft.identity_matrix()
+    tvec = np.array([aruco_to_camera.x, aruco_to_camera.y, aruco_to_camera.z])
+    R_tc, _ = Rodrigues(aruco_to_camera.rvec)
+    R_tc = np.matrix(R_tc).T
+    matrix[0:3,0:3] = R_tc
+    matrix[0:3, 3] =  np.dot(-R_tc, tvec)
+    #T_world_cam = np.dot(origin_to_aruco.matrix, np.linalg.inv(aruco_to_camera.transform_offset().matrix)) #coordinate relative to the origin
+    return Transform.from_matrix(matrix) 
     
+    #return aruco_to_camera.transform_offset().inverse() 
+
     #ref_transform = Transform.from_position_euler(arucoRef.x,arucoRef.y, arucoRef.z, arucoRef.roll, arucoRef.pitch, arucoRef.yaw)
     #print(tft.translation_from_matrix(tft.inverse_matrix(ref_transform.matrix)))
     #invTvec = np.dot(R, np.matrix(-tvec))
@@ -164,19 +172,3 @@ def str_camera_aruco(ref_id, aruco_id):
 
 def str_ref_aruco_to_aruco(ref_id, aruco_id):
     return f"table_{ref_id}_aruco_{aruco_id}"
-
-if __name__ == "__main__":
-    print(rotation(math.pi,0,0,[0,1,0]))
-"""
-tvecs:
-- x: -0.2657684973603784
-  y: 0.28864516818472313
-  z: 0.7879794911990743
-rvecs:
-- x: 2.0277491842572615
-  y: 2.0202839337174843
-  z: 0.6653893427159006
-
-  get_camera_position(Pose(-0.26,0.28,0.78, 2.02, 2.02, 0.665))
-
-  """

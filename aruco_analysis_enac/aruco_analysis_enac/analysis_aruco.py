@@ -64,13 +64,13 @@ class ArucoAnalysis(Node):
         for i, id in enumerate(aruco_poses.marker_ids):
             if id in self.arucosStorage.reference_ids:
                 pose = calc.Pose.from_tvec_rvec(aruco_poses.tvecs[i], aruco_poses.rvecs[i])
-                
-                cur_cam_pose = calc.get_camera_position( pose)
-                cam_poses[id] = cur_cam_pose
+            
                 #TODO : take from aruco storage add middle
-                position_wrt_origin = self.arucosStorage.get_ref_aruco(id)
-                origin = calc.Transform.from_position_euler(*position_wrt_origin.position, *position_wrt_origin.rotation) #unpack position with x,y,z and rotation with  (euler) x,y,z
-                calc.publish_pos_from_reference(self.tf_publisher, now, origin, "origin", calc.str_ref_aruco(id))
+                ref_aruco = self.arucosStorage.get_ref_aruco(id)
+                ref_aruco_transform = calc.Transform.from_position_euler(*ref_aruco.position, *ref_aruco.rotation) #unpack position with x,y,z and rotation with  (euler) x,y,z
+                cur_cam_pose = calc.get_camera_position(ref_aruco_transform, pose)
+                cam_poses[id] = cur_cam_pose
+                calc.publish_pos_from_reference(self.tf_publisher, now, ref_aruco_transform, "origin", calc.str_ref_aruco(id))
 
                 calc.publish_pos_from_reference(self.tf_publisher, now, cur_cam_pose,
                     calc.str_ref_aruco(id), calc.str_camera(id)
@@ -137,3 +137,7 @@ def main():
         pass
 
     rclpy.shutdown()
+
+
+if __name__ == '__main__':
+    main()

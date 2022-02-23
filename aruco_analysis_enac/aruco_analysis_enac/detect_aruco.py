@@ -67,23 +67,23 @@ class ArucoNode(node.Node):
         (corners, ids, rejected) = cv2.aruco.detectMarkers(cv_image, self.dict)
         # pose estimation
         if ids is not None and len(ids) >= 1:
-            mvt_flag = settings.get_movement_flag(self.frame_counter)
+            mvt_flag = settings.get_movement_flag(self.frame_counter) if not self.debug_mode else settings.Movement.ALL
             corners_by_size = self.marker_settings.regroup_corners_by_size(corners, ids, self.get_logger(), mvt_flag)
-            ids, rvecs, tvecs = [], [], []
+            sized_ids, rvecs, tvecs = [], [], []
             for size in corners_by_size:
                 #rvecs and tvecs from current treated size
                 rvecs_cur_size, tvecs_cur_size, _ = cv2.aruco.estimatePoseSingleMarkers(
                     corners_by_size[size][0], size, self.intrinsic_mat, self.distortion)
                 rvecs.append(rvecs_cur_size)
                 tvecs.append(tvecs_cur_size)
-                ids.append(corners_by_size[size][1][0])
+                sized_ids.append(corners_by_size[size][1][0])
                 self.get_logger().debug(f"pose estimation for arucos : \n rvecs : {rvecs} \n tvecs : {tvecs}")
 
             #print("3"+ str(self.get_clock().now() - timeTaken))
 
-            self.publish_markers(img_msg.header, ids, rvecs, tvecs)
-            if self.debug_mode:
-                self.publish_img(img_msg.header, cv_image, corners, ids, rvecs, tvecs, 240)
+            self.publish_markers(img_msg.header, sized_ids, rvecs, tvecs)
+        if self.debug_mode:
+            self.publish_img(img_msg.header, cv_image, corners, ids, rvecs, tvecs, 240)
 
         else:
             self.get_logger().info("ids not detected")
