@@ -17,7 +17,7 @@ FidPoses = _fiducials_poses.FiducialsPoses
 class ArucoNode(node.Node):
     def __init__(self):
         super().__init__('detect_aruco')
-        self.declare_parameter('debug_mode', False)
+        self.declare_parameter('debug_mode', True) #scan all arucos every time and publish a downscaled picture for debug
         settings_description = ParameterDescriptor(description='aruco settings subset from settings.py (by int)')
         self.declare_parameter('aruco_settings', 1, settings_description)
 
@@ -69,19 +69,19 @@ class ArucoNode(node.Node):
         if ids is not None and len(ids) >= 1:
             mvt_flag = settings.get_movement_flag(self.frame_counter) if not self.debug_mode else settings.Movement.ALL
             corners_by_size = self.marker_settings.regroup_corners_by_size(corners, ids, self.get_logger(), mvt_flag)
-            sized_ids, rvecs, tvecs = [], [], []
+            ids_sorted, rvecs, tvecs = [], [], []
             for size in corners_by_size:
                 #rvecs and tvecs from current treated size
                 rvecs_cur_size, tvecs_cur_size, _ = cv2.aruco.estimatePoseSingleMarkers(
                     corners_by_size[size][0], size, self.intrinsic_mat, self.distortion)
                 rvecs.append(rvecs_cur_size)
                 tvecs.append(tvecs_cur_size)
-                sized_ids.append(corners_by_size[size][1][0])
+                ids_sorted.extend(corners_by_size[size][1])
                 self.get_logger().debug(f"pose estimation for arucos : \n rvecs : {rvecs} \n tvecs : {tvecs}")
 
             #print("3"+ str(self.get_clock().now() - timeTaken))
 
-            self.publish_markers(img_msg.header, sized_ids, rvecs, tvecs)
+            self.publish_markers(img_msg.header, ids_sorted, rvecs, tvecs)
         if self.debug_mode:
             self.publish_img(img_msg.header, cv_image, corners, ids, rvecs, tvecs, 240)
 
@@ -107,8 +107,9 @@ class ArucoNode(node.Node):
             Publish image with detected markers downscaled to a given height
         """
         img_with_markers = cv2.aruco.drawDetectedMarkers(cv2_img, corners, np.array(ids))
-        for i, rvec in enumerate(rvecs):
-            cv2.aruco.drawAxis(img_with_markers, self.intrinsic_mat, self.distortion, rvec, tvecs[i], 0.1)
+        for i, sized_rvec in enumerate(rvecs):
+            for y, rvec in enumerate(sized_rvec):
+                cv2.aruco.drawAxis(img_with_markers, self.intrinsic_mat, self.distortion, rvec, tvecs[i][y], 0.1)
         resize_width = int(resize_height * 16/9)
         resized = cv2.resize(img_with_markers, (resize_width, resize_height), interpolation = cv2.INTER_AREA)
         img_ros = self.bridge.cv2_to_imgmsg(resized, encoding="8UC3")

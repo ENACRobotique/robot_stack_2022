@@ -72,7 +72,10 @@ class ArucosSetting():
             if aruco == None:
                 logger.error(f'aruco {id[0]} detected on the camera but not present in the settings.py dataset used ({ self.dataset })')
             elif aruco.expected_mvt in mvt:
-                corners_by_size[aruco.size] = [[corners[i]],[id[0]]]
+                if aruco.size not in corners_by_size:
+                    corners_by_size[aruco.size] = [[], []]
+                corners_by_size[aruco.size][0].extend(corners[i])
+                corners_by_size[aruco.size][1].append(id[0])
 
         return corners_by_size
 
