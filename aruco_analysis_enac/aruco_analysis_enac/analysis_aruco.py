@@ -64,6 +64,7 @@ class ArucoAnalysis(Node):
         for i, id in enumerate(aruco_poses.marker_ids):
             if id in self.arucosStorage.reference_ids:
                 pose = calc.Pose.from_tvec_rvec(aruco_poses.tvecs[i], aruco_poses.rvecs[i])
+
             
                 #TODO : take from aruco storage add middle
                 ref_aruco = self.arucosStorage.get_ref_aruco(id)
@@ -75,7 +76,6 @@ class ArucoAnalysis(Node):
                 calc.publish_pos_from_reference(self.tf_publisher, now, cur_cam_pose,
                     calc.str_ref_aruco(id), calc.str_camera(id)
                 )
-                self.get_logger().info(f"camera see {id} at {pose}")
                 self.get_logger().info(
                     f"according to reference {id}, camera is at {cur_cam_pose.position}"
                 )
@@ -91,9 +91,10 @@ class ArucoAnalysis(Node):
                 marker_id = aruco_poses.marker_ids[i]
                 pose = calc.Pose.from_tvec_rvec(aruco_poses.tvecs[i], aruco_poses.rvecs[i])
                 table_pose = calc.table_pos_from_camera(pose, camera_pose)
-                self.get_logger().info(
-                    f"{marker_id} is located on table at {table_pose} according to reference at {camera_pose.position}"
-                )
+                #self.get_logger().info(
+                #    f"{marker_id} is located on table at {table_pose} according to reference at {camera_pose.position}"
+                #)
+
                 calc.publish_pos_from_reference(self.tf_publisher, now, pose.transform_offset(), 
                     calc.str_camera(cam_ref_id),
                     calc.str_camera_aruco(cam_ref_id, marker_id)
@@ -102,7 +103,17 @@ class ArucoAnalysis(Node):
                 calc.str_ref_aruco(cam_ref_id), calc.str_ref_aruco_to_aruco(cam_ref_id, marker_id) 
                 )
 
-                #calc.publish_pos_from_reference(self.tf_publisher, now, table_pose, 'aruco', str(marker_id)+"_table")
+                origin_to_table_aruco_str = calc.str_ref_aruco_to_aruco(cam_ref_id, marker_id)
+                print(origin_to_table_aruco_str)
+                try:
+                    origin_to_table_aruco_tf = self.tf_buffer.lookup_transform(calc.str_ref_aruco(cam_ref_id), origin_to_table_aruco_str, self.tf_buffer.get_latest_common_time(calc.str_ref_aruco(cam_ref_id), origin_to_table_aruco_str))  #
+                    self.get_logger().info(f"{marker_id} is located on \
+                    {origin_to_table_aruco_tf.transform.translation} according {cam_ref_id}")
+                except:
+                    pass
+
+                    
+
 
     def __send_diagnostics(self, level, msg_txt):
         if not hasattr(self, 'diagnostics'):

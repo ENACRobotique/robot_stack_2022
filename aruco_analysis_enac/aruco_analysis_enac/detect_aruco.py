@@ -74,8 +74,8 @@ class ArucoNode(node.Node):
                 #rvecs and tvecs from current treated size
                 rvecs_cur_size, tvecs_cur_size, _ = cv2.aruco.estimatePoseSingleMarkers(
                     corners_by_size[size][0], size, self.intrinsic_mat, self.distortion)
-                rvecs.append(rvecs_cur_size)
-                tvecs.append(tvecs_cur_size)
+                rvecs.extend(rvecs_cur_size)
+                tvecs.extend(tvecs_cur_size)
                 ids_sorted.extend(corners_by_size[size][1])
                 self.get_logger().debug(f"pose estimation for arucos : \n rvecs : {rvecs} \n tvecs : {tvecs}")
 
@@ -97,9 +97,9 @@ class ArucoNode(node.Node):
         pose_msg.rvecs = []
         pose_msg.tvecs = []
         for rvec in rvecs:
-            pose_msg.rvecs.append(Vector3(x=rvec[0][0][0], y=rvec[0][0][1], z=rvec[0][0][2]))
+            pose_msg.rvecs.append(Vector3(x=rvec[0][0], y=rvec[0][1], z=rvec[0][2]))
         for tvec in tvecs:
-            pose_msg.tvecs.append(Vector3(x=tvec[0][0][0], y=tvec[0][0][1], z=tvec[0][0][2]))
+            pose_msg.tvecs.append(Vector3(x=tvec[0][0], y=tvec[0][1], z=tvec[0][2]))
         self.get_logger().info(f"{header.stamp}")
         self.markers_pose_pub.publish(pose_msg)
     def publish_img(self, header, cv2_img, corners, ids, rvecs, tvecs, resize_height=144)->None:

@@ -88,7 +88,7 @@ def generate_aruco_subset(id_begin, id_end, size=0.07, expected_mvt = Movement.M
 
 #subset 1
 robot_subset_1 = [
-    Aruco(42, 0.10, [1.50, 0.70, 0.0], [0.0, 0.0, 0.0], expected_mvt=Movement.FIXED), #180° rotation of 42 compared to camera (or origin)
+    Aruco(42, 0.10, [1.50, 0.75, 0.0], [0.0, 0.0, 0.0], expected_mvt=Movement.FIXED), #180° rotation of 42 compared to camera (or origin)
     Aruco(36, 0.05, [1.50, 1.0, 0.0], [0.0, 0.0, 0.0], expected_mvt=Movement.ROCK), #Green
     Aruco(13, 0.05, [0.50, 0.50, 0.0], [0.0, 0.0, 0.0], expected_mvt=Movement.ROCK), #Blue
     Aruco(17, 0.05, [0.50, 0.50, 0.0], [0.0, 0.0, 0.0], expected_mvt=Movement.ROCK), #Rock
