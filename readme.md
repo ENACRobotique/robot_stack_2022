@@ -61,6 +61,12 @@ replacer --net=host par
       -p "9090:9090"
 # Developpers
 
+## List of images available :
+
+enac_dependencies:latest -> (ARM64+AMD64) All the dependencies needed by the club to run
+enac_base:latest -> (ARM64+AMD64) The base image to use for the club USAGE
+enac_base:dev -> (ARM64+AMD64) The base image to use for the club DEVELOPMENT (SYMLINK install so source is needed in the volume)
+enac_base:raspy_win (ARM64) -> Future deprecration, just to use when compilling for ARM64 from windows in case of problem
 ## Building
 
 ### target AMD64 and ARM64 (raspy included):

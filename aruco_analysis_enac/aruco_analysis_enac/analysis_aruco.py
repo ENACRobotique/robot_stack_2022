@@ -61,6 +61,7 @@ class ArucoAnalysis(Node):
         now = aruco_poses.header.stamp
         aurcosIdsIndex = [] #not reference
         cam_poses = {} #store multiple camera pose estimated from all the reference aruco
+        ref_aruco_transforms = {} #id: pose wrt origin
         for i, id in enumerate(aruco_poses.marker_ids):
             if id in self.arucosStorage.reference_ids:
                 pose = calc.Pose.from_tvec_rvec(aruco_poses.tvecs[i], aruco_poses.rvecs[i])
@@ -69,8 +70,9 @@ class ArucoAnalysis(Node):
                 #TODO : take from aruco storage add middle
                 ref_aruco = self.arucosStorage.get_ref_aruco(id)
                 ref_aruco_transform = calc.Transform.from_position_euler(*ref_aruco.position, *ref_aruco.rotation) #unpack position with x,y,z and rotation with  (euler) x,y,z
-                cur_cam_pose = calc.get_camera_position(ref_aruco_transform, pose)
+                cur_cam_pose = calc.get_camera_position(pose)
                 cam_poses[id] = cur_cam_pose
+                ref_aruco_transforms[id] = ref_aruco_transform
                 calc.publish_pos_from_reference(self.tf_publisher, now, ref_aruco_transform, "origin", calc.str_ref_aruco(id))
 
                 calc.publish_pos_from_reference(self.tf_publisher, now, cur_cam_pose,
@@ -90,28 +92,19 @@ class ArucoAnalysis(Node):
             for i in aurcosIdsIndex:
                 marker_id = aruco_poses.marker_ids[i]
                 pose = calc.Pose.from_tvec_rvec(aruco_poses.tvecs[i], aruco_poses.rvecs[i])
-                table_pose = calc.table_pos_from_camera(pose, camera_pose)
-                #self.get_logger().info(
-                #    f"{marker_id} is located on table at {table_pose} according to reference at {camera_pose.position}"
-                #)
+                rel_marker_pose = calc.pos_wrt_marker_from_camera(pose, camera_pose)
+                marker_pose_wrt_origin = calc.pose_wrt_origin(ref_aruco_transforms[cam_ref_id], rel_marker_pose)
+                self.get_logger().info(
+                    f"{marker_id} is located on table at {marker_pose_wrt_origin.position} according to reference {cam_ref_id}"
+                )
 
                 calc.publish_pos_from_reference(self.tf_publisher, now, pose.transform_offset(), 
                     calc.str_camera(cam_ref_id),
                     calc.str_camera_aruco(cam_ref_id, marker_id)
                 )
-                calc.publish_pos_from_reference(self.tf_publisher, now, table_pose, 
+                calc.publish_pos_from_reference(self.tf_publisher, now, rel_marker_pose, 
                 calc.str_ref_aruco(cam_ref_id), calc.str_ref_aruco_to_aruco(cam_ref_id, marker_id) 
                 )
-
-                origin_to_table_aruco_str = calc.str_ref_aruco_to_aruco(cam_ref_id, marker_id)
-                print(origin_to_table_aruco_str)
-                try:
-                    origin_to_table_aruco_tf = self.tf_buffer.lookup_transform(calc.str_ref_aruco(cam_ref_id), origin_to_table_aruco_str, self.tf_buffer.get_latest_common_time(calc.str_ref_aruco(cam_ref_id), origin_to_table_aruco_str))  #
-                    self.get_logger().info(f"{marker_id} is located on \
-                    {origin_to_table_aruco_tf.transform.translation} according {cam_ref_id}")
-                except:
-                    pass
-
                     
 
 

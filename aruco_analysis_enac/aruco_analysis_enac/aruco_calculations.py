@@ -127,9 +127,9 @@ def transform_flip_x(transf: Transform):
         euler[0], euler[1], euler[2]) 
 
 @lru_cache(maxsize=10)
-def get_camera_position(origin_to_aruco, aruco_to_camera)-> Transform:
+def get_camera_position(aruco_to_camera)-> Transform:
     """ 
-    return camera position related to origin of the map (bottom left for eurobot)
+    return camera position relative to the marker sent in parameter
     """
     matrix = tft.identity_matrix()
     tvec = np.array([aruco_to_camera.x, aruco_to_camera.y, aruco_to_camera.z])
@@ -150,9 +150,10 @@ def get_camera_position(origin_to_aruco, aruco_to_camera)-> Transform:
     #inverted = np.linalg.inv(transform_matrix)
     
 
-def table_pos_from_camera(arucoPosition: Pose, cameraPosition: Transform)-> Transform:
+def pos_wrt_marker_from_camera(arucoPosition: Pose, cameraPosition: Transform)-> Transform:
     """
-    return aruco position on table from camera position on table, using only one aruco code as reference
+    return aruco position on table with regards to/relative to the reference aruco which was used to calculate the cameraPosition (wrt table)
+    from camera position on table, using only one aruco code as reference
     arucoPosition : relative to camera
     camera Position : relative to table
     """
@@ -160,6 +161,10 @@ def table_pos_from_camera(arucoPosition: Pose, cameraPosition: Transform)-> Tran
     matrix = tft.concatenate_matrices(cameraPosition.matrix, arucoPosition.transform_offset().matrix)
     transf = Transform.from_matrix(matrix)
     return transf
+
+def pose_wrt_origin(ref_aruco_wrt_origin: Transform, cur_aruco_wrt_ref_aruco: Transform) -> Transform:
+    matrix = tft.concatenate_matrices(ref_aruco_wrt_origin.matrix, cur_aruco_wrt_ref_aruco.matrix)
+    return Transform.from_matrix(matrix) 
 
 def str_camera(aruco_id):
     return f"camera_{aruco_id}"
