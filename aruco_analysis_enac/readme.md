@@ -12,4 +12,4 @@ Launch file sur la raspy :
 
 Debuggage à la main detect_aruco : 
 
- ros2 run aruco_analysis_enac detect_aruco
+ ros2 run aruco_analysis_enac detect_aruco --ros-args -p image_size:=[1280,720]
