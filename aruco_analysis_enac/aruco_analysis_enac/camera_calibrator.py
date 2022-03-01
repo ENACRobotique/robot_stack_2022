@@ -65,7 +65,7 @@ class Calibrator(node.Node):
             self.image_callback, qos_profile_sensor_data)
 
         self.downscale_img_pub = self.create_publisher(Image, '/image_calibration', qos_profile_sensor_data)
-
+        
         #TODO : convert to services
         self.create_subscription(Bool, '/calibration_take_picture', self.take_picture, 10)
 
@@ -74,7 +74,7 @@ class Calibrator(node.Node):
     def info_callback(self, infos):
         self.height = infos.height
         self.width =  infos.width
-        self.info_msg = True
+        self.info_msg = infos
         
         pass
 
@@ -91,14 +91,8 @@ class Calibrator(node.Node):
             cv2.imwrite(str(self.get_clock().now().nanoseconds) + '.png', cv_image)
 
         #downscale image and publish it (for debug through wifi from raspberry pi)
-        ret = 1
-        cv2.drawChessboardCorners(cv_image, (9, 7), None, ret)
-        resize_height = 240
-        resize_width = int(resize_height * 16/9)
-        resized = cv2.resize(cv_image, (resize_width, resize_height), interpolation = cv2.INTER_AREA)
-        img_ros = self.bridge.cv2_to_imgmsg(resized, encoding="8UC1")
-        img_ros.header = img_msg.header
-        self.downscale_img_pub.publish(img_ros)
+        self.publish_calibration_picture (cv_image, resize_height=144)
+        self.downscale_img_pub.publish()
 
     def take_picture(self, bool_msg):
         print(bool_msg.data)
@@ -184,8 +178,21 @@ class Calibrator(node.Node):
         #TODO : generate YAML from K and D variables
         pass
 
-    #def publish_calibration_picture(self, cv2img):
-        #rosimg = cv2img.
+    def publish_calibration_picture(self, cv2img, resize_height=144):
+        #draw markers
+        ret = 1
+        cv2.drawChessboardCorners(cv2img, (9, 7), None, ret)
+        rosimg =  self.bridge.imgmsg_to_cv2(cv2img)
+
+        #downscale
+        resize_width = int(resize_height * 16/9)
+        resized = cv2.resize(rosimg, (resize_width, resize_height), interpolation = cv2.INTER_AREA)
+        
+        #reconvert to ros format along camera info
+        img_ros = self.bridge.cv2_to_imgmsg(resized, encoding="8UC3")
+        img_ros.header = self.info_msg
+        self.downscale_img_pub.publish(img_ros)
+    
     
     def write_yaml(self, distorsion_model, matrix_camera, distorsion):
         #TODO : have unique camera name
