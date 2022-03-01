@@ -29,16 +29,14 @@ class Calibrator(node.Node):
         self.width = None
         self.height = None
         self.info_msg = None
-        print(__file__)
-        self.calibration_folder_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + '/calibration'
         #get current file path for calibration pictures at the parent and then subfolder called calibration
         
 
         #ros parameter to get a path string to save pictures
-        self.calibration_relative_path = ParameterDescriptor()
-        self.calibration_relative_path.name = 'save_folder_path'
-        self.calibration_relative_path.description = 'Path to folder where pictures will be saved'
-        self.calibration_relative_path.additional_constraints = 'save_folder_path'
+        self.calibration_folder_path = ParameterDescriptor()
+        self.calibration_folder_path.name = 'save_folder_path'
+        self.calibration_folder_path.description = 'Path to folder where pictures will be saved'
+        self.calibration_folder_path.additional_constraints = 'save_folder_path'
         self.declare_parameter('calib_path', 'calib_imgs')
         self.calibration_folder_path = self.get_parameter('calib_path').get_parameter_value().string_value
         try:
