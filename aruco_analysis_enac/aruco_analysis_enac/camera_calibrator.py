@@ -3,20 +3,14 @@
 #https://docs.opencv.org/3.4/d4/d94/tutorial_camera_calibration.html
 #https://docs.opencv.org/4.x/dc/dbb/tutorial_py_calibration.html
 #https://navigation.ros.org/tutorials/docs/camera_calibration.html
-"""
 
-Fonctionalités nécessaire :
-Prendre un input pour prendre une photo
-Indiquer le "pourcentage de variation"
-CAlculer
-générer le yaml standardisé
-"""
 import curses
 import numpy as np
 import cv2
 import os
 
 import glob
+import yaml
 
 import rclpy
 import rclpy.node as node
@@ -32,20 +26,21 @@ class Calibrator(node.Node):
         self.bridge = CvBridge()
         self.picture_to_take = 0
         self.criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.0001)
+        self.width = None
+        self.height = None
         self.info_msg = None
         print(__file__)
         self.calibration_folder_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + '/calibration'
         #get current file path for calibration pictures at the parent and then subfolder called calibration
         
 
-
         #ros parameter to get a path string to save pictures
         self.calibration_relative_path = ParameterDescriptor()
         self.calibration_relative_path.name = 'save_folder_path'
         self.calibration_relative_path.description = 'Path to folder where pictures will be saved'
         self.calibration_relative_path.additional_constraints = 'save_folder_path'
-        self.declare_parameter('calibration_relative_path', 'calib_imgs')
-        self.calibration_folder_path = self.get_parameter('calibration_relative_path').get_parameter_value().string_value
+        self.declare_parameter('calib_path', 'calib_imgs')
+        self.calibration_folder_path = self.get_parameter('calib_path').get_parameter_value().string_value
         try:
             os.chdir(self.calibration_folder_path)
             #chdir to one parent directory above the current one
@@ -79,10 +74,9 @@ class Calibrator(node.Node):
         self.create_subscription(Bool, '/generate_calibration_file', self.generate_calibration_file, 10)
 
     def info_callback(self, infos):
-        #TODO : get camera height and width and other needed settings
+        self.height = infos.height
+        self.width =  infos.width
         self.info_msg = True
-        #save cv2 image to png in a folder
-
         
         pass
 
@@ -139,9 +133,10 @@ class Calibrator(node.Node):
                 #cv.imshow('img', img)
             frameSize = gray.shape[::-1]
         ret, matrix_camera, dist, rvecs, tvecs = cv2.calibrateCamera(objpoints, imgpoints, frameSize, None, None)
+        print("-- RMS for this calibration batch --")
         print(ret)
+
         print(matrix_camera)
-        print("--dist--")
         print(dist)
 
     def generate_calibration_file_2(self):
@@ -194,6 +189,26 @@ class Calibrator(node.Node):
     #def publish_calibration_picture(self, cv2img):
         #rosimg = cv2img.
     
+    def write_yaml(self, distorsion_model, matrix_camera, distorsion):
+        #TODO : have unique camera name
+        #TODO : check if proejction matrix is needed
+        yaml_matrix_camera = None
+        yaml_distotion_coeff = None
+        yaml_rectification_matrix = [1, 0, 0, 0, 1, 0, 0, 0, 1]
+        yaml_projection_matrix = None
+        [1, 0, 0, 0, 1, 0, 0, 0, 1]
+        dict_file = {}
+        dict_file['image_width'] = self.width
+        dict_file['image_height'] = self.height
+        dict_file['camera_name'] = 'camera_enac'
+        dict_file['camera_matrix'] = {'rows': 3, 'cols': 3, 'data':yaml_matrix_camera} #TODO : unpack matrix_camera
+        dict_file['distorsion_model'] = distorsion_model
+        dict_file['distortion_coefficients'] = {'rows': 1, 'cols': 5, 'data':yaml_distotion_coeff}
+        dict_file['rectification_matrix'] = {'rows': 3, 'cols': 3, 'data':yaml_rectification_matrix}
+        dict_file['projection_matrix']  = {'rows': 3, 'cols': 4, 'data':yaml_projection_matrix}
+        dict_file
+        with open(f'{self.calibration_folder_path}/calib_file.yaml', 'w') as f:
+            yaml.dump(dict_file, f)
 
 def main():
     rclpy.init()
