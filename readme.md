@@ -88,6 +88,12 @@ Then compile :
 sudo docker buildx build --platform linux/amd64,linux/arm64 . -f enac_dependencies.Dockerfile -t enacrobotique/enac-ros --push
 
 sudo docker buildx build --platform linux/amd64,linux/arm64 . -f enac_base.Dockerfile -t enacrobotique/enac-base --push
+
+Pour la version **prod** 
+    --build-arg DEV="False"
+
+Pour la version **dev**
+    --build-arg DEV="True"
 ```
 ### AMD64 only:
 ```
