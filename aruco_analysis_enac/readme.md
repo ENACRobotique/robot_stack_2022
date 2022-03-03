@@ -6,6 +6,8 @@ https://chev.me/arucogen/
 
  ?? --no-service-checker
 
+ros2 run aruco_analysis_enac camera_calibrator --ros-args -p calib_path:='/enac_ws/src/aruco_analysis_enac/calibration/Calib_fisheye_480'
+
  ## utilisation normale
 
 Launch file sur la raspy :
