@@ -91,8 +91,7 @@ class Calibrator(node.Node):
             cv2.imwrite(str(self.get_clock().now().nanoseconds) + '.png', cv_image)
 
         #downscale image and publish it (for debug through wifi from raspberry pi)
-        self.publish_calibration_picture (cv_image, resize_height=144)
-        self.downscale_img_pub.publish()
+        self.publish_calibration_picture (img_msg.header, cv_image, resize_height=144)
 
     def take_picture(self, bool_msg):
         print(bool_msg.data)
@@ -184,19 +183,19 @@ class Calibrator(node.Node):
         #TODO : generate YAML from K and D variables
         pass
 
-    def publish_calibration_picture(self, cv2img, resize_height=144):
+    def publish_calibration_picture(self, header, cv2img, resize_height=144):
         #draw markers
         ret = 1
         cv2.drawChessboardCorners(cv2img, (9, 7), None, ret)
-        rosimg =  self.bridge.imgmsg_to_cv2(cv2img)
 
         #downscale
         resize_width = int(resize_height * 16/9)
-        resized = cv2.resize(rosimg, (resize_width, resize_height), interpolation = cv2.INTER_AREA)
+        resized = cv2.resize(cv2img, (resize_width, resize_height), interpolation = cv2.INTER_AREA)
         
         #reconvert to ros format along camera info
-        img_ros = self.bridge.cv2_to_imgmsg(resized, encoding="8UC3")
-        img_ros.header = self.info_msg
+        img_ros = self.bridge.cv2_to_imgmsg(resized, encoding="8UC1")
+        img_ros.header = header
+        print("publishing")
         self.downscale_img_pub.publish(img_ros)
     
     
