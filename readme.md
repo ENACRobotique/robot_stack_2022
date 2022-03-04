@@ -9,7 +9,8 @@ For the rest :
 ```
 docker run -it --net=host -e DISPLAY --volume /home/robot/ros_aruco/src/robot_stack_2022:/enac_ws/src --volume /home/robot/bag_files:/enac_ws/bag enacrobotique/enac-base bash
 ```
-
+PI 4 with camera :
+docker run -it --net=host --pid=host -e DISPLAY --device=/dev/video0 enacrobotique/enac-base bash:prod
 ## Useful commands
 
 #### Connection with rosbridge (for foxglove,...)
