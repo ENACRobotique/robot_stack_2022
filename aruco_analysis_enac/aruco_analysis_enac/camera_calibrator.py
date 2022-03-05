@@ -11,6 +11,7 @@ import os
 
 import glob
 import yaml
+import ruamel.yaml as ryaml
 
 import rclpy
 import rclpy.node as node
@@ -99,9 +100,14 @@ class Calibrator(node.Node):
             self.picture_to_take += 1
 
     def generate_calibration_file(self, bool_generate_msg):
-        distorsion_model = bool_generate_msg.data #true or false
+        distorsion_model = 'fisheye' if bool_generate_msg.data else 'plum_bob' #true or false
         height = 9
         width = 7
+
+        calibration_flags = cv2.fisheye.CALIB_RECOMPUTE_EXTRINSIC+cv2.fisheye.CALIB_CHECK_COND+cv2.fisheye.CALIB_FIX_SKEW
+
+        self.get_logger().info(f'generate_calibration_file with distorsion model {distorsion_model}')
+
         objp = np.zeros((height*width,3), np.float32)
         objp[:,:2] = np.mgrid[0:width,0:height].T.reshape(-1,2)
         # Arrays to store object points and image points from all the images.
@@ -124,20 +130,20 @@ class Calibrator(node.Node):
                 #cv2.drawChessboardCorners(img, (7,9, corners2, ret)
                 #cv.imshow('img', img)
             frameSize = gray.shape[::-1]
-
-        if not fisheye:
+        if distorsion_model == 'plum_bob':
             rms, matrix_camera, dist, rvecs, tvecs = cv2.calibrateCamera(objpoints, imgpoints, frameSize, None, None)
-        else:
+        elif distorsion_model == 'fisheye':
             N_OK = len(objpoints)
             K = np.zeros((3, 3))
             D = np.zeros((4, 1))
             rvecs = [np.zeros((1, 1, 3), dtype=np.float64) for i in range(N_OK)]
             tvecs = [np.zeros((1, 1, 3), dtype=np.float64) for i in range(N_OK)]
-            rms, _, _, _, _ = \
+            np.expand_dims(np.asarray(objpoints), -2) #https://github.com/opencv/opencv/issues/9150
+            rms, matrix_camera, dist, rvecs, tvecs = \
                 cv2.fisheye.calibrate(
                     objpoints,
                     imgpoints,
-                    gray.shape[::-1],
+                    frameSize,
                     K,
                     D,
                     rvecs,
@@ -145,14 +151,23 @@ class Calibrator(node.Node):
                     calibration_flags,
                     (cv2.TERM_CRITERIA_EPS+cv2.TERM_CRITERIA_MAX_ITER, 30, 1e-6)
                 )
+        undistorted_img = cv2.remap(img, map1, map2, interpolation=cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT)    
+        cv2.imshow("undistorted", undistorted_img)
+        proj_matrix = self.get_proj_matrix(matrix_camera, rvecs, tvecs)
+        print()
         print("-- RMS for this calibration batch --")
         print(rms)
 
-        print(matrix_camera)
-        print(dist)
 
         self.write_yaml(
-            self.generate_dict_camera_info(distorsion_model, matrix_camera, dist))
+            self.generate_dict_camera_info(distorsion_model, matrix_camera, dist, proj_matrix))
+
+    def get_proj_matrix(self, mtx, rvecs, tvecs):
+        R = cv2.Rodrigues(rvecs[0])[0]
+        t = tvecs[0]
+        Rt = np.concatenate([R,t], axis=-1) # [R|t]
+        P = np.matmul(mtx,Rt) # A[R|t]
+        return P
 
     def generate_calibration_file_2(self):
         #https://medium.com/@kennethjiang/calibrate-fisheye-lens-using-opencv-333b05afa0b0
@@ -160,7 +175,6 @@ class Calibrator(node.Node):
         CHECKERBOARD = (7,7)
         gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
         subpix_criteria = (cv2.TERM_CRITERIA_EPS+cv2.TERM_CRITERIA_MAX_ITER, 30, 0.1)
-        calibration_flags = cv2.fisheye.CALIB_RECOMPUTE_EXTRINSIC+cv2.fisheye.CALIB_CHECK_COND+cv2.fisheye.CALIB_FIX_SKEW
         objpoints = [] # 3d point in real world space
         imgpoints = [] # 2d points in image plane.
         objp = np.zeros((1, CHECKERBOARD[0]*CHECKERBOARD[1], 3), np.float32)
@@ -198,22 +212,23 @@ class Calibrator(node.Node):
         #reconvert to ros format along camera info
         img_ros = self.bridge.cv2_to_imgmsg(resized, encoding="8UC1")
         img_ros.header = header
-        print("publishing")
         self.downscale_img_pub.publish(img_ros)
     
     
     def write_yaml(self, dict_file):
         with open(f'{self.calibration_folder_path}/calib_file.yaml', 'w') as f:
-            yaml.dump(dict_file, f)
+            yaml.dump(dict_file, f, sort_keys=False)
 
-    def generate_dict_camera_info(self, distorsion_model, matrix_camera, distorsion):
+    def generate_dict_camera_info(self, distorsion_model, matrix_camera, distorsion, proj_matrix):
         #TODO : have unique camera name
         #TODO : check if proejction matrix is needed
-        yaml_matrix_camera = None
-        yaml_distotion_coeff = None
+        print(matrix_camera)
+        print(distorsion)
+        yaml_matrix_camera = matrix_camera.flatten().tolist()
+        yaml_distotion_coeff = distorsion.flatten().tolist()
         yaml_rectification_matrix = [1, 0, 0, 0, 1, 0, 0, 0, 1]
-        yaml_projection_matrix = None
-        [1, 0, 0, 0, 1, 0, 0, 0, 1]
+        yaml_projection_matrix = proj_matrix.flatten().tolist()
+        print(type(yaml_projection_matrix[0]))
         dict_file = {}
         dict_file['image_width'] = self.width
         dict_file['image_height'] = self.height
