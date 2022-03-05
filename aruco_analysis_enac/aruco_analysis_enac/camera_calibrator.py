@@ -99,7 +99,7 @@ class Calibrator(node.Node):
             self.picture_to_take += 1
 
     def generate_calibration_file(self, bool_generate_msg):
-        fisheye = bool_generate_msg.data #true or false
+        distorsion_model = bool_generate_msg.data #true or false
         height = 9
         width = 7
         objp = np.zeros((height*width,3), np.float32)
@@ -151,6 +151,9 @@ class Calibrator(node.Node):
         print(matrix_camera)
         print(dist)
 
+        self.write_yaml(
+            self.generate_dict_camera_info(distorsion_model, matrix_camera, dist))
+
     def generate_calibration_file_2(self):
         #https://medium.com/@kennethjiang/calibrate-fisheye-lens-using-opencv-333b05afa0b0
         #https://stackoverflow.com/questions/50857278/raspicam-fisheye-calibration-with-opencv
@@ -199,7 +202,11 @@ class Calibrator(node.Node):
         self.downscale_img_pub.publish(img_ros)
     
     
-    def write_yaml(self, distorsion_model, matrix_camera, distorsion):
+    def write_yaml(self, dict_file):
+        with open(f'{self.calibration_folder_path}/calib_file.yaml', 'w') as f:
+            yaml.dump(dict_file, f)
+
+    def generate_dict_camera_info(self, distorsion_model, matrix_camera, distorsion):
         #TODO : have unique camera name
         #TODO : check if proejction matrix is needed
         yaml_matrix_camera = None
@@ -216,9 +223,8 @@ class Calibrator(node.Node):
         dict_file['distortion_coefficients'] = {'rows': 1, 'cols': 5, 'data':yaml_distotion_coeff}
         dict_file['rectification_matrix'] = {'rows': 3, 'cols': 3, 'data':yaml_rectification_matrix}
         dict_file['projection_matrix']  = {'rows': 3, 'cols': 4, 'data':yaml_projection_matrix}
-        dict_file
-        with open(f'{self.calibration_folder_path}/calib_file.yaml', 'w') as f:
-            yaml.dump(dict_file, f)
+        return dict_file
+
 
 def main():
     rclpy.init()
