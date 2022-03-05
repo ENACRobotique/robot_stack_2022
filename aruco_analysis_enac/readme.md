@@ -8,6 +8,12 @@ https://chev.me/arucogen/
 
 ros2 run aruco_analysis_enac camera_calibrator --ros-args -p calib_path:='/enac_ws/src/aruco_analysis_enac/calibration/Calib_fisheye_480'
 
+### Workflow pour calibrer en remote
+Lancer le driver & le node de calibration
+Puis ramener le fichier en local : 
+scp ubuntu@192.168.42.164:/home/ubuntu/.ros/camera_info/mmal_service_16.1.yaml ~
+
+
  ## utilisation normale
 
 Launch file sur la raspy :
@@ -15,3 +21,5 @@ Launch file sur la raspy :
 Debuggage à la main detect_aruco : 
 
  ros2 run aruco_analysis_enac detect_aruco --ros-args -p image_size:=[1280,720]
+
+

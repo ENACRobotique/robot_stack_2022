@@ -108,6 +108,55 @@ class Calibrator(node.Node):
 
         self.get_logger().info(f'generate_calibration_file with distorsion model {distorsion_model}')
 
+        if distorsion_model == 'fisheye':
+            # Checkboard dimensions
+            CHECKERBOARD = (7,9)
+            subpix_criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.1)
+            calibration_flags = cv2.fisheye.CALIB_RECOMPUTE_EXTRINSIC + cv2.fisheye.CALIB_CHECK_COND + cv2.fisheye.CALIB_FIX_SKEW
+            objp = np.zeros((1, CHECKERBOARD[0]*CHECKERBOARD[1], 3), np.float32)
+            objp[0,:,:2] = np.mgrid[0:CHECKERBOARD[0], 0:CHECKERBOARD[1]].T.reshape(-1, 2)
+
+            objpoints = [] # 3d point in real world space
+            imgpoints = [] # 2d points in image plane.
+            np.expand_dims(np.asarray(objpoints), -2)
+            ### read images and for each image:
+            images = glob.glob(self.calibration_folder_path + '/*.png')
+            N_imm = 0
+            print(len(images))
+            for fname in images:
+                img = cv2.imread(fname)
+                img_shape = img.shape[:2]
+
+                gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
+                # Find the chess board corners
+                ret, corners = cv2.findChessboardCorners(gray, CHECKERBOARD, cv2.CALIB_CB_ADAPTIVE_THRESH+cv2.CALIB_CB_FAST_CHECK+cv2.CALIB_CB_NORMALIZE_IMAGE)
+                # If found, add object points, image points (after refining them)
+                if ret == True:
+                    objpoints.append(objp)
+                    print(type(objp[0][0][0]))
+                    corners2 = cv2.cornerSubPix(gray,corners,(3,3),(-1,-1),subpix_criteria)
+                    imgpoints.append(corners2)
+                    N_imm += 1
+            ###
+            print(objpoints)
+            print(type(objpoints))
+            # calculate K & D
+            K = np.zeros((3, 3))
+            D = np.zeros((4, 1))
+            rvecs = [np.zeros((1, 1, 3), dtype=np.float64) for i in range(N_imm)]
+            tvecs = [np.zeros((1, 1, 3), dtype=np.float64) for i in range(N_imm)]
+            retval, K, D, rvecs, tvecs = cv2.fisheye.calibrate(
+                objpoints,
+                imgpoints,
+                gray.shape[::-1],
+                K,
+                D,
+                rvecs,
+                tvecs,
+                calibration_flags,
+                (cv2.TERM_CRITERIA_EPS+cv2.TERM_CRITERIA_MAX_ITER, 30, 1e-6))
+
+        #else : 
         objp = np.zeros((height*width,3), np.float32)
         objp[:,:2] = np.mgrid[0:width,0:height].T.reshape(-1,2)
         # Arrays to store object points and image points from all the images.
@@ -120,9 +169,12 @@ class Calibrator(node.Node):
             img = cv2.imread(fname)
             gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
             # Find the chess board corners
-            rms, corners = cv2.findChessboardCorners(gray, (width,height), None)
+            if distorsion_model == 'plum_bob':
+                ret, corners = cv2.findChessboardCorners(gray, (width,height), None)
+            elif distorsion_model == 'fisheye':
+                ret, corners = cv2.findChessboardCorners(gray, (width,height), cv2.CALIB_CB_ADAPTIVE_THRESH+cv2.CALIB_CB_FAST_CHECK+cv2.CALIB_CB_NORMALIZE_IMAGE)
             # If found, add object points, image points (after refining them)
-            if rms == True:
+            if ret == True:
                 objpoints.append(objp)
                 corners2 = cv2.cornerSubPix(gray,corners, (11,11), (-1,-1), self.criteria)
                 imgpoints.append(corners2)
@@ -133,6 +185,8 @@ class Calibrator(node.Node):
         if distorsion_model == 'plum_bob':
             rms, matrix_camera, dist, rvecs, tvecs = cv2.calibrateCamera(objpoints, imgpoints, frameSize, None, None)
         elif distorsion_model == 'fisheye':
+            objp = np.zeros((1, width*height, 3), np.float32)
+            objp[0,:,:2] = np.mgrid[0:width, 0:height].T.reshape(-1, 2)
             N_OK = len(objpoints)
             K = np.zeros((3, 3))
             D = np.zeros((4, 1))
@@ -151,13 +205,14 @@ class Calibrator(node.Node):
                     calibration_flags,
                     (cv2.TERM_CRITERIA_EPS+cv2.TERM_CRITERIA_MAX_ITER, 30, 1e-6)
                 )
-        undistorted_img = cv2.remap(img, map1, map2, interpolation=cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT)    
-        cv2.imshow("undistorted", undistorted_img)
         proj_matrix = self.get_proj_matrix(matrix_camera, rvecs, tvecs)
         print()
         print("-- RMS for this calibration batch --")
         print(rms)
 
+        newcameramtx, roi = cv2.getOptimalNewCameraMatrix(matrix_camera, dist, (self.width,self.height), 1, (self.width,self.height))
+        dst = cv2.undistort(img, matrix_camera, dist, None, newcameramtx)
+        cv2.imwrite('calibresult.png', dst)
 
         self.write_yaml(
             self.generate_dict_camera_info(distorsion_model, matrix_camera, dist, proj_matrix))
@@ -221,14 +276,10 @@ class Calibrator(node.Node):
 
     def generate_dict_camera_info(self, distorsion_model, matrix_camera, distorsion, proj_matrix):
         #TODO : have unique camera name
-        #TODO : check if proejction matrix is needed
-        print(matrix_camera)
-        print(distorsion)
         yaml_matrix_camera = matrix_camera.flatten().tolist()
         yaml_distotion_coeff = distorsion.flatten().tolist()
         yaml_rectification_matrix = [1, 0, 0, 0, 1, 0, 0, 0, 1]
         yaml_projection_matrix = proj_matrix.flatten().tolist()
-        print(type(yaml_projection_matrix[0]))
         dict_file = {}
         dict_file['image_width'] = self.width
         dict_file['image_height'] = self.height
