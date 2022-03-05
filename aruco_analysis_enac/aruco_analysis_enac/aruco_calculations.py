@@ -70,15 +70,6 @@ class Pose:
         matrix[0:3, 3] = tvec
         t = Transform.from_matrix(matrix)
         return t
-        #tvec = np.matrix([self.x, self.y, self.z])
-        #(yaw, pitch, roll) = tft.euler_from_matrix(R_tc)
-        #if inverseRoll:
-        #    roll = -roll 
-        #if inversePitch:
-        #    pitch = -pitch 
-        #if inverseYaw:
-        #    yaw = -yaw 
-        #t = Transform.from_position_euler(self.x, self.y, self.z, roll+xAxis, pitch+yAxis, yaw+ zAxis)
 
     
     def __str__(self):
@@ -137,7 +128,6 @@ def get_camera_position(aruco_to_camera)-> Transform:
     R_tc = np.matrix(R_tc).T
     matrix[0:3,0:3] = R_tc
     matrix[0:3, 3] =  np.dot(-R_tc, tvec)
-    #T_world_cam = np.dot(origin_to_aruco.matrix, np.linalg.inv(aruco_to_camera.transform_offset().matrix)) #coordinate relative to the origin
     return Transform.from_matrix(matrix) 
     
     #return aruco_to_camera.transform_offset().inverse() 

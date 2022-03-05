@@ -9,7 +9,8 @@ For the rest :
 ```
 docker run -it --net=host -e DISPLAY --name club_robot --volume /home/robot/ros_aruco/src/robot_stack_2022:/enac_ws/src --volume /home/robot/bag_files:/enac_ws/bag enacrobotique/enac-base bash
 ```
-
+PI 4 with camera :
+docker run -it --net=host --pid=host -e DISPLAY --device=/dev/video0 enacrobotique/enac-base bash:prod
 ## Useful commands
 
 #### Connection with rosbridge (for foxglove,...)
@@ -88,6 +89,12 @@ Then compile :
 sudo docker buildx build --platform linux/amd64,linux/arm64 . -f enac_dependencies.Dockerfile -t enacrobotique/enac-ros --push
 
 sudo docker buildx build --platform linux/amd64,linux/arm64 . -f enac_base.Dockerfile -t enacrobotique/enac-base --push
+
+Pour la version **prod** 
+    --build-arg DEV="False"
+
+Pour la version **dev**
+    --build-arg DEV="True"
 ```
 ### AMD64 only:
 ```

@@ -16,15 +16,14 @@ COPY . /enac_ws/src
 
 RUN pip install -r /enac_ws/src/requirements.txt
 
-RUN /enac_ws &&\
+RUN cd /enac_ws &&\
     source /opt/ros/galactic/setup.bash &&\
     #conditionnal symlink if target don't have src (because not dev env)
     if [ "$DEV" = "True" ]; then \
-        colcon build --symlink-install \
-    fi; \
+        colcon build --symlink-install; \
     else \
-        colcon build \
-    fi \
+        colcon build; \
+    fi &&\
     source install/local_setup.bash
 
 VOLUME [ "/enac_ws/src" , "/enac_ws/bag"]
