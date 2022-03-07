@@ -29,6 +29,9 @@ class TestCameraCalibrator(unittest.TestCase):
         # Test if the node is instantiated
         assert self.node != None
 
+    def test_calibration_from_fish_eye(self):
+        pass
+
     def test_dict_for_yaml(self):
         distorsion_model = 'plumb_bob'
         matrix_camera = []

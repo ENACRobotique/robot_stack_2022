@@ -4,6 +4,7 @@
 #https://docs.opencv.org/4.x/dc/dbb/tutorial_py_calibration.html
 #https://navigation.ros.org/tutorials/docs/camera_calibration.html
 
+from array import array
 import curses
 import numpy as np
 import cv2
@@ -20,6 +21,35 @@ from sensor_msgs.msg import CameraInfo, Image
 from std_msgs.msg import Bool
 from rcl_interfaces.msg import ParameterDescriptor
 
+def calib_path_parameter(node):
+    #get current file path for calibration pictures at the parent and then subfolder called calibration
+    calibration_folder_path = ParameterDescriptor()
+    calibration_folder_path.name = 'save_folder_path'
+    calibration_folder_path.description = 'Path to folder where pictures will be saved'
+    calibration_folder_path.additional_constraints = 'save_folder_path'
+    node.declare_parameter('calib_path', 'calib_imgs')
+    calibration_folder_path = node.get_parameter('calib_path').get_parameter_value().string_value
+    try:
+        os.chdir(calibration_folder_path)
+        #chdir to one parent directory above the current one
+    except FileNotFoundError:
+        try:
+            os.chdir(os.path.dirname(calibration_folder_path))
+            os.mkdir(calibration_folder_path)
+            os.chdir(calibration_folder_path)
+        except FileNotFoundError:
+            raise Exception("Calibration folder path not found - you need to set calib_path that point to at least a valid path (it can create one child if needed)")
+
+    return calibration_folder_path
+
+def input_ros_parameter(node):
+    node.declare_parameter('use_console_input', 
+        False,
+        ParameterDescriptor(description='use console input if set to true (without console output) ' \
+            'instead of inputs from ros topics (calibration_take_picture and generate_aruco file)'))
+
+    return node.get_parameter('use_console_input').get_parameter_value().bool_value
+
 class Calibrator(node.Node):
     def __init__(self) -> None:
         super().__init__('camera_calibrator')
@@ -29,33 +59,12 @@ class Calibrator(node.Node):
         self.width = None
         self.height = None
         self.info_msg = None
-        #get current file path for calibration pictures at the parent and then subfolder called calibration
         
-
         #ros parameter to get a path string to save pictures
-        self.calibration_folder_path = ParameterDescriptor()
-        self.calibration_folder_path.name = 'save_folder_path'
-        self.calibration_folder_path.description = 'Path to folder where pictures will be saved'
-        self.calibration_folder_path.additional_constraints = 'save_folder_path'
-        self.declare_parameter('calib_path', 'calib_imgs')
-        self.calibration_folder_path = self.get_parameter('calib_path').get_parameter_value().string_value
-        try:
-            os.chdir(self.calibration_folder_path)
-            #chdir to one parent directory above the current one
-        except:
-            os.chdir(os.path.dirname(self.calibration_folder_path))
-            os.mkdir(self.calibration_folder_path)
-            os.chdir(self.calibration_folder_path)
+        self.calibration_folder_path = calib_path_parameter(self)
 
-        self.declare_parameter('use_console_input', 
-            False,
-            ParameterDescriptor(description='use console input if set to true (without console output) ' \
-                'instead of inputs from ros topics (calibration_take_picture and generate_aruco file)'))
-
-        self.use_console_input = self.get_parameter('use_console_input').get_parameter_value().bool_value
+        self.use_console_input = input_ros_parameter(self)
         #ros parameter description for use_console_input
-        #pamarater description synthax
-        #https://docs.ros.org/api/rclpy/html/rclpy.html#rclpy.Parameter.get_parameter_value
         self.info_sub = self.create_subscription(CameraInfo,
             'camera_info', #'/camera/camera_info',
             self.info_callback,
@@ -72,6 +81,7 @@ class Calibrator(node.Node):
         self.create_subscription(Bool, '/generate_calibration_file', self.generate_calibration_file, 10)
 
     def info_callback(self, infos):
+        """ get camera info and set width and height"""
         self.height = infos.height
         self.width =  infos.width
         self.info_msg = infos
@@ -79,6 +89,11 @@ class Calibrator(node.Node):
         pass
 
     def image_callback(self, img_msg):
+        """take picture and save it to the calibration folder if picture_to_take is not 0
+        Args:
+            img_msg (sensor_msgs.msg.Image): image message from camera
+        """
+
         if self.info_msg == None:
             self.get_logger().info('No camera info received yet')
             return
@@ -112,39 +127,13 @@ class Calibrator(node.Node):
         images = glob.glob(self.calibration_folder_path + '/*.png')
         for fname in images:
             img = cv2.imread(fname)
-            gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-            # Find the chess board corners
-            rms, corners = cv2.findChessboardCorners(gray, (width,height), None)
-            # If found, add object points, image points (after refining them)
-            if rms == True:
-                objpoints.append(objp)
-                corners2 = cv2.cornerSubPix(gray,corners, (11,11), (-1,-1), self.criteria)
-                imgpoints.append(corners2)
-                # Draw and display the corners
-                #cv2.drawChessboardCorners(img, (7,9, corners2, ret)
-                #cv.imshow('img', img)
-            frameSize = gray.shape[::-1]
+            frameSize = self.img_chessboard_extraction(img, objpoints, imgpoints)
+
 
         if not fisheye:
             rms, matrix_camera, dist, rvecs, tvecs = cv2.calibrateCamera(objpoints, imgpoints, frameSize, None, None)
         else:
-            N_OK = len(objpoints)
-            K = np.zeros((3, 3))
-            D = np.zeros((4, 1))
-            rvecs = [np.zeros((1, 1, 3), dtype=np.float64) for i in range(N_OK)]
-            tvecs = [np.zeros((1, 1, 3), dtype=np.float64) for i in range(N_OK)]
-            rms, _, _, _, _ = \
-                cv2.fisheye.calibrate(
-                    objpoints,
-                    imgpoints,
-                    gray.shape[::-1],
-                    K,
-                    D,
-                    rvecs,
-                    tvecs,
-                    calibration_flags,
-                    (cv2.TERM_CRITERIA_EPS+cv2.TERM_CRITERIA_MAX_ITER, 30, 1e-6)
-                )
+            rms, matrix_camera, dist, rvecs, tvecs = self.generate_fisheye_params(objpoints, imgpoints, frameSize)
         print("-- RMS for this calibration batch --")
         print(rms)
 
@@ -154,13 +143,46 @@ class Calibrator(node.Node):
         self.write_yaml(
             self.generate_dict_camera_info(distorsion_model, matrix_camera, dist))
 
+    def img_chessboard_extraction(self, img, objpoints: list(), imgpoints: list()):
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        # Find the chess board corners
+        ret, corners = cv2.findChessboardCorners(gray, (width,height), None)
+        # If found, add object points, image points (after refining them)
+        if ret == True:
+            objpoints.append(objp)
+            corners2 = cv2.cornerSubPix(gray,corners, (11,11), (-1,-1), self.criteria)
+            imgpoints.append(corners2)
+            # Draw and display the corners
+            #cv2.drawChessboardCorners(img, (7,9, corners2, ret)
+            #cv.imshow('img', img)
+        frameSize = gray.shape[::-1]
+        return frameSize
+    def generate_fisheye_params(self, objpoints, imgpoints, frameSize):
+        calibration_flags = cv2.fisheye.CALIB_RECOMPUTE_EXTRINSIC+cv2.fisheye.CALIB_CHECK_COND+cv2.fisheye.CALIB_FIX_SKEW
+        N_OK = len(objpoints)
+        K = np.zeros((3, 3))
+        D = np.zeros((4, 1))
+        rvecs = [np.zeros((1, 1, 3), dtype=np.float64) for i in range(N_OK)]
+        tvecs = [np.zeros((1, 1, 3), dtype=np.float64) for i in range(N_OK)]
+        rms, matrix_camera, dist, rvecs, tvecs = \
+            cv2.fisheye.calibrate(
+                objpoints,
+                imgpoints,
+                frameSize,
+                K,
+                D,
+                rvecs,
+                tvecs,
+                calibration_flags,
+                (cv2.TERM_CRITERIA_EPS+cv2.TERM_CRITERIA_MAX_ITER, 30, 1e-6)
+            )
+        return rms, matrix_camera, dist, rvecs, tvecs
+
+    """
     def generate_calibration_file_2(self):
-        #https://medium.com/@kennethjiang/calibrate-fisheye-lens-using-opencv-333b05afa0b0
-        #https://stackoverflow.com/questions/50857278/raspicam-fisheye-calibration-with-opencv
         CHECKERBOARD = (7,7)
         gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
         subpix_criteria = (cv2.TERM_CRITERIA_EPS+cv2.TERM_CRITERIA_MAX_ITER, 30, 0.1)
-        calibration_flags = cv2.fisheye.CALIB_RECOMPUTE_EXTRINSIC+cv2.fisheye.CALIB_CHECK_COND+cv2.fisheye.CALIB_FIX_SKEW
         objpoints = [] # 3d point in real world space
         imgpoints = [] # 2d points in image plane.
         objp = np.zeros((1, CHECKERBOARD[0]*CHECKERBOARD[1], 3), np.float32)
@@ -180,11 +202,7 @@ class Calibrator(node.Node):
                 objpoints.append(objp)
                 cv2.cornerSubPix(gray,corners,(3,3),(-1,-1),subpix_criteria)
                 imgpoints.append(corners)
-                
-
-        print(rms)
-        #TODO : generate YAML from K and D variables
-        pass
+    """    
 
     def publish_calibration_picture(self, header, cv2img, resize_height=144):
         #draw markers
