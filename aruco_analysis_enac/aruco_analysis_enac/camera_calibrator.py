@@ -118,34 +118,35 @@ class Calibrator(node.Node):
         height = 9
         width = 7
 
-        calibration_flags = cv2.fisheye.CALIB_RECOMPUTE_EXTRINSIC+cv2.fisheye.CALIB_CHECK_COND+cv2.fisheye.CALIB_FIX_SKEW
-
         self.get_logger().info(f'generate_calibration_file with distorsion model {distorsion_model}')
-
-        if distorsion_model == 'fisheye':
-            
-
-        #else : 
+        #TODO : wtf is used objp? 
         objp = np.zeros((height*width,3), np.float32)
         objp[:,:2] = np.mgrid[0:width,0:height].T.reshape(-1,2)
         # Arrays to store object points and image points from all the images.
         objpoints = [] # 3d point in real world space
         imgpoints = [] # 2d points in image plane.
 
-        frameSize = None
-        images = glob.glob(self.calibration_folder_path + '/*.png')
-        for fname in images:
-            img = cv2.imread(fname)
-            frameSize = self.img_chessboard_extraction(img, objpoints, imgpoints)
+        if distorsion_model == 'fisheye':
+            #TODO : Use img_chessboard_extration before using generate_fisheye_params
+            #TODO : remove last_img & frame_size
+            rms, matrix_camera, dist, rvecs, tvecs, frame_size, img = self.generate_fisheye_params(objpoints, imgpoints)
+        else: #distorsion_model == 'plum_bob'
 
-        rms, matrix_camera, dist, rvecs, tvecs = cv2.calibrateCamera(objpoints, imgpoints, frameSize, None, None)
+            frame_size = None
+            images = glob.glob(self.calibration_folder_path + '/*.png')
+            for fname in images:
+                img = cv2.imread(fname)
+                frame_size = self.img_chessboard_extraction(img, objpoints, imgpoints)
 
-       
+            rms, matrix_camera, dist, rvecs, tvecs = cv2.calibrateCamera(objpoints, imgpoints, frameSize, None, None)
+
         proj_matrix = self.get_proj_matrix(matrix_camera, rvecs, tvecs)
-        print()
         print("-- RMS for this calibration batch --")
         print(rms)
-
+        if self.height == None: #no camera plugged
+            self.height = frame_size[1]
+        if self.width == None:
+            self.width = frame_size[0]
         newcameramtx, roi = cv2.getOptimalNewCameraMatrix(matrix_camera, dist, (self.width,self.height), 1, (self.width,self.height))
         dst = cv2.undistort(img, matrix_camera, dist, None, newcameramtx)
         cv2.imwrite('calibresult.png', dst)
@@ -174,7 +175,7 @@ class Calibrator(node.Node):
             #cv.imshow('img', img)
         frameSize = gray.shape[::-1]
         return frameSize
-    def generate_fisheye_params(self, objpoints, imgpoints, frameSize):
+    def generate_fisheye_params(self, objpoints, imgpoints):
         """
         https://medium.com/@kennethjiang/calibrate-fisheye-lens-using-opencv-333b05afa0b0
         """
@@ -191,7 +192,8 @@ class Calibrator(node.Node):
         ### read images and for each image:
         images = glob.glob(self.calibration_folder_path + '/*.png')
         N_imm = 0
-        print(len(images))
+        frame_size = None
+        img = None #TODO : remove
         for fname in images:
             img = cv2.imread(fname)
             img_shape = img.shape[:2]
@@ -206,9 +208,11 @@ class Calibrator(node.Node):
                 corners2 = cv2.cornerSubPix(gray,corners,(3,3),(-1,-1),subpix_criteria)
                 imgpoints.append(corners2)
                 N_imm += 1
-        ###
-        print(objpoints)
-        print(type(objpoints))
+                frame_size = gray.shape[::-1]
+        #check if folder empty of picture or not (avoid assertion 215 error on calibrate)
+        #if (len(objpoints) or len(imgpoints) or not (len(objpoints) == len(imgpoints))):
+        #    self.get_logger().error("calibration folder is empty - can't calibrate")
+        #    return
         # calculate K & D
         K = np.zeros((3, 3)) #matrix_camera
         D = np.zeros((4, 1)) #distorsion_coeff
@@ -217,7 +221,7 @@ class Calibrator(node.Node):
         rms, K, D, rvecs, tvecs = cv2.fisheye.calibrate(
             objpoints,
             imgpoints,
-            gray.shape[::-1],
+            frame_size,
             K,
             D,
             rvecs,
@@ -226,7 +230,7 @@ class Calibrator(node.Node):
             (cv2.TERM_CRITERIA_EPS+cv2.TERM_CRITERIA_MAX_ITER, 30, 1e-6)
         )
         
-        return rms, K, D, rvecs, tvecs
+        return rms, K, D, rvecs, tvecs, frame_size, img
 
     """
     def generate_calibration_file_2(self):
