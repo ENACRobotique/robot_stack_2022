@@ -149,7 +149,10 @@ class Calibrator(node.Node):
             self.width = frame_size[0]
         newcameramtx, roi = cv2.getOptimalNewCameraMatrix(matrix_camera, dist, (self.width,self.height), 1, (self.width,self.height))
         dst = cv2.undistort(img, matrix_camera, dist, None, newcameramtx)
-        cv2.imwrite('calibresult.png', dst)
+        DIM = (self.width, self.height)
+        map1, map2 = cv2.fisheye.initUndistortRectifyMap(matrix_camera, dist, np.eye(3), newcameramtx, DIM, cv2.CV_16SC2)
+        undistorted_img = cv2.remap(img, map1, map2, interpolation=cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT)
+        cv2.imwrite('calibresult.png', undistorted_img)
 
         self.write_yaml(
             self.generate_dict_camera_info(distorsion_model, matrix_camera, dist, proj_matrix))

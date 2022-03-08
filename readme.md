@@ -7,7 +7,7 @@ xhost local:root
 ```
 For the rest : 
 ```
-docker run -it --net=host -e DISPLAY --name club_robot --volume /home/robot/ros_aruco/src/robot_stack_2022:/enac_ws/src --volume /home/robot/bag_files:/enac_ws/bag enacrobotique/enac-base bash
+docker run -it -d --net=host -e DISPLAY --name club_robot --volume /home/robot/ros_aruco/src/robot_stack_2022:/enac_ws/src --volume /home/robot/bag_files:/enac_ws/bag enacrobotique/enac-base bash
 ```
 PI 4 with camera :
 docker run -it --net=host --pid=host -e DISPLAY --device=/dev/video0 enacrobotique/enac-base bash:prod
@@ -93,8 +93,13 @@ sudo docker buildx build --platform linux/amd64,linux/arm64 . -f enac_base.Docke
 Pour la version **prod** 
     --build-arg DEV="False"
 
-Pour la version **dev**
+docker buildx build --build-arg DEV="False" --platform linux/amd64,linux/arm64 . -f enac_base.Dockerfile -t enacrobotique/enac-base:prod --push
+
+Pour la version **dev** (avec le volume)
     --build-arg DEV="True"
+
+docker buildx build --build-arg DEV="True" --platform linux/amd64,linux/arm64 . -f enac_base.Dockerfile -t enacrobotique/enac-base:dev --push
+
 ```
 ### AMD64 only:
 ```
