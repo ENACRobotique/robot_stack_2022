@@ -280,18 +280,34 @@ class Calibrator(node.Node):
             yaml.dump(dict_file, f, sort_keys=False)
 
     def generate_dict_camera_info(self, distorsion_model, matrix_camera, distorsion, proj_matrix):
+        """generate dict for camera info to make a yaml file
+
+        Args:
+            distorsion_model (_type_): _description_
+            matrix_camera (_type_): _description_
+            distorsion (_type_): _description_
+            proj_matrix (_type_): _description_
+
+        Returns:
+            _type_: _description_
+        """
         #TODO : have unique camera name
+
+        #preparing data
         yaml_matrix_camera = matrix_camera.flatten().tolist()
         yaml_distotion_coeff = distorsion.flatten().tolist()
         yaml_rectification_matrix = [1, 0, 0, 0, 1, 0, 0, 0, 1]
         yaml_projection_matrix = proj_matrix.flatten().tolist()
+        column_dist_coeff = 5 if distorsion_model == 'plum_bob' else 4 #if fisheye
+
+        #writing yaml file
         dict_file = {}
         dict_file['image_width'] = self.width
         dict_file['image_height'] = self.height
         dict_file['camera_name'] = 'camera_enac'
         dict_file['camera_matrix'] = {'rows': 3, 'cols': 3, 'data':yaml_matrix_camera} #TODO : unpack matrix_camera
         dict_file['distorsion_model'] = distorsion_model
-        dict_file['distortion_coefficients'] = {'rows': 1, 'cols': 4, 'data':yaml_distotion_coeff}
+        dict_file['distortion_coefficients'] = {'rows': 1, 'cols': column_dist_coeff, 'data':yaml_distotion_coeff}
         dict_file['rectification_matrix'] = {'rows': 3, 'cols': 3, 'data':yaml_rectification_matrix}
         dict_file['projection_matrix']  = {'rows': 3, 'cols': 4, 'data':yaml_projection_matrix}
         return dict_file
