@@ -2,6 +2,8 @@ import unittest
 import pytest
 import rclpy
 
+Parameter = rclpy.Parameter
+
 import aruco_analysis_enac.camera_calibrator as cam_cal
 
 class TestCameraCalibrator(unittest.TestCase):
@@ -16,10 +18,18 @@ class TestCameraCalibrator(unittest.TestCase):
         rclpy.shutdown()
 
     def setUp(self):
+        #Path to calibration folder
+        path = '/enac_ws/src/aruco_analysis_enac/calibration'
+        calib_path = Parameter('calib_path', 
+            Parameter.Type.STRING, 
+            '/enac_ws/src/aruco_analysis_enac/calibration'
+        )
+
         # Create a ROS node for tests
-        self.node = rclpy.Calibrator()
-        self.node.set_parameter('calib_path', 
-            '/enac_ws/src/robot_stack_2022/aruco_analysis_enac/calibration')
+        self.node = cam_cal.Calibrator(calib_file_override = path)
+
+        #self.node.set_parameters('calib_path', 
+        #    '/enac_ws/src/robot_stack_2022/aruco_analysis_enac/calibration')
 
     def tearDown(self):
         self.node.destroy_node()
@@ -34,9 +44,10 @@ class TestCameraCalibrator(unittest.TestCase):
 
     def test_dict_for_yaml(self):
         distorsion_model = 'plumb_bob'
-        matrix_camera = []
-        distorsion_coeff = [0.0, 0.0, 0.0, 0.0, 0.0]
-        dict = self.node.generate_dict_camera_info(distorsion_model, matrix_camera, distorsion_coeff)
+        projection_matrix = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+        distorsion_coeff = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+        matrix_camera = [0.0, 0.0,0.0,0.0]
+        dict = self.node.generate_dict_camera_info(distorsion_model, matrix_camera, distorsion_coeff, projection_matrix)
         assert dict['image_height'] == 2050
         assert dict['camera_name'] == 'camera_enac'
         assert dict['camera_matrix'] == [

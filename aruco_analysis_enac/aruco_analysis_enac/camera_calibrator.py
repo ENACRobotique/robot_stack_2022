@@ -51,7 +51,7 @@ def input_ros_parameter(node):
     return node.get_parameter('use_console_input').get_parameter_value().bool_value
 
 class Calibrator(node.Node):
-    def __init__(self) -> None:
+    def __init__(self, calib_file_override=None) -> None:
         super().__init__('camera_calibrator')
         self.bridge = CvBridge()
         self.picture_to_take = 0
@@ -61,7 +61,7 @@ class Calibrator(node.Node):
         self.info_msg = None
         
         #ros parameter to get a path string to save pictures
-        self.calibration_folder_path = calib_path_parameter(self)
+        self.calibration_folder_path = calib_path_parameter(self) if calib_file_override == None else calib_file_override
 
         self.use_console_input = input_ros_parameter(self)
         #ros parameter description for use_console_input
@@ -291,7 +291,7 @@ class Calibrator(node.Node):
         dict_file['camera_name'] = 'camera_enac'
         dict_file['camera_matrix'] = {'rows': 3, 'cols': 3, 'data':yaml_matrix_camera} #TODO : unpack matrix_camera
         dict_file['distorsion_model'] = distorsion_model
-        dict_file['distortion_coefficients'] = {'rows': 1, 'cols': 5, 'data':yaml_distotion_coeff}
+        dict_file['distortion_coefficients'] = {'rows': 1, 'cols': 4, 'data':yaml_distotion_coeff}
         dict_file['rectification_matrix'] = {'rows': 3, 'cols': 3, 'data':yaml_rectification_matrix}
         dict_file['projection_matrix']  = {'rows': 3, 'cols': 4, 'data':yaml_projection_matrix}
         return dict_file
