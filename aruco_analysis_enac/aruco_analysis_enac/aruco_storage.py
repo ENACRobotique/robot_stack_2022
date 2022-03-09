@@ -43,6 +43,13 @@ class ArucosStorage:
             if aruco.expected_mvt == settings.Movement.FIXED and aruco.id == id:
                 return aruco
 
+    @lru_cache(maxsize=1000)
+    def get_aruco_mvt(self, id: int) -> settings.Movement:
+        """ Get the movement of the aruco. """
+        for aruco in self.ref_arucos:
+            if aruco.id == id:
+                return aruco.expected_mvt
+                
     """TODO : BELOW CODE IS NOT DONE """
     def aruco_pose_update(self, aruco_id: int, position): #TODO : add position signature
         if not self._correlate(aruco_id, position):
