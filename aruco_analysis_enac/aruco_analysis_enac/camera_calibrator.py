@@ -207,7 +207,6 @@ class Calibrator(node.Node):
             # If found, add object points, image points (after refining them)
             if ret == True:
                 objpoints.append(objp)
-                print(type(objp[0][0][0]))
                 corners2 = cv2.cornerSubPix(gray,corners,(3,3),(-1,-1),subpix_criteria)
                 imgpoints.append(corners2)
                 N_imm += 1
