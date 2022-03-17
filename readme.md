@@ -7,9 +7,10 @@ xhost local:root
 ```
 For the rest : 
 ```
-docker run -it --net=host -e DISPLAY --volume /home/robot/ros_aruco/src/robot_stack_2022:/enac_ws/src --volume /home/robot/bag_files:/enac_ws/bag enacrobotique/enac-base bash
+docker run -it -d --net=host -e DISPLAY --name club_robot --volume /home/robot/ros_aruco/src/robot_stack_2022:/enac_ws/src --volume /home/robot/bag_files:/enac_ws/bag enacrobotique/enac-base bash
 ```
-
+PI 4 with camera :
+docker run -it --net=host --pid=host -e DISPLAY --device=/dev/video0 enacrobotique/enac-base bash:prod
 ## Useful commands
 
 #### Connection with rosbridge (for foxglove,...)
@@ -61,6 +62,17 @@ replacer --net=host par
       -p "9090:9090"
 # Developpers
 
+## List of images available :
+
+enac_dependencies:latest -> (ARM64+AMD64) All the dependencies needed by the club to run
+
+**enac_base:prod** -> (ARM64+AMD64) The base image to use for the club USAGE
+
+enac_base:dev -> (ARM64+AMD64) The base image to use for the club DEVELOPMENT (SYMLINK install so source is needed in the volume)
+
+enac_base:raspy_win (ARM64) -> Future deprecration, just to use when compilling for ARM64 from windows in case of problem
+
+*enac_base:latest -> to use for people who forget to set a tag*
 ## Building
 
 ### target AMD64 and ARM64 (raspy included):
@@ -77,6 +89,17 @@ Then compile :
 sudo docker buildx build --platform linux/amd64,linux/arm64 . -f enac_dependencies.Dockerfile -t enacrobotique/enac-ros --push
 
 sudo docker buildx build --platform linux/amd64,linux/arm64 . -f enac_base.Dockerfile -t enacrobotique/enac-base --push
+
+Pour la version **prod** 
+    --build-arg DEV="False"
+
+docker buildx build --build-arg DEV="False" --platform linux/amd64,linux/arm64 . -f enac_base.Dockerfile -t enacrobotique/enac-base:prod --push
+
+Pour la version **dev** (avec le volume)
+    --build-arg DEV="True"
+
+docker buildx build --build-arg DEV="True" --platform linux/amd64,linux/arm64 . -f enac_base.Dockerfile -t enacrobotique/enac-base:dev --push
+
 ```
 ### AMD64 only:
 ```

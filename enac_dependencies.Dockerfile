@@ -93,4 +93,3 @@ RUN echo "source /opt/ros/galactic/setup.bash" >> ~/.bashrc
 RUN echo "source /driver_ws/install/local_setup.bash" >> ~/.bashrc
 
 
-

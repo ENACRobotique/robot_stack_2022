@@ -1,5 +1,7 @@
 FROM enacrobotique/enac-ros:latest
 
+ARG DEV
+
 SHELL [ "/bin/bash" , "-c" ]
 
 RUN cd /
@@ -12,13 +14,18 @@ RUN mkdir /enac_ws &&\
 
 COPY . /enac_ws/src
 
-VOLUME [ "/enac_ws/src" , "/enac_ws/bag"]
-
 RUN pip install -r /enac_ws/src/requirements.txt
 
 RUN cd /enac_ws &&\
     source /opt/ros/galactic/setup.bash &&\
-    colcon build --symlink-install &&\
+    #conditionnal symlink if target don't have src (because not dev env)
+    if [ "$DEV" = "True" ]; then \
+        colcon build --symlink-install; \
+    else \
+        colcon build; \
+    fi &&\
     source install/local_setup.bash
+
+VOLUME [ "/enac_ws/src" , "/enac_ws/bag"]
 
 RUN echo "source /enac_ws/install/local_setup.bash" >> /root/.bashrc

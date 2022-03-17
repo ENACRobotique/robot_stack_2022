@@ -62,7 +62,6 @@ class ArucosSetting():
         Returns:
             dict: [description] example : {size: [[corners], [ids]], ... }
         """
-        
         if len(corners) != len(ids):
             logger.error("Error : corners and ids are not the same size")
             return None
@@ -73,7 +72,10 @@ class ArucosSetting():
             if aruco == None:
                 logger.error(f'aruco {id[0]} detected on the camera but not present in the settings.py dataset used ({ self.dataset })')
             elif aruco.expected_mvt in mvt:
-                corners_by_size[aruco.size] = [[corners[i]],[id[0]]]
+                if aruco.size not in corners_by_size:
+                    corners_by_size[aruco.size] = [[], []]
+                corners_by_size[aruco.size][0].extend(corners[i])
+                corners_by_size[aruco.size][1].append(id[0])
 
         return corners_by_size
 
@@ -86,12 +88,12 @@ def generate_aruco_subset(id_begin, id_end, size=0.07, expected_mvt = Movement.M
 
 #subset 1
 robot_subset_1 = [
-    Aruco(42, 0.10, [1.50, 0.75, 0.0], [0.0, 0.0, pi], expected_mvt=Movement.FIXED), #180° rotation of 42 compared to camera (or origin)
+    Aruco(42, 0.10, [1.50, 0.75, 0.0], [0.0, 0.0, 0.0], expected_mvt=Movement.FIXED), #180° rotation of 42 compared to camera (or origin)
     Aruco(36, 0.05, [1.50, 1.0, 0.0], [0.0, 0.0, 0.0], expected_mvt=Movement.ROCK), #Green
     Aruco(13, 0.05, [0.50, 0.50, 0.0], [0.0, 0.0, 0.0], expected_mvt=Movement.ROCK), #Blue
     Aruco(17, 0.05, [0.50, 0.50, 0.0], [0.0, 0.0, 0.0], expected_mvt=Movement.ROCK), #Rock
     Aruco(47, 0.05, [0.50, 0.50, 0.0], [0.0, 0.0, 0.0], expected_mvt=Movement.ROCK), #RED
-    Aruco(6, 0.07, [0.50, 0.25, 0.0], [0.0, 0.0, 0.0], expected_mvt=Movement.FIXED), #Usual marker for yellow team but used for reference for projet technique
+    Aruco(6, 0.07, [0.50, 0.25, 0.015], [0.0, 0.0, -pi/2], expected_mvt=Movement.FIXED), #Usual marker for yellow team but used for reference for projet technique
 ]
 #TODO : test unitaire pour vérifier la validité du subset
 robot_subset_1.extend(generate_aruco_subset(3,6, 0.07, Movement.MOVING)) #equipe bleue ou qq chose comme ça

@@ -70,20 +70,10 @@ class Pose:
         matrix[0:3, 3] = tvec
         t = Transform.from_matrix(matrix)
         return t
-        #tvec = np.matrix([self.x, self.y, self.z])
-        #(yaw, pitch, roll) = tft.euler_from_matrix(R_tc)
-        #if inverseRoll:
-        #    roll = -roll 
-        #if inversePitch:
-        #    pitch = -pitch 
-        #if inverseYaw:
-        #    yaw = -yaw 
-        #t = Transform.from_position_euler(self.x, self.y, self.z, roll+xAxis, pitch+yAxis, yaw+ zAxis)
 
     
     def __str__(self):
-        return f"Pos : {self.x:.2f} {self.y:.2f} {self.z:.2f} \
-            Rotation : {self.roll} {self.pitch} {self.yaw} \n"
+        return f"Pos : {self.x:.2f} {self.y:.2f} {self.z:.2f} \n"
 
 def quaternion_from_euler(roll, pitch, yaw):
 
@@ -128,13 +118,20 @@ def transform_flip_x(transf: Transform):
         euler[0], euler[1], euler[2]) 
 
 @lru_cache(maxsize=10)
-def get_camera_position(aruco_to_camera : Pose)-> Transform:
+def get_camera_position(aruco_to_camera)-> Transform:
     """ 
-    return camera position related to origin of the map (bottom left for eurobot)
+    return camera position relative to the marker sent in parameter
     """
-
-    return aruco_to_camera.transform_offset().inverse() #tree.lookup_transform("camera", "aruco")
+    matrix = tft.identity_matrix()
+    tvec = np.array([aruco_to_camera.x, aruco_to_camera.y, aruco_to_camera.z])
+    R_tc, _ = Rodrigues(aruco_to_camera.rvec)
+    R_tc = np.matrix(R_tc).T
+    matrix[0:3,0:3] = R_tc
+    matrix[0:3, 3] =  np.dot(-R_tc, tvec)
+    return Transform.from_matrix(matrix) 
     
+    #return aruco_to_camera.transform_offset().inverse() 
+
     #ref_transform = Transform.from_position_euler(arucoRef.x,arucoRef.y, arucoRef.z, arucoRef.roll, arucoRef.pitch, arucoRef.yaw)
     #print(tft.translation_from_matrix(tft.inverse_matrix(ref_transform.matrix)))
     #invTvec = np.dot(R, np.matrix(-tvec))
@@ -143,9 +140,10 @@ def get_camera_position(aruco_to_camera : Pose)-> Transform:
     #inverted = np.linalg.inv(transform_matrix)
     
 
-def table_pos_from_camera(arucoPosition: Pose, cameraPosition: Transform)-> Transform:
+def pos_wrt_marker_from_camera(arucoPosition: Pose, cameraPosition: Transform)-> Transform:
     """
-    return aruco position on table from camera position on table, using only one aruco code as reference
+    return aruco position on table with regards to/relative to the reference aruco which was used to calculate the cameraPosition (wrt table)
+    from camera position on table, using only one aruco code as reference
     arucoPosition : relative to camera
     camera Position : relative to table
     """
@@ -154,18 +152,18 @@ def table_pos_from_camera(arucoPosition: Pose, cameraPosition: Transform)-> Tran
     transf = Transform.from_matrix(matrix)
     return transf
 
-if __name__ == "__main__":
-    print(rotation(math.pi,0,0,[0,1,0]))
-"""
-tvecs:
-- x: -0.2657684973603784
-  y: 0.28864516818472313
-  z: 0.7879794911990743
-rvecs:
-- x: 2.0277491842572615
-  y: 2.0202839337174843
-  z: 0.6653893427159006
+def pose_wrt_origin(ref_aruco_wrt_origin: Transform, cur_aruco_wrt_ref_aruco: Transform) -> Transform:
+    matrix = tft.concatenate_matrices(ref_aruco_wrt_origin.matrix, cur_aruco_wrt_ref_aruco.matrix)
+    return Transform.from_matrix(matrix) 
 
-  get_camera_position(Pose(-0.26,0.28,0.78, 2.02, 2.02, 0.665))
+def str_camera(aruco_id):
+    return f"camera_{aruco_id}"
 
-  """
+def str_ref_aruco(aruco_id):
+    return f"ref_aruco_{aruco_id}"
+
+def str_camera_aruco(ref_id, aruco_id):
+    return f"camera_{ref_id}_aruco_{aruco_id}"
+
+def str_ref_aruco_to_aruco(ref_id, aruco_id):
+    return f"table_{ref_id}_aruco_{aruco_id}"
