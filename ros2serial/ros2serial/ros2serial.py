@@ -63,6 +63,7 @@ class Ros2Serial(Node):
         self.ros_odom = self.create_publisher(Odometry, '/odom', 10)
         self.ros_peripherals = self.create_publisher(PeriphValue, '/peripherals', 10)
         self.ros_diagnostics = self.create_publisher(DiagnosticArray, '/diagnostics', 10)
+        
         self.ros_vel_listener = self.create_subscription(Twist, '/cmd_vel', self.on_ros_cmd_vel, 10)
         self.ros_vel_listener = self.create_subscription(Pid, '/pid', self.on_ros_pid, 10)
         self.ros_periph_listener = self.create_subscription(PeriphValue, '/peripherals', self.on_ros_periph_cmd, 10)
