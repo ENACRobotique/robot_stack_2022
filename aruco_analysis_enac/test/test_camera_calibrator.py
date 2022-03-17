@@ -11,6 +11,7 @@ class TestCameraCalibrator(unittest.TestCase):
     def setUpClass(cls):
         # Initialize the ROS context for the test node
         rclpy.init()
+        self.path = None
 
     @classmethod
     def tearDownClass(cls):
@@ -19,14 +20,14 @@ class TestCameraCalibrator(unittest.TestCase):
 
     def setUp(self):
         #Path to calibration folder
-        path = '/enac_ws/src/aruco_analysis_enac/calibration'
+        self.path = '/enac_ws/src/aruco_analysis_enac/calibration'
         calib_path = Parameter('calib_path', 
             Parameter.Type.STRING, 
             '/enac_ws/src/aruco_analysis_enac/calibration'
         )
 
         # Create a ROS node for tests
-        self.node = cam_cal.Calibrator(calib_file_override = path)
+        self.node = cam_cal.Calibrator(calib_file_override = self.path)
 
         #self.node.set_parameters('calib_path', 
         #    '/enac_ws/src/robot_stack_2022/aruco_analysis_enac/calibration')
@@ -40,6 +41,7 @@ class TestCameraCalibrator(unittest.TestCase):
         assert self.node != None
 
     def test_calibration_from_fish_eye(self):
+        path_to_calib = self.path + '/Calib_fisheye_480'
         pass
 
     def test_dict_for_yaml(self):

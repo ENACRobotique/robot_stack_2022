@@ -23,12 +23,15 @@ from rcl_interfaces.msg import ParameterDescriptor
 
 def calib_path_parameter(node):
     #get current file path for calibration pictures at the parent and then subfolder called calibration
+    
     calibration_folder_path = ParameterDescriptor()
     calibration_folder_path.name = 'save_folder_path'
     calibration_folder_path.description = 'Path to folder where pictures will be saved'
     calibration_folder_path.additional_constraints = 'save_folder_path'
     node.declare_parameter('calib_path', 'calib_imgs')
     calibration_folder_path = node.get_parameter('calib_path').get_parameter_value().string_value
+    
+    #create folder if it does not exist 
     try:
         os.chdir(calibration_folder_path)
         #chdir to one parent directory above the current one
@@ -43,6 +46,7 @@ def calib_path_parameter(node):
     return calibration_folder_path
 
 def input_ros_parameter(node):
+    #get ros parameter for which input method to use
     node.declare_parameter('use_console_input', 
         False,
         ParameterDescriptor(description='use console input if set to true (without console output) ' \
@@ -148,7 +152,7 @@ class Calibrator(node.Node):
         if self.width == None:
             self.width = frame_size[0]
         newcameramtx, roi = cv2.getOptimalNewCameraMatrix(matrix_camera, dist, (self.width,self.height), 1, (self.width,self.height))
-        dst = cv2.undistort(img, matrix_camera, dist, None, newcameramtx)
+
         DIM = (self.width, self.height)
         map1, map2 = cv2.fisheye.initUndistortRectifyMap(matrix_camera, dist, np.eye(3), newcameramtx, DIM, cv2.CV_16SC2)
         undistorted_img = cv2.remap(img, map1, map2, interpolation=cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT)

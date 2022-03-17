@@ -20,6 +20,7 @@ class ArucoNode(node.Node):
         self.declare_parameter('debug_mode', True) #scan all arucos every time and publish a downscaled picture for debug
         settings_description = ParameterDescriptor(description='aruco settings subset from settings.py (by int)')
         self.declare_parameter('aruco_settings', 1, settings_description)
+        self.declare_parameter('is_fish_cam', False)
 
         self.bridge = CvBridge()
         self.dict = cv2.aruco.Dictionary_get(cv2.aruco.DICT_4X4_1000)
@@ -30,7 +31,9 @@ class ArucoNode(node.Node):
         self.debug_mode = self.get_parameter('debug_mode').get_parameter_value().bool_value
         self.get_logger().info(f"debug mode : {self.debug_mode}")
         self.marker_settings = settings.get_markers(self.get_parameter('aruco_settings').get_parameter_value().integer_value)
-
+        self.is_fisheye = self.get_parameter('is_fish_cam').get_parameter_value().bool_value
+        if self.is_fisheye:
+            self.map1, selfMap2 = None, None #used for undistortion
 
         self.info_sub = self.create_subscription(CameraInfo,
             'camera_info', #'/camera/camera_info',
@@ -50,6 +53,10 @@ class ArucoNode(node.Node):
         self.info_msg = info_msg
         self.intrinsic_mat = np.reshape(np.array(self.info_msg.k), (3, 3))
         self.distortion = np.array(self.info_msg.d)
+        if self.is_fisheye:
+            newcameramtx, roi = cv2.getOptimalNewCameraMatrix(self.intrinsic_mat, self.distortion, (self.width,self.height), 1, (self.width,self.height))
+            DIM = (self.info_msg.width, self.info_msg.height)
+            self.map1, self.map2 = cv2.fisheye.initUndistortRectifyMap(self.intrinsic_mat, self.distortion, np.eye(3), newcameramtx, DIM, cv2.CV_16SC2)
 
         self.get_logger().debug('info from camera has been added : ')
         self.get_logger().debug(info_msg)
@@ -64,6 +71,9 @@ class ArucoNode(node.Node):
         self.frame_counter += 1
 
         cv_image = self.bridge.imgmsg_to_cv2(img_msg)
+        if self.is_fisheye: #undistort the image in case of fisheye camera (i'm trying to fix errors from fisheye)
+            cv_image = cv2.remap(cv_image, self.map1, self.map2, interpolation=cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT)
+
         (corners, ids, rejected) = cv2.aruco.detectMarkers(cv_image, self.dict)
         # pose estimation
         if ids is not None and len(ids) >= 1:
