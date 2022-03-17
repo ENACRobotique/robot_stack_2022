@@ -19,7 +19,7 @@ class ArucoNode(node.Node):
         super().__init__('detect_aruco')
         self.declare_parameter('debug_mode', True) #scan all arucos every time and publish a downscaled picture for debug
         settings_description = ParameterDescriptor(description='aruco settings subset from settings.py (by int)')
-        self.declare_parameter('aruco_settings', 1, settings_description)
+        self.declare_parameter('subset', 1, settings_description)
         self.declare_parameter('is_fish_cam', False)
 
         self.bridge = CvBridge()

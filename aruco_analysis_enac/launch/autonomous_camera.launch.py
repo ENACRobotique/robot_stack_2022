@@ -26,7 +26,23 @@ def generate_launch_description():
         name='detect_aruco',
         #arguments=['--ros-args', '--log-level', 'debug'],
         parameters=[
-            {'debug_mode': True},
+            {'debug_mode': False, 
+            'subset': 1,
+            'is_fish_cam': True,
+            },
+        ],
+        output="screen",
+    )
+
+    analysis_node = Node(
+        package='aruco_analysis_enac',
+        namespace='camera',
+        executable='analysis_aruco',
+        name='analysis_aruco',
+        parameters=[{
+            'debug_mode': False, 
+            'subset': 1,
+            }
         ],
         output="screen",
     )
@@ -34,4 +50,5 @@ def generate_launch_description():
     return LaunchDescription([
         data_src,
         detect_node,
+        analysis_node,
     ])
