@@ -1,4 +1,4 @@
 std_msgs/Header header
 
-string sensor_name
+string periph_name
 int32 value

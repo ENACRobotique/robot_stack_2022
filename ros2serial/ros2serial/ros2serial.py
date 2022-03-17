@@ -9,9 +9,10 @@ from tf2_msgs.msg import TFMessage
 from tf2_ros import TransformBroadcaster
 from diagnostic_msgs.msg import DiagnosticArray, DiagnosticStatus, KeyValue
 
-from interfaces_enac import __sensorvalue
+from interfaces_enac import __sensorvalue, __pid
 
-SensorValue = __sensorvalue.SensorValue
+PeriphValue = __periphvalue.PeriphValue
+Pid = __pid.Pid
 
 import serial
 import threading
@@ -29,17 +30,17 @@ CAPT_VAL = "c"
 
 #commandes à envoyer au serial:
 #v <int> <int>: commande de vitesse <linéaire * 1000> <omega * 1000>
-#s: arrêt du robot
+#s: arrêt du robot (ignoré: RoboKontrol)
 #a <id> <int> : ordre à un actionneur.
-#   id est deux caractères, le premier donnant le type d'actionneur (a pour AX12A, p pour pompe, e pour electroVanne, s pour servo)
+#   id est deux caractères (les deux premières lettres de son nom a6_MAIN_AVANT, donc a6), le premier donnant le type d'actionneur (a pour AX12A, p pour pompe, e pour electroVanne, s pour servo)
 #   le deuxième est un chiffre d'identification.
-#d : demande de description des actionneurs (pas forcément utile: RoboKontrol?)
+#d : demande de description des actionneurs (ignoré: RoboKontrol)
 #g [o/v] <int> <int> : changement des valeurs des PIDs (kp et ki)
 
 #commandes à récupérer du serial:
 #m <string>
 #p <double> <double> <double> <double> <double>: odométrie moteur <x> <y> <théta> <vlin> <vtheta>
-#b <string> <int> <int> <int> [R/RW] <string>: déclaration d'un actionneur (RW) ou d'un capteur (R). (pas forcément utile: RoboKontrol?) 
+#b <string> <int> <int> <int> [R/RW] <string>: déclaration d'un actionneur (RW) ou d'un capteur (R). (ignoré: RoboKontrol)
 #c <string> <int> : retour de capteur
 
 def quaternion_from_euler(roll, pitch, yaw):
@@ -60,8 +61,11 @@ class Ros2Serial(Node):
         self.listen = True
         #paramétrage ROS
         self.ros_odom = self.create_publisher(Odometry, '/odom', 10)
-        self.ros_peripherals = self.create_publisher(SensorValue, '/peripherals', 10)
+        self.ros_peripherals = self.create_publisher(PeriphValue, '/peripherals', 10)
         self.ros_diagnostics = self.create_publisher(DiagnosticArray, '/diagnostics', 10)
+        self.ros_vel_listener = self.create_subscription(Twist, '/cmd_vel', self.on_ros_cmd_vel, 10)
+        self.ros_vel_listener = self.create_subscription(Pid, '/pid', self.on_ros_pid, 10)
+        self.ros_periph_listener = self.create_subscription(PeriphValue, '/peripherals', self.on_ros_periph_cmd, 10)
 
     def start_serial_read(self):
         self.thread_read.start()
@@ -138,7 +142,7 @@ class Ros2Serial(Node):
 
     def on_serial_capt(self, args):
         #convertir les infor reçues au format ROS2
-        msg = SensorValue() #TODO: args
+        msg = PeriphValue() #TODO: args
         msg.header.stamp = self.get_clock().now().to_msg()
         msg.sensor_name = args[0]
         msg.value = int(args[1])
@@ -150,14 +154,28 @@ class Ros2Serial(Node):
         """Envoyer un message sur le port série"""
         self.ser.write(msg.encode('utf-8'))
 
-    def ros_send_odom(self, args):
-        pass
+    def on_ros_cmd_vel(self, msg):
+        vlin = msg.linear.x
+        vtheta = msg.angular.z
+        self.serial_send(CMD_VEL.format(int(vlin*1000), int(vtheta*1000)))
 
-    def ros_send_actu(self, args):
-        pass
+    def on_ros_periph_cmd(self, msg):
+        id = msg.periph_name[:2]
+        cmd = msg.value
+        self.serial_send(CMD_VEL.format(id, cmd))
 
-    def on_ros_cmd_vel(self, args):
-        pass
+    def on_ros_pid(self, msg):
+        kpv = msg.kpv
+        kiv = msg.kiv
+        #kdv = msg.kdv
+        kpo = msg.kpo
+        kio = msg.kio
+        #kdo = msg.kdo
+        if (kpv != 0 or kiv == 0): # or kdv != 0:
+            self.serial_send(CMD_PID.format('v', kpv, kiv))
+        if (kpo != 0 or kio == 0): # or kdo != 0:
+            self.serial_send(CMD_PID.format('o', kpo, kio))
+
 
 def main(args=None):
     rclpy.init(args=args)
