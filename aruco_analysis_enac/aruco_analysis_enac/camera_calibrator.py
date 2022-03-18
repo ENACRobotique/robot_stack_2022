@@ -65,8 +65,8 @@ class Calibrator(node.Node):
         self.info_msg = None
         
         #ros parameter to get a path string to save pictures
-        self.calibration_folder_path = calib_path_parameter(self) if calib_file_override == None else calib_file_override
-
+        #self.calibration_folder_path = calib_path_parameter(self) if calib_file_override == None else calib_file_override
+        self.calibration_folder_path = '/enac_ws/src/aruco_analysis_enac/calibration/Calib_fisheye_480'
         self.use_console_input = input_ros_parameter(self)
         #ros parameter description for use_console_input
         self.info_sub = self.create_subscription(CameraInfo,
@@ -123,9 +123,7 @@ class Calibrator(node.Node):
         width = 7
 
         self.get_logger().info(f'generate_calibration_file with distorsion model {distorsion_model}')
-        #TODO : wtf is used objp? 
-        objp = np.zeros((height*width,3), np.float32)
-        objp[:,:2] = np.mgrid[0:width,0:height].T.reshape(-1,2)
+
         # Arrays to store object points and image points from all the images.
         objpoints = [] # 3d point in real world space
         imgpoints = [] # 2d points in image plane.
@@ -140,9 +138,9 @@ class Calibrator(node.Node):
             images = glob.glob(self.calibration_folder_path + '/*.png')
             for fname in images:
                 img = cv2.imread(fname)
-                frame_size = self.img_chessboard_extraction(img, objpoints, imgpoints)
+                frame_size = self.img_chessboard_extraction(img, objpoints, imgpoints,width, height)
 
-            rms, matrix_camera, dist, rvecs, tvecs = cv2.calibrateCamera(objpoints, imgpoints, frameSize, None, None)
+            rms, matrix_camera, dist, rvecs, tvecs = cv2.calibrateCamera(objpoints, imgpoints, frame_size, None, None)
 
         proj_matrix = self.get_proj_matrix(matrix_camera, rvecs, tvecs)
         print("-- RMS for this calibration batch --")
@@ -151,12 +149,14 @@ class Calibrator(node.Node):
             self.height = frame_size[1]
         if self.width == None:
             self.width = frame_size[0]
-        newcameramtx, roi = cv2.getOptimalNewCameraMatrix(matrix_camera, dist, (self.width,self.height), 1, (self.width,self.height))
 
-        DIM = (self.width, self.height)
-        map1, map2 = cv2.fisheye.initUndistortRectifyMap(matrix_camera, dist, np.eye(3), newcameramtx, DIM, cv2.CV_16SC2)
-        undistorted_img = cv2.remap(img, map1, map2, interpolation=cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT)
-        cv2.imwrite('calibresult.png', undistorted_img)
+        if distorsion_model == 'fisheye':
+            newcameramtx, roi = cv2.getOptimalNewCameraMatrix(matrix_camera, dist, (self.width,self.height), 1, (self.width,self.height))
+
+            DIM = (self.width, self.height)
+            map1, map2 = cv2.fisheye.initUndistortRectifyMap(matrix_camera, dist, np.eye(3), newcameramtx, DIM, cv2.CV_16SC2)
+            undistorted_img = cv2.remap(img, map1, map2, interpolation=cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT)
+            cv2.imwrite('calibresult.png', undistorted_img)
 
         self.write_yaml(
             self.generate_dict_camera_info(distorsion_model, matrix_camera, dist, proj_matrix))
@@ -168,10 +168,13 @@ class Calibrator(node.Node):
         P = np.matmul(mtx,Rt) # A[R|t]
         return P
 
-    def img_chessboard_extraction(self, img, objpoints: list(), imgpoints: list()):
+    def img_chessboard_extraction(self, img, objpoints: list(), imgpoints: list(), chess_width, chess_height):
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        #TODO : wtf is used objp? 
+        objp = np.zeros((chess_height*chess_width,3), np.float32)
+        objp[:,:2] = np.mgrid[0:chess_width,0:chess_height].T.reshape(-1,2)
         # Find the chess board corners
-        ret, corners = cv2.findChessboardCorners(gray, (width,height), None)
+        ret, corners = cv2.findChessboardCorners(gray, (chess_width,chess_height), None)
         # If found, add object points, image points (after refining them)
         if ret == True:
             objpoints.append(objp)

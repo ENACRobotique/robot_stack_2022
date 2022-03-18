@@ -30,7 +30,7 @@ class ArucoNode(node.Node):
 
         self.debug_mode = self.get_parameter('debug_mode').get_parameter_value().bool_value
         self.get_logger().info(f"debug mode : {self.debug_mode}")
-        self.marker_settings = settings.get_markers(self.get_parameter('aruco_settings').get_parameter_value().integer_value)
+        self.marker_settings = settings.get_markers(self.get_parameter('subset').get_parameter_value().integer_value)
         self.is_fisheye = self.get_parameter('is_fish_cam').get_parameter_value().bool_value
         if self.is_fisheye:
             self.map1, selfMap2 = None, None #used for undistortion
