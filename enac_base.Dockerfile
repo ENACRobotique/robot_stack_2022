@@ -19,6 +19,7 @@ RUN pip install -r /enac_ws/src/requirements.txt
 RUN cd /enac_ws &&\
     source /opt/ros/galactic/setup.bash &&\
     #conditionnal symlink if target don't have src (because not dev env)
+    #Don't Correct this condition below with elif if you don't fix the CI pipeline build-arg for prod env
     if [ "$DEV" = "True" ]; then \
         colcon build --symlink-install; \
     else \

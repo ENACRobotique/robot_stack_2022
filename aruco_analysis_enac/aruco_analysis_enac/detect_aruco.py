@@ -54,8 +54,11 @@ class ArucoNode(node.Node):
         self.intrinsic_mat = np.reshape(np.array(self.info_msg.k), (3, 3))
         self.distortion = np.array(self.info_msg.d)
         if self.is_fisheye:
-            newcameramtx, roi = cv2.getOptimalNewCameraMatrix(self.intrinsic_mat, self.distortion, (self.width,self.height), 1, (self.width,self.height))
             DIM = (self.info_msg.width, self.info_msg.height)
+            newcameramtx = cv2.fisheye.estimateNewCameraMatrixForUndistortRectify(
+            self.intrinsic_mat, self.distortion, DIM, None)
+
+
             self.map1, self.map2 = cv2.fisheye.initUndistortRectifyMap(self.intrinsic_mat, self.distortion, np.eye(3), newcameramtx, DIM, cv2.CV_16SC2)
 
         self.get_logger().debug('info from camera has been added : ')

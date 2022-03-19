@@ -65,8 +65,8 @@ class Calibrator(node.Node):
         self.info_msg = None
         
         #ros parameter to get a path string to save pictures
-        #self.calibration_folder_path = calib_path_parameter(self) if calib_file_override == None else calib_file_override
-        self.calibration_folder_path = '/enac_ws/src/aruco_analysis_enac/calibration/Calib_fisheye_480'
+        self.calibration_folder_path = calib_path_parameter(self) if calib_file_override == None else calib_file_override
+        #self.calibration_folder_path = '/enac_ws/src/aruco_analysis_enac/calibration/Calib_fisheye_480'
         self.use_console_input = input_ros_parameter(self)
         #ros parameter description for use_console_input
         self.info_sub = self.create_subscription(CameraInfo,
@@ -151,12 +151,16 @@ class Calibrator(node.Node):
             self.width = frame_size[0]
 
         if distorsion_model == 'fisheye':
-            newcameramtx, roi = cv2.getOptimalNewCameraMatrix(matrix_camera, dist, (self.width,self.height), 1, (self.width,self.height))
+            #https://stackoverflow.com/questions/43790081/how-to-undistort-a-cropped-fisheye-image-using-opencv
+            newcameramtx = cv2.fisheye.estimateNewCameraMatrixForUndistortRectify(
+                matrix_camera,dist,(self.width,self.height),None)
+            #newcameramtx, roi = cv2.getOptimalNewCameraMatrix(matrix_camera, dist, (self.width,self.height), 1, (self.width,self.height))
 
             DIM = (self.width, self.height)
             map1, map2 = cv2.fisheye.initUndistortRectifyMap(matrix_camera, dist, np.eye(3), newcameramtx, DIM, cv2.CV_16SC2)
             undistorted_img = cv2.remap(img, map1, map2, interpolation=cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT)
-            cv2.imwrite('calibresult.png', undistorted_img)
+            #cv2.imwrite(self.calibration_folder_path+'/calibresult1.png', undistorted_img)
+            cv2.imwrite('/calibresult1.png', undistorted_img)
 
         self.write_yaml(
             self.generate_dict_camera_info(distorsion_model, matrix_camera, dist, proj_matrix))
