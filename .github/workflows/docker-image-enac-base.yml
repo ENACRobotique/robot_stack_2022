@@ -3,7 +3,7 @@ name: Docker Setup Buildx
 on:
   push:
     branches:
-      - 'main'
+      - 'master'
         
 jobs:
   docker:
