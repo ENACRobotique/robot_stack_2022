@@ -77,10 +77,10 @@ class ArucoNode(node.Node):
         print(self.is_fisheye)
         cv_image = self.bridge.imgmsg_to_cv2(img_msg)
         if self.is_fisheye: #undistort the image in case of fisheye camera (i'm trying to fix errors from fisheye)
-            cv_image2 = cv2.remap(cv_image, self.map1, self.map2, interpolation=cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT)
+            cv_image = cv2.remap(cv_image, self.map1, self.map2, interpolation=cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT)
             pass
 
-        (corners, ids, rejected) = cv2.aruco.detectMarkers(cv_image2, self.dict)
+        (corners, ids, rejected) = cv2.aruco.detectMarkers(cv_image, self.dict)
         # pose estimation
         if ids is not None and len(ids) >= 1:
             mvt_flag = settings.get_movement_flag(self.frame_counter) if not self.debug_mode else settings.Movement.ALL
@@ -99,7 +99,7 @@ class ArucoNode(node.Node):
 
             self.publish_markers(img_msg.header, ids_sorted, rvecs, tvecs)
         if self.debug_mode:
-            self.publish_img(img_msg.header, cv_image2, corners, ids, rvecs, tvecs, 240)
+            self.publish_img(img_msg.header, cv_image, corners, ids, rvecs, tvecs, 240)
 
         else:
             self.get_logger().info("ids not detected")
