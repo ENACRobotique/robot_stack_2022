@@ -58,7 +58,7 @@ class ArucoNode(node.Node):
         if self.is_fisheye:
             DIM = (self.info_msg.width, self.info_msg.height)
             newcameramtx = cv2.fisheye.estimateNewCameraMatrixForUndistortRectify(
-            self.intrinsic_mat, self.distortion, DIM, None)
+            self.intrinsic_mat, self.distortion, DIM, np.eye(3), balance=1)
 
 
             self.map1, self.map2 = cv2.fisheye.initUndistortRectifyMap(self.intrinsic_mat, self.distortion, np.eye(3), newcameramtx, DIM, cv2.CV_16SC2)
@@ -74,12 +74,13 @@ class ArucoNode(node.Node):
         if self.info_msg == None:
             return
         self.frame_counter += 1
-
+        print(self.is_fisheye)
         cv_image = self.bridge.imgmsg_to_cv2(img_msg)
         if self.is_fisheye: #undistort the image in case of fisheye camera (i'm trying to fix errors from fisheye)
-            cv_image = cv2.remap(cv_image, self.map1, self.map2, interpolation=cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT)
+            cv_image2 = cv2.remap(cv_image, self.map1, self.map2, interpolation=cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT)
+            pass
 
-        (corners, ids, rejected) = cv2.aruco.detectMarkers(cv_image, self.dict)
+        (corners, ids, rejected) = cv2.aruco.detectMarkers(cv_image2, self.dict)
         # pose estimation
         if ids is not None and len(ids) >= 1:
             mvt_flag = settings.get_movement_flag(self.frame_counter) if not self.debug_mode else settings.Movement.ALL
@@ -98,7 +99,7 @@ class ArucoNode(node.Node):
 
             self.publish_markers(img_msg.header, ids_sorted, rvecs, tvecs)
         if self.debug_mode:
-            self.publish_img(img_msg.header, cv_image, corners, ids, rvecs, tvecs, 240)
+            self.publish_img(img_msg.header, cv_image2, corners, ids, rvecs, tvecs, 240)
 
         else:
             self.get_logger().info("ids not detected")
@@ -124,7 +125,7 @@ class ArucoNode(node.Node):
         img_with_markers = cv2.aruco.drawDetectedMarkers(cv2_img, corners, np.array(ids))
 
         #Adding timeout because function sometimes takes too long to finish
-        with timeout(0.1):
+        with timeout(1):
             for i, sized_rvec in enumerate(rvecs):
                 for y, rvec in enumerate(sized_rvec):
                     cv2.aruco.drawAxis(img_with_markers, self.intrinsic_mat, self.distortion, rvec, tvecs[i][y], 0.1)
@@ -145,7 +146,7 @@ def timeout(time):
     try:
         yield
     except TimeoutError:
-        print(f" draw axis has timeout : exceeded 0.1s ")
+        print(f" draw axis has timeout : exceeded 1s ")
         pass
     finally:
         # Unregister the signal so it won't be triggered
