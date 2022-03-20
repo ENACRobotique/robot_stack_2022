@@ -1,5 +1,7 @@
 import cv2
 import numpy as np
+import signal
+from contextlib import contextmanager
 import aruco_analysis_enac.settings as settings
 
 import rclpy
@@ -120,14 +122,40 @@ class ArucoNode(node.Node):
             Publish image with detected markers downscaled to a given height
         """
         img_with_markers = cv2.aruco.drawDetectedMarkers(cv2_img, corners, np.array(ids))
-        for i, sized_rvec in enumerate(rvecs):
-            for y, rvec in enumerate(sized_rvec):
-                cv2.aruco.drawAxis(img_with_markers, self.intrinsic_mat, self.distortion, rvec, tvecs[i][y], 0.1)
+
+        #Adding timeout because function sometimes takes too long to finish
+        with timeout(0.1):
+            for i, sized_rvec in enumerate(rvecs):
+                for y, rvec in enumerate(sized_rvec):
+                    cv2.aruco.drawAxis(img_with_markers, self.intrinsic_mat, self.distortion, rvec, tvecs[i][y], 0.1)
         resize_width = int(resize_height * 16/9)
         resized = cv2.resize(img_with_markers, (resize_width, resize_height), interpolation = cv2.INTER_AREA)
         img_ros = self.bridge.cv2_to_imgmsg(resized, encoding="8UC3")
         img_ros.header = header
         self.markers_image_pub.publish(img_ros)
+
+#https://www.jujens.eu/posts/en/2018/Jun/02/python-timeout-function/
+@contextmanager
+def timeout(time):
+    # Register a function to raise a TimeoutError on the signal.
+    signal.signal(signal.SIGALRM, raise_timeout)
+    # Schedule the signal to be sent after ``time``.
+    signal.alarm(time)
+
+    try:
+        yield
+    except TimeoutError:
+        print(f" draw axis has timeout : exceeded 0.1s ")
+        pass
+    finally:
+        # Unregister the signal so it won't be triggered
+        # if the timeout is not reached.
+        signal.signal(signal.SIGALRM, signal.SIG_IGN)
+
+def raise_timeout(signum, frame):
+    raise TimeoutError
+
+
 
 def main():
     rclpy.init()
