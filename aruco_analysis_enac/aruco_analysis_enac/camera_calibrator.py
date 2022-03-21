@@ -9,6 +9,7 @@ import curses
 import numpy as np
 import cv2
 import os
+import re
 
 import glob
 import yaml
@@ -285,10 +286,19 @@ class Calibrator(node.Node):
         img_ros.header = header
         self.downscale_img_pub.publish(img_ros)
     
+    def replace_yaml_array(self, string):
+    #format string to array with the correct format -> data: [1, -1, 3]
+        string = re.sub(r'\n\s+- ', ', ', string, 0, re.DOTALL | re.MULTILINE) #convert to format -> '  data:, -0.052, 0.22525385, -0.535028681'
+        string = re.sub(r'(:, ?)([0-9-]+)', r': [\2', string, 0, re.DOTALL | re.MULTILINE) #convert - add beggining bracket -> '  data: [264.55, 243.605'
+        string = re.sub(r'(\[[\d\., -]+)', r'\1]', string) #convert - add closing bracket -> '  data: [363.65623590403345, 0.0]'
+        return string
+
     
     def write_yaml(self, dict_file):
         with open(f'{self.calibration_folder_path}/calib_file.yaml', 'w') as f:
-            yaml.dump(dict_file, f, sort_keys=False)
+            yaml_str = yaml.dump(dict_file, sort_keys=False)
+            yaml_str = self.replace_yaml_array(yaml_str)
+            f.write(yaml_str)
 
     def generate_dict_camera_info(self, distorsion_model, matrix_camera, distorsion, proj_matrix):
         """generate dict for camera info to make a yaml file
