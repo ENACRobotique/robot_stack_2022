@@ -119,7 +119,7 @@ class Calibrator(node.Node):
             self.picture_to_take += 1
 
     def generate_calibration_file(self, bool_generate_msg):
-        distorsion_model = 'fisheye' if bool_generate_msg.data else 'plum_bob' #true or false
+        distorsion_model = 'fisheye' if bool_generate_msg.data else 'plumb_bob' #true or false
         height = 9
         width = 7
 
@@ -319,7 +319,7 @@ class Calibrator(node.Node):
         yaml_distotion_coeff = distorsion.flatten().tolist()
         yaml_rectification_matrix = [1, 0, 0, 0, 1, 0, 0, 0, 1]
         yaml_projection_matrix = proj_matrix.flatten().tolist()
-        column_dist_coeff = 5 if distorsion_model == 'plum_bob' else 4 #if fisheye
+        column_dist_coeff = 5 if distorsion_model == 'plumb_bob' else 4 #if fisheye
 
         #writing yaml file
         dict_file = {}
