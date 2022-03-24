@@ -1,6 +1,6 @@
 import rclpy
 from rclpy.node import Node
-from std_msgs import LaserScan
+from std_msgs.msg import LaserScan
 
 class lidarlocation(Node):
      def __init__(self,name='Lidar_location'):
