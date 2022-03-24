@@ -3,7 +3,7 @@ from rclpy.node import Node
 from std_msgs import LaserScan
 
 class lidarlocation(Node):
-     def __init__(self,, name='Lidar_location', ):
+     def __init__(self,name='Lidar_location'):
         super().__init__(name)
      self.subscription= self.create_subscription(
          LaserScan,
