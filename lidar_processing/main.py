@@ -15,7 +15,8 @@ class lidarlocation(Node):
 
     def generate_filtered_message(self,message, filtered_data):
         out = message
-        out.ranges = filtered_data
+        for i in range(0, len(filtered_data)):
+            out.ranges[i] = filtered_data[i]
         return out    
     
     def filter_out(self,message):
