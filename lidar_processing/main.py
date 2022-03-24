@@ -17,7 +17,7 @@ class lidarlocation(Node):
 
 def main():
     rclpy.init()
-    node = ArucoAnalysis()
+    node = lidarlocation()
     try:
         rclpy.spin(node)
     except KeyboardInterrupt:
