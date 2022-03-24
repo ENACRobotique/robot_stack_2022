@@ -38,7 +38,7 @@ class lidarlocation(Node):
         #msg_out = self.generate_filtered_message(msg,self.filter_out(msg))
         msg_out = msg
         #self.get_logger().info(msg_out.angle_max)
-        self.publisher_publish(msg_out) 
+        self.publisher_.publish(msg_out) 
  
     
 
