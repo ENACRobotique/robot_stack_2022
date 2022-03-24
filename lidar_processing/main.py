@@ -13,12 +13,12 @@ class lidarlocation(Node):
         self.subscription
         self.publisher_=self.create_publisher(LaserScan,'filtered_scan',10)
 
-    def generate_filtered_message(message, filtered_data):
+    def generate_filtered_message(self,message, filtered_data):
         out = message
         out['ranges'] = filtered_data
         return out    
     
-    def filter_out(message):
+    def filter_out(self,message):
         out = []
         for i in range(0, len(message['ranges'])):
             if message['ranges'][i] is not None :
