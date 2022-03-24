@@ -42,8 +42,8 @@ class lidarlocation(Node):
         self.publisher_.publish(msg_out) 
  
     
+ 
 
-    
 
 def main():
     rclpy.init()
