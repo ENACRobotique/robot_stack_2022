@@ -12,14 +12,12 @@ class lidarlocation(Node):
             10)
         self.subscription
         self.publisher_=self.create_publisher(LaserScan,'filtered_scan',10)
-        
 
-    def listener_callback(self,msg):
-        #self.get_logger().info(msg.angle_max)
-        msg_out = generate_filtered_message(msg,filter_out(msg))
-        #self.get_logger().info(msg_out.angle_max)
-        self.publisher_publish(msg_out) 
-             
+    def generate_filtered_message(message, filtered_data):
+        out = message
+        out['ranges'] = filtered_data
+        return out    
+    
     def filter_out(message):
         out = []
         for i in range(0, len(message['ranges'])):
@@ -32,10 +30,15 @@ class lidarlocation(Node):
                 out.append(message['ranges'][i])
         return out
 
-    def generate_filtered_message(message, filtered_data):
-        out = message
-        out['ranges'] = filtered_data
-        return out
+    def listener_callback(self,msg):
+        #self.get_logger().info(msg.angle_max)
+        msg_out = generate_filtered_message(msg,filter_out(msg))
+        #self.get_logger().info(msg_out.angle_max)
+        self.publisher_publish(msg_out) 
+ 
+    
+
+    
 
 def main():
     rclpy.init()
