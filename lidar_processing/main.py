@@ -5,12 +5,12 @@ from std_msgs import LaserScan
 class lidarlocation(Node):
      def __init__(self,name='Lidar_location'):
         super().__init__(name)
-     self.subscription= self.create_subscription(
-         LaserScan,
-         'scan',
-         self.listener_callback,
-         10)
-         self.subscription
+        self.subscription= self.create_subscription(
+            LaserScan,
+            'scan',
+            self.listener_callback,
+            10)
+        self.subscription
 
      def listener_callback(self,msg):
          self.get_logger().info(msg.ranges)    
