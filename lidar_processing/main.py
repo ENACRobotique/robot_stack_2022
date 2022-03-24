@@ -15,9 +15,9 @@ class lidarlocation(Node):
         
 
     def listener_callback(self,msg):
-        self.get_logger().info(msg.angle_max)
+        #self.get_logger().info(msg.angle_max)
         msg_out = generate_filtered_message(msg,filter_out(msg))
-        self.get_logger().info(msg_out.angle_max)
+        #self.get_logger().info(msg_out.angle_max)
         self.publisher_publish(msg_out) 
              
     def filter_out(message):
