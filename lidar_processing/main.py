@@ -20,14 +20,14 @@ class lidarlocation(Node):
     
     def filter_out(self,message):
         out = []
-        for i in range(0, len(message['ranges'])):
-            if message['ranges'][i] is not None :
-                if message['ranges'][i] > 3.6 :
+        for i in range(0, len(message.ranges)):
+            if message.ranges[i] is not None :
+                if message.ranges[i] > 3.6 :
                     out.append(None)
                 else:
-                    out.append(message['ranges'][i])
+                    out.append(message.ranges[i])
             else:
-                out.append(message['ranges'][i])
+                out.append(message.ranges[i])
         return out
 
     def echo(self, messsage):
