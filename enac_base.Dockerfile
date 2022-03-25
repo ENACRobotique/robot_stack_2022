@@ -6,6 +6,9 @@ SHELL [ "/bin/bash" , "-c" ]
 
 RUN cd /
 
+#TODO : TO MOVE TO ENAC_DEPENDENCIES
+RUN apt-get install -y libudev
+
 RUN mkdir /enac_ws &&\
     cd /enac_ws &&\ 
     mkdir src &&\
@@ -20,9 +23,9 @@ RUN cd /enac_ws &&\
     source /opt/ros/galactic/setup.bash &&\
     #conditionnal symlink if target don't have src (because not dev env)
     if [ "$DEV" = "True" ]; then \
-        colcon build --symlink-install; \
+    colcon build --symlink-install; \
     else \
-        colcon build; \
+    colcon build; \
     fi &&\
     source install/local_setup.bash
 
