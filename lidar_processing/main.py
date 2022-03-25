@@ -1,52 +1,60 @@
-#!/usr/bin/env python
-import rospy
-from std_msgs.msg import LaserScan
+import rclpy
+from rclpy.node import Node
+from sensor_msgs.msg import LaserScan
 
-# Filters out unnecessary points. points farther than the size of the table
-# will be set to "None" 
-def filter_out(message):
-    out = []
-    for i in range(0, len(message['ranges'])):
-        if message['ranges'][i] is not None :
-            if message['ranges'][i] > 3.6 :
-                out.append(None)
+class lidarlocation(Node):
+    def __init__(self,name='Lidar_location'):
+        super().__init__(name)
+        self.subscription= self.create_subscription(
+            LaserScan,
+            'scan',
+            self.listener_callback,
+            10)
+        self.subscription
+        self.publisher_=self.create_publisher(LaserScan,'filtered_scan',10)
+
+    def generate_filtered_message(self,message, filtered_data):
+        out = message
+        for i in range(0, len(filtered_data)):
+            out.ranges[i] = filtered_data[i]
+        return out    
+    
+    def filter_out(self,message):
+        out = []
+        for i in range(0, len(message.ranges)):
+            if message.ranges[i] is not None :
+                if message.ranges[i] > 3.6 :
+                    out.append(0)
+                else:
+                    out.append(message.ranges[i])
             else:
-                out.append(message['ranges'][i])
-        else:
-            out.append(message['ranges'][i])
-    return out
+                out.append(message.ranges[i])
+        return out
 
-def generate_filtered_message(message, filtered_data):
-    out = message
-    out['ranges'] = filtered_data
-    return out
+    def echo(self, messsage):
+        return message
 
-def listener():
+    def listener_callback(self,msg):
+        #self.get_logger().info(msg.angle_max)
+        msg_out = self.generate_filtered_message(msg,self.filter_out(msg))
+        #msg_out = msg
+        #self.get_logger().info(msg_out.angle_max)
+        self.publisher_.publish(msg_out) 
+ 
+    
 
-    # In ROS, nodes are uniquely named. If two nodes with the same
-    # name are launched, the previous one is kicked off. The
-    # anonymous=True flag means that rospy will choose a unique
-    # name for our 'listener' node so that multiple listeners can
-    # run simultaneously.
-    rospy.init_node('listener', anonymous=True)
+    
 
-    rospy.Subscriber("scan", LaserScan, callback)
+def main():
+    rclpy.init()
+    node = lidarlocation()
+    try:
+        rclpy.spin(node)
+    except KeyboardInterrupt:
+        pass
 
-    # spin() simply keeps python from exiting until this node is stopped
-    rospy.spin()
+    rclpy.shutdown()
 
-def talker():
-    pub = rospy.Publisher('chatter', LaseScan, queue_size=10)
-    rospy.init_node('filtered_scan', anonymous=True)
-    rate = rospy.Rate(10) # 10hz
-    while not rospy.is_shutdown():
-        pub.publish(generate_filtered_message(message, filter_out(message)))
-        rate.sleep()
 
 if __name__ == '__main__':
-    message = {}
-     try:
-        listener()
-        talker()
-    except rospy.ROSInterruptException:
-        pass
+    main()
