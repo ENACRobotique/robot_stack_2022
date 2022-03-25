@@ -7,7 +7,7 @@ SHELL [ "/bin/bash" , "-c" ]
 RUN cd /
 
 #TODO : TO MOVE TO ENAC_DEPENDENCIES
-RUN apt-get install -y libudev
+RUN apt-get install -y libudev-dev
 
 RUN mkdir /enac_ws &&\
     cd /enac_ws &&\ 
