@@ -35,7 +35,7 @@ class ArucoNode(node.Node):
         self.marker_settings = settings.get_markers(self.get_parameter('subset').get_parameter_value().integer_value)
         self.is_fisheye = self.get_parameter('is_fish_cam').get_parameter_value().bool_value
         if self.is_fisheye:
-            self.map1, selfMap2 = None, None #used for undistortion
+            self.map1, self.map2 = None, None #used for undistortion
 
         self.info_sub = self.create_subscription(CameraInfo,
             'camera_info', #'/camera/camera_info',
@@ -98,7 +98,7 @@ class ArucoNode(node.Node):
             #print("3"+ str(self.get_clock().now() - timeTaken))
 
             self.publish_markers(img_msg.header, ids_sorted, rvecs, tvecs)
-        if self.debug_mode:
+        if self.debug_mode and rvecs is not None and tvecs is not None: #prevent from publishing image without corners which would crash the node
             self.publish_img(img_msg.header, cv_image, corners, ids, rvecs, tvecs, 240)
 
         else:
@@ -122,7 +122,8 @@ class ArucoNode(node.Node):
         """ 
             Publish image with detected markers downscaled to a given height
         """
-        img_with_markers = cv2.aruco.drawDetectedMarkers(cv2_img, corners, np.array(ids))
+        if corners != None:
+            img_with_markers = cv2.aruco.drawDetectedMarkers(cv2_img, corners, np.array(ids))
 
         #Adding timeout because function sometimes takes too long to finish
         with timeout(1):

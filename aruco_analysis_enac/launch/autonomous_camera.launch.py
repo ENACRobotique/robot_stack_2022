@@ -15,7 +15,7 @@ def generate_launch_description():
         executable='v4l2_camera_node',
         name='camera',
         parameters=[
-            {'image_size':[1920,1080]},
+            {'image_size':[1280,720]},
         ],
     )
 
@@ -28,7 +28,7 @@ def generate_launch_description():
         parameters=[
             {'debug_mode': False, 
             'subset': 1,
-            'is_fish_cam': True,
+            'is_fish_cam': False,
             },
         ],
         output="screen",
