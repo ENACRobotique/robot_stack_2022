@@ -1,15 +1,21 @@
-FROM python:3.8-alpine
+FROM ubuntu:latest
 
-RUN apk add --no-cache libffi-dev openssl-dev gcc musl-dev libc6-compat gcompat
+SHELL [ "/bin/bash" , "-c" ]
+
+RUN apt-get update && apt-get install -y \
+    python3-pip \
+    libffi-dev \
+    gcc \
+    musl-dev
 
 ENV CRYPTOGRAPHY_DONT_BUILD_RUST=1
 
-RUN pip3 install platformio
+RUN pip install platformio
 
 # folowing command installs more dependencies...
 RUN pio remote agent start || true
 
 #TODO : move it to the first RUN
-RUN apk add --no-cache eudev-dev
+#RUN apk add --no-cache eudev-dev
 
 ENTRYPOINT [ "pio", "remote", "agent", "start" ]
