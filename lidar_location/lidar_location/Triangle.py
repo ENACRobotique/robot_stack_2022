@@ -62,15 +62,24 @@ class Triangle:
 
     def compare_angles(self, triangle2):
         for angle1 in self.angles:
+            is_triangle = False
             for angle2 in triangle2.angles:
+                is_triangle = True
                 if math.abs(angle1 - angle2) > jitter_angle:
-                    return False
+                    is_triangle = False
+                if is_triangle == True:
+                    return True
+        return False
 
     def compare_distances(self, triangle2):
         for dist1 in self.distances:
             for dist2 in triangle2.distances:
+                is_triangle = True
                 if math.abs(dist1 - dist2) > jitter_distance:
-                    return False
+                    is_triangle = False
+                if is_triangle == True:
+                    return True
+        return False
 
     def get_distance_pt(self, pt1, pt2):
         angle_difference = abs(pt1.angle - pt2.angle)
