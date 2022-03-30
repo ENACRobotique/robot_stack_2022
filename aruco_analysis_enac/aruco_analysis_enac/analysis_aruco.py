@@ -1,5 +1,5 @@
 from turtle import position
-from aruco_analysis_enac.aruco_analysis_enac.tf import Transform
+from aruco_analysis_enac.tf import Transform
 import rclpy
 from rclpy.node import Node
 from rclpy.qos import qos_profile_sensor_data
@@ -9,7 +9,7 @@ from diagnostic_msgs.msg import DiagnosticArray, DiagnosticStatus, KeyValue
 import aruco_analysis_enac.aruco_calculations as calc
 from aruco_analysis_enac.aruco_storage import ArucosStorage
 from aruco_analysis_enac.settings import Movement as Mvt
-from interfaces_enac.msg import _fiducials_poses, _object_marked, _objects_marked
+from interfaces_enac.msg import _fiducials_poses, _object_marked#, _objects_marked
 
 from tf2_ros.buffer import Buffer
 from tf2_ros.transform_listener import TransformListener
@@ -18,7 +18,7 @@ from tf2_ros import TransformBroadcaster
 
 FidPoses = _fiducials_poses.FiducialsPoses
 ObjectMarked = _object_marked.ObjectMarked
-ObjectsMarked = _objects_marked.ObjectsMarked
+#ObjectsMarked = _objects_marked.ObjectsMarked
 
 class ArucoAnalysis(Node):
     """ class that"""
@@ -117,7 +117,7 @@ class ArucoAnalysis(Node):
                 #third step : publish the object poses
                 #TODO : avoid dupplication of marker ids if multiple references
                 objects_marked.append(self.__get_object_marked_msg(aruco_poses.header, marker_id, marker_pose_wrt_origin))
-        self.__publish_objects_marked(objects_marked)
+        #self.__publish_objects_marked(objects_marked) #TODO : uncomment
 
     def __send_diagnostics(self, level, msg_txt):
         if not hasattr(self, 'diagnostics'):
@@ -138,21 +138,21 @@ class ArucoAnalysis(Node):
     #def identify_fixed_markers(self, )
     def publish_arucos(self, objects_marked):
         """Publish aruco poses in ObjectMarked """
-        cur_obj = ObjectsMarked()
-        cur_obj.objectsMarked = objects_marked
-        self.object_marked_pub.publish(cur_obj)
+        #cur_obj = ObjectsMarked()
+        #cur_obj.objectsMarked = objects_marked
+        #self.object_marked_pub.publish(cur_obj)
         pass
 
     def __get_object_marked_msg(self, header, id:int, pose:Transform):
         """ get a ObjectMarked message from a aruco id and a pose"""
         cur_obj = ObjectMarked()
-        cur_obj.id = id
+        cur_obj.marker_id = id
         cur_obj.is_moving = True if self.arucosStorage.get_aruco_mvt(id) == Mvt.MOVING else False
         
         #fill PoseStamped message
         cur_obj.pose.header = header
-        cur_obj.pose.position = pose.position
-        cur_obj.pose.orientation = pose.quaternion
+        #cur_obj.pose.pose.position = pose.position #TODO uncomment
+        #cur_obj.pose.pose.orientation = pose.quaternion
         #TODO : fill diameter with settings.py
         return cur_obj
 def main():

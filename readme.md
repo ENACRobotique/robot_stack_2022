@@ -7,13 +7,14 @@ xhost local:root
 ```
 For the rest : 
 ```
-docker run -it -d --net=host -e DISPLAY --name club_robot --volume /home/robot/ros_aruco/src/robot_stack_2022:/enac_ws/src --volume /home/robot/bag_files:/enac_ws/bag enacrobotique/enac-base bash
+docker run -it -d --net=host -e DISPLAY --name club_robot --volume /home/robot/ros_aruco/src/robot_stack_2022:/enac_ws/src --volume /home/robot/bag_files:/enac_ws/bag enacrobotique/enac-base:dev bash
 ```
 PI 4 with camera :
 docker run -it --net=host --pid=host -e DISPLAY --device=/dev/video0 enacrobotique/enac-base bash:prod
 ## Useful commands
 
-#### Connection with rosbridge (for foxglove,...)
+#### Connection wi    ros2 launch rosbridge_server rosbridge_websocket_launch.xml
+th rosbridge (for foxglove,...)
 
     ros2 launch rosbridge_server rosbridge_websocket_launch.xml
 
@@ -53,7 +54,7 @@ ipconfig
 obtenir l'addresse IP WSL
 
 ```
-docker run -it --rm -p "9090:9090" --name club_robot --gpus all --env="NVIDIA_DRIVER_CAPABILITIES=all" --env="DISPLAY=172.29.208.1:0.0" --env="QT_X11_NO_MITSHM=1" --env="LIBGL_ALWAYS_INDIRECT=0" --volume D:\Sync\Code\Robotique\CDR2022\robot_stack_2022:/enac_ws/src --volume "C:\Users\Jonathan\Downloads\Aruco data":/enac_ws/bag enacrobotique/enac-base bash
+docker run -it --rm -p "9090:9090" --name club_robot --gpus all --env="NVIDIA_DRIVER_CAPABILITIES=all" --env="DISPLAY=172.29.208.1:0.0" --env="QT_X11_NO_MITSHM=1" --env="LIBGL_ALWAYS_INDIRECT=0" --volume D:\Sync\Code\Robotique\CDR2022\robot_stack_2022:/enac_ws/src --volume "C:\Users\Jonathan\Downloads\Aruco data":/enac_ws/bag enacrobotique/enac-base:dev bash
 ```
 
 ### pour faire marcher foxglove (sous windows):
@@ -73,6 +74,9 @@ enac_base:dev -> (ARM64+AMD64) The base image to use for the club DEVELOPMENT (S
 enac_base:raspy_win (ARM64) -> Future deprecration, just to use when compilling for ARM64 from windows in case of problem
 
 *enac_base:latest -> to use for people who forget to set a tag*
+
+platformio :
+    docker run --restart=always --rm -e PLATFORMIO_AUTH_TOKEN=nauXr57H2WBfcGppv6WIzYx7pGeerZTdmZnZXmKeaGuUpLecjHnSlHChZalqmKBej2xlZrvTvMmFfKVlnaaZq53D2ZBkc2hr enacrobotique/platformio-remote 
 ## Building
 
 ### target AMD64 and ARM64 (raspy included):
@@ -99,6 +103,9 @@ Pour la version **dev** (avec le volume)
     --build-arg DEV="True"
 
 docker buildx build --build-arg DEV="True" --platform linux/amd64,linux/arm64 . -f enac_base.Dockerfile -t enacrobotique/enac-base:dev --push
+
+Pour platformio-core :
+docker buildx build --platform linux/amd64,linux/arm64 . -f platformio_core.Dockerfile -t enacrobotique/platformio-remote:latest --push
 
 ```
 ### AMD64 only:

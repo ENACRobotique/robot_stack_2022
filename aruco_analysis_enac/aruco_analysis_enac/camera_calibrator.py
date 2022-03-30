@@ -9,6 +9,7 @@ import curses
 import numpy as np
 import cv2
 import os
+import re
 
 import glob
 import yaml
@@ -66,7 +67,7 @@ class Calibrator(node.Node):
         
         #ros parameter to get a path string to save pictures
         self.calibration_folder_path = calib_path_parameter(self) if calib_file_override == None else calib_file_override
-
+        #self.calibration_folder_path = '/enac_ws/src/aruco_analysis_enac/calibration/Calib_fisheye_480'
         self.use_console_input = input_ros_parameter(self)
         #ros parameter description for use_console_input
         self.info_sub = self.create_subscription(CameraInfo,
@@ -118,14 +119,12 @@ class Calibrator(node.Node):
             self.picture_to_take += 1
 
     def generate_calibration_file(self, bool_generate_msg):
-        distorsion_model = 'fisheye' if bool_generate_msg.data else 'plum_bob' #true or false
+        distorsion_model = 'fisheye' if bool_generate_msg.data else 'plumb_bob' #true or false
         height = 9
         width = 7
 
         self.get_logger().info(f'generate_calibration_file with distorsion model {distorsion_model}')
-        #TODO : wtf is used objp? 
-        objp = np.zeros((height*width,3), np.float32)
-        objp[:,:2] = np.mgrid[0:width,0:height].T.reshape(-1,2)
+
         # Arrays to store object points and image points from all the images.
         objpoints = [] # 3d point in real world space
         imgpoints = [] # 2d points in image plane.
@@ -140,9 +139,9 @@ class Calibrator(node.Node):
             images = glob.glob(self.calibration_folder_path + '/*.png')
             for fname in images:
                 img = cv2.imread(fname)
-                frame_size = self.img_chessboard_extraction(img, objpoints, imgpoints)
+                frame_size = self.img_chessboard_extraction(img, objpoints, imgpoints,width, height)
 
-            rms, matrix_camera, dist, rvecs, tvecs = cv2.calibrateCamera(objpoints, imgpoints, frameSize, None, None)
+            rms, matrix_camera, dist, rvecs, tvecs = cv2.calibrateCamera(objpoints, imgpoints, frame_size, None, None)
 
         proj_matrix = self.get_proj_matrix(matrix_camera, rvecs, tvecs)
         print("-- RMS for this calibration batch --")
@@ -151,12 +150,18 @@ class Calibrator(node.Node):
             self.height = frame_size[1]
         if self.width == None:
             self.width = frame_size[0]
-        newcameramtx, roi = cv2.getOptimalNewCameraMatrix(matrix_camera, dist, (self.width,self.height), 1, (self.width,self.height))
 
-        DIM = (self.width, self.height)
-        map1, map2 = cv2.fisheye.initUndistortRectifyMap(matrix_camera, dist, np.eye(3), newcameramtx, DIM, cv2.CV_16SC2)
-        undistorted_img = cv2.remap(img, map1, map2, interpolation=cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT)
-        cv2.imwrite('calibresult.png', undistorted_img)
+        if distorsion_model == 'fisheye':
+            #https://stackoverflow.com/questions/43790081/how-to-undistort-a-cropped-fisheye-image-using-opencv
+            newcameramtx = cv2.fisheye.estimateNewCameraMatrixForUndistortRectify(
+                matrix_camera,dist,(self.width,self.height),None)
+            #newcameramtx, roi = cv2.getOptimalNewCameraMatrix(matrix_camera, dist, (self.width,self.height), 1, (self.width,self.height))
+
+            DIM = (self.width, self.height)
+            map1, map2 = cv2.fisheye.initUndistortRectifyMap(matrix_camera, dist, np.eye(3), newcameramtx, DIM, cv2.CV_16SC2)
+            undistorted_img = cv2.remap(img, map1, map2, interpolation=cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT)
+            #cv2.imwrite(self.calibration_folder_path+'/calibresult1.png', undistorted_img)
+            cv2.imwrite('/calibresult1.png', undistorted_img)
 
         self.write_yaml(
             self.generate_dict_camera_info(distorsion_model, matrix_camera, dist, proj_matrix))
@@ -168,10 +173,13 @@ class Calibrator(node.Node):
         P = np.matmul(mtx,Rt) # A[R|t]
         return P
 
-    def img_chessboard_extraction(self, img, objpoints: list(), imgpoints: list()):
+    def img_chessboard_extraction(self, img, objpoints: list(), imgpoints: list(), chess_width, chess_height):
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        #TODO : wtf is used objp? 
+        objp = np.zeros((chess_height*chess_width,3), np.float32)
+        objp[:,:2] = np.mgrid[0:chess_width,0:chess_height].T.reshape(-1,2)
         # Find the chess board corners
-        ret, corners = cv2.findChessboardCorners(gray, (width,height), None)
+        ret, corners = cv2.findChessboardCorners(gray, (chess_width,chess_height), None)
         # If found, add object points, image points (after refining them)
         if ret == True:
             objpoints.append(objp)
@@ -278,10 +286,19 @@ class Calibrator(node.Node):
         img_ros.header = header
         self.downscale_img_pub.publish(img_ros)
     
+    def replace_yaml_array(self, string):
+    #format string to array with the correct format -> data: [1, -1, 3]
+        string = re.sub(r'\n\s+- ', ', ', string, 0, re.DOTALL | re.MULTILINE) #convert to format -> '  data:, -0.052, 0.22525385, -0.535028681'
+        string = re.sub(r'(:, ?)([0-9-]+)', r': [\2', string, 0, re.DOTALL | re.MULTILINE) #convert - add beggining bracket -> '  data: [264.55, 243.605'
+        string = re.sub(r'(\[[\d\., -]+)', r'\1]', string) #convert - add closing bracket -> '  data: [363.65623590403345, 0.0]'
+        return string
+
     
     def write_yaml(self, dict_file):
         with open(f'{self.calibration_folder_path}/calib_file.yaml', 'w') as f:
-            yaml.dump(dict_file, f, sort_keys=False)
+            yaml_str = yaml.dump(dict_file, sort_keys=False)
+            yaml_str = self.replace_yaml_array(yaml_str)
+            f.write(yaml_str)
 
     def generate_dict_camera_info(self, distorsion_model, matrix_camera, distorsion, proj_matrix):
         """generate dict for camera info to make a yaml file
@@ -302,7 +319,7 @@ class Calibrator(node.Node):
         yaml_distotion_coeff = distorsion.flatten().tolist()
         yaml_rectification_matrix = [1, 0, 0, 0, 1, 0, 0, 0, 1]
         yaml_projection_matrix = proj_matrix.flatten().tolist()
-        column_dist_coeff = 5 if distorsion_model == 'plum_bob' else 4 #if fisheye
+        column_dist_coeff = 5 if distorsion_model == 'plumb_bob' else 4 #if fisheye
 
         #writing yaml file
         dict_file = {}
