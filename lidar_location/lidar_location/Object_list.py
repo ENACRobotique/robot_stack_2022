@@ -63,7 +63,7 @@ class Object_list:
             a = first_point
             b = second_point
 
-        x1 = a * b.distance * math.cos(angle_difference)
+        x1 = b.distance * math.cos(angle_difference)
         y1 = b.distance * math.sin(angle_difference)
         x2 = a.distance - x1
 

@@ -30,7 +30,7 @@ class Triangle:
             a = self.pt_list[0]
             b = self.pt_list[1]
 
-        x1 = a * b.distance * math.cos(angle_difference)
+        x1 = b.distance * math.cos(angle_difference)
         y1 = b.distance * math.sin(angle_difference)
         x2 = a.distance - x1
         # Reusing code from Object_list.is_break
