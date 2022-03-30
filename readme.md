@@ -76,7 +76,7 @@ enac_base:raspy_win (ARM64) -> Future deprecration, just to use when compilling 
 *enac_base:latest -> to use for people who forget to set a tag*
 
 platformio :
-    docker run --restart=always --rm -e PLATFORMIO_AUTH_TOKEN=nauXr57H2WBfcGppv6WIzYx7pGeerZTdmZnZXmKeaGuUpLecjHnSlHChZalqmKBej2xlZrvTvMmFfKVlnaaZq53D2ZBkc2hr enacrobotique/platformio-remote 
+    docker run --privileged --rm -e PLATFORMIO_AUTH_TOKEN=nauXr57H2WBfcGppv6WIzYx7pGeerZTdmZnZXmKeaGuUpLecjHnSlHChZalqmKBej2xlZrvTvMmFfKVlnaaZq53D2ZBkc2hr enacrobotique/platformio-remote:ubuntu
 ## Building
 
 ### target AMD64 and ARM64 (raspy included):
