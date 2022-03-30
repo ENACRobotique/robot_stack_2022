@@ -1,6 +1,11 @@
 from ctypes import sizeof
 from sensor_msgs.msg import LaserScan
+import math
 import Point
+import Object
+
+# This variable defines the minimun distance to consider that 2 points are not part of the same object
+objects_min_dist = 0.10
 
 
 class Object_list:
@@ -17,18 +22,35 @@ class Object_list:
             self.list_points.append(new_point)
 
     def detect_objects(self):
-        position = find_first_break()
+        # First we'll need to get the first point of the list that is a break. This will allow us to work in a fully circular way
+        start_position = self.find_first_break()
+        position = start_position
+
+        while position < sizeof(self.list_points) + start_position:
+            new_object = Object()
+            list_pt_obj = self.list_points[position]
+            while (not self.is_break(position+1)) or (position < sizeof(self.list_points) + start_position):
+                position += 1
+                list_pt_obj.append(self.list_points[position])
+            new_object.liste_points
+            self.list_obj.append(new_object)
+
+    # Returns the first point in the list that is a break
+    # If not break is found, will return position 0
 
     def find_first_break(self):
-        while()
+        for index, point in enumerate(self.list_points):
+            if self.is_break(point):
+                return index
+
+        return 0
 
     # gets last point before a break, returns true if this point is the last one before a break
     def is_break(self, pos_first):
         first_point = self.list_points[pos_first]
+        second_point = self.list_points[0]
         if pos_first < sizeof(self.list_points):
             second_point = self.list_points[pos_first+1]
-        else
-        second_point = self.list_points[0]
 
         angle_difference = abs(first_point.angle - second_point.angle)
 
@@ -39,3 +61,11 @@ class Object_list:
         else:
             a = first_point
             b = second_point
+
+        x1 = a * b.distance * math.cos(angle_difference)
+        y1 = b.distance * math.sin(angle_difference)
+        x2 = a.distance - x1
+
+        pt_distance = math.sqrt(y1*y1 + x2*x2)
+
+        return True if pt_distance > objects_min_dist else False
