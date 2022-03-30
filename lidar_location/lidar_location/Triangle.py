@@ -34,7 +34,8 @@ class Triangle:
         y1 = b.distance * math.sin(angle_difference)
         x2 = a.distance - x1
         # Reusing code from Object_list.is_break
-        y3 = self.pt_list[1].distance * cos(math.Pi - self.pt_list[1].angle)
+        y3 = self.pt_list[1].distance * \
+            math.cos(math.Pi - self.pt_list[1].angle)
 
         a1 = math.atan(y1/x2)
         a2 = math.pi/2 - a1
