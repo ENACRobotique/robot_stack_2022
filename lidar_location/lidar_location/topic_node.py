@@ -1,4 +1,4 @@
-from lidar_location.lidar_location.Triangulation import Triangulation
+from lidar_location.Triangulation import Triangulation
 import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import LaserScan

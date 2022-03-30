@@ -1,7 +1,7 @@
 
 from ctypes import sizeof
-from lidar_location.lidar_location.Object_list import Object_list
-from lidar_location.lidar_location.Triangle import Triangle
+from lidar_location.Object_list import Object_list
+from lidar_location.Triangle import Triangle
 
 
 class Triangulation:
