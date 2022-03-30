@@ -33,7 +33,7 @@ class lidarlocation(Node):
                 out.append(message.ranges[i])
         return out
 
-    def echo(self, messsage):
+    def echo(self, message):
         return message
 
     def listener_callback(self, msg):
