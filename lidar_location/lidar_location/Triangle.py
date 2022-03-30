@@ -39,7 +39,7 @@ class Triangle:
 
         a1 = math.atan(y1/x2)
         a2 = math.pi/2 - a1
-        a3 = math.pi/2 - self.pt_list[1] - self.pt_list[0]
+        a3 = math.pi/2 - self.pt_list[1].angle - self.pt_list[0].angle
         a4 = math.asin(y3/(self.pt_list[1].distance))
 
         angle_pt2 = a2 + a3 + a4
