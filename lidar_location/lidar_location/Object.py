@@ -6,11 +6,11 @@ types_obj = ['Pylon', 'Tower', 'Friend', 'Foe', 'Unknown']
 
 class Object:
     def __init__(self, list_points):
-        self.type
+        self.type = ""
         self.list_points = list_points
         self.relative_center = self._calculate_relative_center()
-        self.absolute_position
-        self.size
+        self.absolute_position = []
+        self.size = 0
 
     def _calculate_relative_center(self):
         mean_distance = 0

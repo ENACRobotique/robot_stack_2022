@@ -3,7 +3,7 @@ class Point:
     def __init__(self):
         self.angle = 0  # Radians
         self.distance = 0  # en m
-        self.position_absolue  # Position de l'element une fois determine
+        self.position_absolue = 0  # Position de l'element une fois determine
 
     # Retourne l'angle relatif du point en fonction de sa position et le pas de l'angle
     def set_angle(self, increment, position):
