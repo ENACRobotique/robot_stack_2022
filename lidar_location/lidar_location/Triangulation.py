@@ -8,8 +8,14 @@ from lidar_location.Point import Point
 class Triangulation:
     # Create abasic pylon triangle and sets its parameters
     pt1 = Point()
+    pt1.angle = 0.1
+    pt1.distance = 1
     pt2 = Point()
+    pt2.angle = 0.2
+    pt2.distance = 2
     pt3 = Point()
+    pt3.angle = 0.3
+    pt3.distance = 3
     triangle_pylon = Triangle(pt1, pt2, pt3)
     triangle_pylon.angles = [1.21, 1.21, 0.72]
     triangle_pylon.distances = [1.9, 3.2, 3.2]
