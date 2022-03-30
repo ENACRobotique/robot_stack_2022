@@ -1,8 +1,8 @@
 
 class Point:
     def __init__(self):
-        self.angle  # Radians
-        self.distance  # en m
+        self.angle = 0  # Radians
+        self.distance = 0  # en m
         self.position_absolue  # Position de l'element une fois determine
 
     # Retourne l'angle relatif du point en fonction de sa position et le pas de l'angle
