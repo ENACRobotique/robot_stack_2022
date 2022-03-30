@@ -1,5 +1,5 @@
 from ctypes import sizeof
-import Point
+from lidar_location.Point import Point
 
 types_obj = ['Pylon', 'Tower', 'Friend', 'Foe', 'Unknown']
 
