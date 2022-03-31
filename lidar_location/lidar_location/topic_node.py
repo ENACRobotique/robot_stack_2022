@@ -1,4 +1,5 @@
 from lidar_location.Triangulation import Triangulation
+from lidar_location.lidar_location.Object_list import Object_list
 import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import LaserScan
@@ -41,9 +42,9 @@ class lidarlocation(Node):
         msg_out = self.generate_filtered_message(msg, self.filter_out(msg))
         #msg_out = msg
         # self.get_logger().info(msg_out.angle_max)
-        triangulation = Triangulation(msg_out)
+        triangulation = Object_list(msg_out)
         self.get_logger().info(
-            f"debug triangles detectes : {triangulation.valid_triangles}")
+            f"debug triangles detectes : {triangulation.list_obj}")
         self.publisher_.publish(msg_out)
 
 
