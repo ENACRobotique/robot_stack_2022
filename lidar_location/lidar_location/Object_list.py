@@ -13,6 +13,7 @@ class Object_list:
         self.list_obj = []
         self.list_points = []
         self.message = message
+        self.detect_objects()
 
     def message_to_points(self):
         for index, distance in enumerate(self.message['ranges']):
