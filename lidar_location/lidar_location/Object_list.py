@@ -11,10 +11,9 @@ objects_min_dist = 0.10
 class Object_list:
     def __init__(self, message):
         self.message = message
-        self.list_obj = []
         self.list_points = self.message_to_points()
-        self.message_to_points()
-        self.detect_objects()
+        #self.list_obj = []
+        # self.detect_objects()
 
     def message_to_points(self):
         list_points = []
@@ -30,15 +29,16 @@ class Object_list:
         start_position = self.find_first_break()
         position = start_position
 
-        # Goes thoug all the list of points starting from the first break
+        # Goes through all the list of points starting from the first break
         while position < sizeof(self.list_points) + start_position:
-            list_pt_obj = [self.list_points[position]]
-            # Creates a group of points while there's no break
-            while (not self.is_break(position+1)) or (position < sizeof(self.list_points) + start_position):
-                position += 1
-                list_pt_obj.append(self.list_points[position])
-            # at the end adds this list of points to an object
-            self.list_obj.append(Object(list_pt_obj))
+            if self.list_points[position] > 0:  # Removes filtered points
+                list_pt_obj = [self.list_points[position]]
+                # Creates a group of points while there's no break
+                while (not self.is_break(position+1)) or (position < sizeof(self.list_points) + start_position):
+                    position += 1
+                    list_pt_obj.append(self.list_points[position])
+                # at the end adds this list of points to an object
+                self.list_obj.append(Object(list_pt_obj))
 
     # Returns the first point in the list that is a break
     # If not break is found, will return position 0
