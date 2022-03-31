@@ -10,9 +10,9 @@ objects_min_dist = 0.10
 
 class Object_list:
     def __init__(self, message):
+        self.message = message
         self.list_obj = []
         self.list_points = self.message_to_points()
-        self.message = message
         self.message_to_points()
         self.detect_objects()
 
