@@ -11,17 +11,19 @@ objects_min_dist = 0.10
 class Object_list:
     def __init__(self, message):
         self.list_obj = []
-        self.list_points = []
+        self.list_points = self.message_to_points()
         self.message = message
         self.message_to_points()
         self.detect_objects()
 
     def message_to_points(self):
+        list_points = []
         for index, distance in enumerate(self.message.ranges):
             new_point = Point()
             new_point.distance = distance
             new_point.set_angle(self.message.angle_increment, index)
-            self.list_points.append(new_point)
+            list_points.append(new_point)
+        return list_points
 
     def detect_objects(self):
         # First we'll need to get the first point of the list that is a break. This will allow us to work in a fully circular way
