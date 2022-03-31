@@ -37,6 +37,8 @@ class Object_list:
                 while (not self.is_break(position+1)) or (position < len(self.list_points) + start_position):
                     position += 1
                     list_pt_obj.append(self.list_points[position])
+                    self.get_logger().info(
+                        f"position de calcul : {position}")
                 # at the end adds this list of points to an object
                 new_obj = Object(list_pt_obj)
                 list_obj.append(new_obj)
