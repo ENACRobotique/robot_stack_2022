@@ -12,8 +12,7 @@ class Object_list:
     def __init__(self, message):
         self.message = message
         self.list_points = self.message_to_points()
-        #self.list_obj = []
-        # self.detect_objects()
+        self.list_obj = self.detect_objects()
 
     def message_to_points(self):
         list_points = []
@@ -28,6 +27,7 @@ class Object_list:
         # First we'll need to get the first point of the list that is a break. This will allow us to work in a fully circular way
         start_position = self.find_first_break()
         position = start_position
+        list_obj = []
 
         # Goes through all the list of points starting from the first break
         while position < sizeof(self.list_points) + start_position:
@@ -38,7 +38,9 @@ class Object_list:
                     position += 1
                     list_pt_obj.append(self.list_points[position])
                 # at the end adds this list of points to an object
-                self.list_obj.append(Object(list_pt_obj))
+                new_obj = Object(list_pt_obj)
+                list_obj.append(new_obj)
+        return list_obj
 
     # Returns the first point in the list that is a break
     # If not break is found, will return position 0
