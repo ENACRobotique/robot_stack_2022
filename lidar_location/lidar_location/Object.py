@@ -1,4 +1,4 @@
-from ctypes import sizeof
+
 from lidar_location.Point import Point
 
 types_obj = ['Pylon', 'Tower', 'Friend', 'Foe', 'Unknown']
@@ -16,7 +16,7 @@ class Object:
         mean_distance = 0
         for point in self.list_points:
             mean_distance += point.distance
-        mean_distance /= sizeof(self.list_points)
-        mean_angle = self.list_points[sizeof(self.list_points)/2].angle
+        mean_distance /= len(self.list_points)
+        mean_angle = self.list_points[len(self.list_points)/2].angle
 
         return [mean_distance, mean_angle]

@@ -1,5 +1,3 @@
-
-from ctypes import sizeof
 from lidar_location.Object_list import Object_list
 from lidar_location.Triangle import Triangle
 from lidar_location.Point import Point
@@ -30,7 +28,7 @@ class Triangulation:
         j = 1
         k = 2
         tri_list = []
-        while i < sizeof(self.obj_list.list_obj) - 2 and j < sizeof(self.obj_list.list_obj) - 1 and k < sizeof(self.obj_list.list_obj):
+        while i < len(self.obj_list.list_obj) - 2 and j < len(self.obj_list.list_obj) - 1 and k < len(self.obj_list.list_obj):
             tri_list.append(Triangle(
                 self.obj_list.list_obj[i], self.obj_list.list_obj[j], self.obj_list.list_obj[k]))
         return tri_list

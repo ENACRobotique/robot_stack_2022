@@ -1,4 +1,4 @@
-from ctypes import sizeof
+
 from sensor_msgs.msg import LaserScan
 import math
 from lidar_location.Point import Point
@@ -30,11 +30,11 @@ class Object_list:
         list_obj = []
 
         # Goes through all the list of points starting from the first break
-        while position < sizeof(self.list_points) + start_position:
+        while position < len(self.list_points) + start_position:
             if self.list_points[position] > 0:  # Removes filtered points
                 list_pt_obj = [self.list_points[position]]
                 # Creates a group of points while there's no break
-                while (not self.is_break(position+1)) or (position < sizeof(self.list_points) + start_position):
+                while (not self.is_break(position+1)) or (position < len(self.list_points) + start_position):
                     position += 1
                     list_pt_obj.append(self.list_points[position])
                 # at the end adds this list of points to an object
@@ -56,7 +56,7 @@ class Object_list:
     def is_break(self, pos_first):
         first_point = self.list_points[pos_first]
         second_point = self.list_points[0]
-        if pos_first < sizeof(self.list_points):
+        if pos_first < len(self.list_points):
             second_point = self.list_points[pos_first+1]
 
         angle_difference = abs(first_point.angle - second_point.angle)
