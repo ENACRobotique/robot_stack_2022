@@ -31,6 +31,10 @@ class Object_list:
 
         # Goes through all the list of points starting from the first break
         while position < len(self.list_points) + start_position:
+            self.get_logger().info(
+                f"position de calcul : {position}")
+            self.get_logger().info(
+                f"distance de calcul : {self.list_points[position].distance}")
             if self.list_points[position].distance > 0:  # Removes filtered points
                 list_pt_obj = [self.list_points[position]]
                 # Creates a group of points while there's no break
