@@ -40,3 +40,4 @@ class Triangulation:
         for triangle in self.tri_list:
             if triangle.compare_triangles(self.triangle_pylon):
                 valid_list.append(triangle)
+        return valid_list
