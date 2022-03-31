@@ -54,10 +54,11 @@ class Object_list:
 
     # gets last point before a break, returns true if this point is the last one before a break
     def is_break(self, pos_first):
-        first_point = self.list_points[pos_first]
+        f_pos = pos_first % len(self.list_points)
+        first_point = self.list_points[f_pos]
         second_point = self.list_points[0]
-        if pos_first < len(self.list_points) - 1:
-            second_point = self.list_points[pos_first+1]
+        if f_pos < len(self.list_points) - 1:
+            second_point = self.list_points[f_pos+1]
 
         angle_difference = abs(first_point.angle - second_point.angle)
 
