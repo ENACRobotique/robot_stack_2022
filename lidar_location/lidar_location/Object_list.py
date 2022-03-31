@@ -43,7 +43,7 @@ class Object_list:
 
     def find_first_break(self):
         for index, point in enumerate(self.list_points):
-            if self.is_break(point):
+            if self.is_break(index):
                 return index
 
         return 0
