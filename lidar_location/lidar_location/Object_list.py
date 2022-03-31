@@ -19,7 +19,7 @@ class Object_list:
     def message_to_points(self):
         for index, distance in enumerate(self.message.ranges):
             new_point = Point()
-            new_point = distance
+            new_point.distance = distance
             new_point.set_angle(self.message.angle_increment, index)
             self.list_points.append(new_point)
 
