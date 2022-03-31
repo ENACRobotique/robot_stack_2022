@@ -56,7 +56,7 @@ class Object_list:
     def is_break(self, pos_first):
         first_point = self.list_points[pos_first]
         second_point = self.list_points[0]
-        if pos_first < len(self.list_points):
+        if pos_first < len(self.list_points) - 1:
             second_point = self.list_points[pos_first+1]
 
         angle_difference = abs(first_point.angle - second_point.angle)
