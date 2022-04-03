@@ -58,6 +58,8 @@ class Object_list:
         # The break calculation hasd been simplified from a previous complex calculation.
         # Given the small angle between 2 points (less than 1 degree) we can assume that points
         # are aligned and thus calculate only the difference in distance between 2 points
-        distance = self.list_points[pos_first].distance - self.list_points[(pos_first+1)%len(self.list_points)].distance
+        points_length = len(self.list_points)
+
+        distance = self.list_points[pos_first%points_length].distance - self.list_points[(pos_first+1)%points_length].distance
 
         return True if distance > objects_min_dist else False
