@@ -35,7 +35,7 @@ class Object_list:
             # Creates a group of points while there's no break
             while (not self.is_break(position+1)) or (position < len(self.list_points) + start_position):
                 position += 1
-                list_pt_obj.append(self.list_points[position])
+                list_pt_obj.append(self.list_points[position%len(self.list_points)])
             # at the end adds this list of points to an object
             if list_pt_obj[0].distance > 0:  # Removes filtered points
                 new_obj = Object(list_pt_obj)
