@@ -28,9 +28,14 @@ class Triangulation:
         j = 1
         k = 2
         tri_list = []
-        while i < len(self.obj_list.list_obj) - 2 and j < len(self.obj_list.list_obj) - 1 and k < len(self.obj_list.list_obj):
-            tri_list.append(Triangle(
-                self.obj_list.list_obj[i], self.obj_list.list_obj[j], self.obj_list.list_obj[k]))
+        while i < len(self.obj_list.list_obj) - 2:
+            j = i + 1
+            while j < len(self.obj_list.list_obj) - 1:
+                k = j + 1
+                while k < len(self.obj_list.list_obj):
+                    tri_list.append(Triangle(
+                        self.obj_list.list_obj[i].relative_center[1], self.obj_list.list_obj[j].relative_center[1], self.obj_list.list_obj[k].relative_center[1]))
+            i += 1
         return tri_list
 
     def find_triangles(self):
