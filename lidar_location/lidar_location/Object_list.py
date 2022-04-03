@@ -34,13 +34,12 @@ class Object_list:
         while position < points_length + start_position:
             list_pt_obj = [self.list_points[position%points_length]]
             # Creates a group of points while there's no break
-            while (not self.is_break(position+1)) or (position < points_length + start_position):
+            while (not self.is_break(position)) and (position < points_length + start_position):
                 position += 1
                 list_pt_obj.append(self.list_points[position%points_length])
             # at the end adds this list of points to an object
             #if list_pt_obj[0].distance > 0:  # Removes filtered points
-            new_obj = Object(list_pt_obj)
-            list_obj.append(new_obj)
+            list_obj.append(Object(list_pt_obj))
         return list_obj
 
     # Returns the first point in the list that is a break
