@@ -42,10 +42,15 @@ class lidarlocation(Node):
         msg_out = self.generate_filtered_message(msg, self.filter_out(msg))
         #msg_out = msg
         # self.get_logger().info(msg_out.angle_max)
-        triangulation = Object_list(msg_out)
-
+        #triangulation = Object_list(msg_out)
+        triangulation = Triangulation(msg_out)
         self.get_logger().info("Debug obj detectes:")
-        for obj in triangulation.list_obj:
+        #for obj in triangulation.list_obj:
+        #    self.get_logger().info(
+        #        f"{obj.relative_center}")
+        #self.publisher_.publish(msg_out)
+
+        for obj in triangulation.valid_triangles:
             self.get_logger().info(
                 f"{obj.relative_center}")
         self.publisher_.publish(msg_out)
