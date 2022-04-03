@@ -45,9 +45,9 @@ class lidarlocation(Node):
         triangulation = Object_list(msg_out)
 
         self.get_logger().info("Debug obj detectes:")
-        for obj in triangulation.list_obj:
+        for obj in triangulation.list_points:
             self.get_logger().info(
-                f"{obj.relative_center}")
+                f"{obj.distance}")
         self.publisher_.publish(msg_out)
 
         self.get_logger().info(
