@@ -1,5 +1,6 @@
 
 from lidar_location.Point import Point
+import math
 
 types_obj = ['Pylon', 'Tower', 'Friend', 'Foe', 'Unknown']
 
@@ -17,6 +18,6 @@ class Object:
         for point in self.list_points:
             mean_distance += point.distance
         mean_distance /= len(self.list_points)
-        mean_angle = self.list_points[len(self.list_points)/2].angle
+        mean_angle = self.list_points[math.floor(len(self.list_points)/2)].angle
 
         return [mean_distance, mean_angle]
