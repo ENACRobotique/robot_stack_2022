@@ -32,7 +32,7 @@ class Object_list:
 
         # Goes through all the list of points starting from the first break
         while position < points_length + start_position:
-            if self.list_points[position%points_length] > 0 :
+            if self.list_points[position%points_length].distance > 0 :
                 pos_temp = position
                 list_pt_obj = [self.list_points[pos_temp%points_length]]
                 # Creates a group of points while there's no break
