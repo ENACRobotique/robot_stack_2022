@@ -55,26 +55,9 @@ class Object_list:
 
     # gets last point before a break, returns true if this point is the last one before a break
     def is_break(self, pos_first):
-        f_pos = pos_first % len(self.list_points)
-        first_point = self.list_points[f_pos]
-        second_point = self.list_points[0]
-        if f_pos < len(self.list_points) - 1:
-            second_point = self.list_points[f_pos+1]
+        # The break calculation hasd been simplified from a previous complex calculation.
+        # Given the small angle between 2 points (less than 1 degree) we can assume that points
+        # are aligned and thus calculate only the difference in distance between 2 points
+        distance = self.list_points[pos_first].distance - self.list_points[(pos_first+1)%len(self.list_points)].distance
 
-        angle_difference = abs(first_point.angle - second_point.angle)
-
-        # Defines a and b to simplify calculations
-        if second_point.distance - first_point.distance > 0:
-            a = second_point
-            b = first_point
-        else:
-            a = first_point
-            b = second_point
-
-        x1 = b.distance * math.cos(angle_difference)
-        y1 = b.distance * math.sin(angle_difference)
-        x2 = a.distance - x1
-
-        pt_distance = math.sqrt(y1*y1 + x2*x2)
-
-        return True if pt_distance > objects_min_dist else False
+        return True if distance > objects_min_dist else False
