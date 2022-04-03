@@ -52,7 +52,7 @@ class lidarlocation(Node):
 
         for obj in triangulation.valid_triangles:
             self.get_logger().info(
-                f"{obj.relative_center}")
+                f"{obj}")
         self.publisher_.publish(msg_out)
 
         self.get_logger().info(
