@@ -50,6 +50,8 @@ class lidarlocation(Node):
                 f"{obj.relative_center}")
         self.publisher_.publish(msg_out)
 
+        self.get_logger().info(
+                f"{triangulation.find_first_break()}")
 
 def main():
     rclpy.init()

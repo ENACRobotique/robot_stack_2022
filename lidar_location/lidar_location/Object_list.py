@@ -31,7 +31,7 @@ class Object_list:
         points_length = len(self.list_points)
 
         # Goes through all the list of points starting from the first break
-        while position < len(self.list_points) + start_position:
+        while position < points_length + start_position:
             list_pt_obj = [self.list_points[position%points_length]]
             # Creates a group of points while there's no break
             while (not self.is_break(position+1)) or (position < points_length + start_position):
