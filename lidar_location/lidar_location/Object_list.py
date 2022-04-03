@@ -38,9 +38,9 @@ class Object_list:
                 position += 1
                 list_pt_obj.append(self.list_points[position%points_length])
             # at the end adds this list of points to an object
-            if list_pt_obj[0].distance > 0:  # Removes filtered points
-                new_obj = Object(list_pt_obj)
-                list_obj.append(new_obj)
+            #if list_pt_obj[0].distance > 0:  # Removes filtered points
+            new_obj = Object(list_pt_obj)
+            list_obj.append(new_obj)
         return list_obj
 
     # Returns the first point in the list that is a break
