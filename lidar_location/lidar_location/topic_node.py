@@ -45,7 +45,7 @@ class lidarlocation(Node):
         triangulation = Triangulation(msg_out)
 
         self.get_logger().info(
-            f"debug triangles detectes : {triangulation.list_obj}")
+            f"debug triangles detectes : {triangulation.valid_triangles}")
         self.publisher_.publish(msg_out)
 
 
