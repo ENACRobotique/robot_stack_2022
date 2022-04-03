@@ -28,14 +28,15 @@ class Object_list:
         start_position = self.find_first_break()
         position = start_position
         list_obj = []
+        points_length = len(self.list_points)
 
         # Goes through all the list of points starting from the first break
         while position < len(self.list_points) + start_position:
-            list_pt_obj = [self.list_points[position]]
+            list_pt_obj = [self.list_points[position%points_length]]
             # Creates a group of points while there's no break
-            while (not self.is_break(position+1)) or (position < len(self.list_points) + start_position):
+            while (not self.is_break(position+1)) or (position < points_length + start_position):
                 position += 1
-                list_pt_obj.append(self.list_points[position%len(self.list_points)])
+                list_pt_obj.append(self.list_points[position%points_length])
             # at the end adds this list of points to an object
             if list_pt_obj[0].distance > 0:  # Removes filtered points
                 new_obj = Object(list_pt_obj)
