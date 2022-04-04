@@ -52,7 +52,7 @@ class lidarlocation(Node):
 
         for obj in triangulation.tri_list:
             self.get_logger().info(
-                f"{obj.angles}")
+                f"{obj.distances}")
         self.publisher_.publish(msg_out)
 
 
