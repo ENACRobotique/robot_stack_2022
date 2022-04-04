@@ -66,7 +66,7 @@ class Triangle:
             is_triangle = False
             for angle2 in triangle2.angles:
                 is_triangle = True
-                if math.abs(angle1 - angle2) > jitter_angle:
+                if abs(angle1 - angle2) > jitter_angle:
                     is_triangle = False
                 if is_triangle == True:
                     return True
