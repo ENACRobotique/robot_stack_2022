@@ -14,11 +14,12 @@ class Object:
         self.size = 0
 
     def _calculate_relative_center(self):
-        mean_distance = 0
         new_p = Point()
+        new_p.distance = 0
         for point in self.list_points:
-            mean_distance += point.distance
+            new_p.distance += point.distance
         new_p.distance /= len(self.list_points)
-        new_p.angle = self.list_points[math.floor(len(self.list_points)/2)].angle
+        new_p.angle = self.list_points[math.floor(
+            len(self.list_points)/2)].angle
 
         return new_p
