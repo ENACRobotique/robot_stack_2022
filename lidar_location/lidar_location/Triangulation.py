@@ -35,7 +35,7 @@ class Triangulation:
                 while k < len(self.obj_list.list_obj):
                     tri_list.append(Triangle(
                         self.obj_list.list_obj[i].relative_center, self.obj_list.list_obj[j].relative_center, self.obj_list.list_obj[k].relative_center))
-                    print("i" + i + "j" + j + "k" + k)
+                    print("i" + str(i) + "j" + str(j) + "k" + str(k))
             i += 1
         return tri_list
 
