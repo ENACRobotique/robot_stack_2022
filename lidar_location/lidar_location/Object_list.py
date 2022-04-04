@@ -41,8 +41,8 @@ class Object_list:
                     list_pt_obj.append(
                         self.list_points[pos_temp % points_length])
                 # at the end adds this list of points to an object
-                if list_pt_obj[0].distance > 0:  # Removes filtered points
-                    list_obj.append(Object(list_pt_obj))
+                # if list_pt_obj[0].distance > 0:  # Removes filtered points
+                list_obj.append(Object(list_pt_obj))
             position += 1
         return list_obj
 
