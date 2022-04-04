@@ -76,7 +76,7 @@ class Triangle:
         for dist1 in self.distances:
             for dist2 in triangle2.distances:
                 is_triangle = True
-                if math.abs(dist1 - dist2) > jitter_distance:
+                if abs(dist1 - dist2) > jitter_distance:
                     is_triangle = False
                 if is_triangle == True:
                     return True
