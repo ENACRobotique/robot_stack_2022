@@ -45,18 +45,16 @@ class lidarlocation(Node):
         #triangulation = Object_list(msg_out)
         triangulation = Triangulation(msg_out)
         self.get_logger().info("Debug obj detectes:")
-        #for obj in triangulation.list_obj:
+        # for obj in triangulation.list_obj:
         #    self.get_logger().info(
         #        f"{obj.relative_center}")
-        #self.publisher_.publish(msg_out)
+        # self.publisher_.publish(msg_out)
 
-        for obj in triangulation.valid_triangles:
+        for obj in triangulation.tri_list:
             self.get_logger().info(
                 f"{obj}")
         self.publisher_.publish(msg_out)
 
-        self.get_logger().info(
-                f"{triangulation.find_first_break()}")
 
 def main():
     rclpy.init()
