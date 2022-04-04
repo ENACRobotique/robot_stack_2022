@@ -32,16 +32,17 @@ class Object_list:
 
         # Goes through all the list of points starting from the first break
         while position < points_length + start_position:
-            if self.list_points[position%points_length].distance > 0 :
+            if self.list_points[position % points_length].distance > 0:
                 pos_temp = position
-                list_pt_obj = [self.list_points[pos_temp%points_length]]
+                list_pt_obj = [self.list_points[pos_temp % points_length]]
                 # Creates a group of points while there's no break
                 while (not self.is_break(pos_temp)) or (pos_temp < points_length + start_position):
                     pos_temp += 1
-                    list_pt_obj.append(self.list_points[pos_temp%points_length])
+                    list_pt_obj.append(
+                        self.list_points[pos_temp % points_length])
                 # at the end adds this list of points to an object
-                #if list_pt_obj[0].distance > 0:  # Removes filtered points
-                list_obj.append(Object(list_pt_obj))
+                if list_pt_obj[0].distance > 0:  # Removes filtered points
+                    list_obj.append(Object(list_pt_obj))
             position += 1
         return list_obj
 
@@ -62,6 +63,7 @@ class Object_list:
         # are aligned and thus calculate only the difference in distance between 2 points
         points_length = len(self.list_points)
 
-        distance = self.list_points[pos_first%points_length].distance - self.list_points[(pos_first+1)%points_length].distance
+        distance = self.list_points[pos_first % points_length].distance - \
+            self.list_points[(pos_first+1) % points_length].distance
 
         return True if distance > objects_min_dist else False
