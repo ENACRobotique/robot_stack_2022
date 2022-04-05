@@ -49,12 +49,12 @@ class Triangle:
     # Returns true if triangle fits within approximation values (distance-angle)
 
     def compare_triangles(self, triangle2):
-        if self.compare_angles(triangle2) and self.compare_distances(triangle2):
+        if self.compare_distances(triangle2):
             return True
         else:
             return False
 
-    def compare_angles(self, triangle2):
+    """def compare_angles(self, triangle2):
         for angle1 in self.angles:
             is_triangle = False
             for angle2 in triangle2.angles:
@@ -64,6 +64,7 @@ class Triangle:
                 if is_triangle == True:
                     return True
         return False
+    """
 
     def compare_distances(self, triangle2):
         for dist1 in self.distances:
