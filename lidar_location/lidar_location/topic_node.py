@@ -51,16 +51,17 @@ class lidarlocation(Node):
         # self.publisher_.publish(msg_out)
 
         for tri in triangulation.tri_list:
-            self.get_logger().info("Un triangle:")
-            for pt in tri.pt_list:
-                self.get_logger().info("Un point:")
+            if tri.distances[0] > 1:
+                self.get_logger().info("Un triangle:")
+                for pt in tri.pt_list:
+                    self.get_logger().info("Un point:")
+                    self.get_logger().info(
+                        f"{pt.distance}")
+                    self.get_logger().info(
+                        f"{pt.angle}")
+                self.get_logger().info("Les distances:")
                 self.get_logger().info(
-                    f"{pt.distance}")
-                self.get_logger().info(
-                    f"{pt.angle}")
-            self.get_logger().info("Les distances:")
-            self.get_logger().info(
-                f"{tri.distances}")
+                    f"{tri.distances}")
         self.publisher_.publish(msg_out)
 
 
