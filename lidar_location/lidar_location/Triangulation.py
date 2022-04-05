@@ -24,7 +24,7 @@ class Triangulation:
         self.obj_list = Object_list(message)
         self.tri_list = self.create_triangle_list()
         self.valid_triangles = self.find_triangles()
-        self.location = self.find_location()
+        #self.location = self.find_location()
 
     def create_triangle_list(self):
         i = 0
