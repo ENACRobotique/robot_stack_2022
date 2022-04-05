@@ -51,7 +51,7 @@ class lidarlocation(Node):
         # self.publisher_.publish(msg_out)
 
         for tri in triangulation.tri_list:
-            if tri.distances[0] > 1:
+            if tri.distances[0] > 1 and tri.distances[1] > 1 and tri.distances[2] > 1:
                 self.get_logger().info("Un triangle:")
                 for pt in tri.pt_list:
                     self.get_logger().info("Un point:")
