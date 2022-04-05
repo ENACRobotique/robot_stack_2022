@@ -54,7 +54,7 @@ class lidarlocation(Node):
             for pt in tri.pt_list:
                 self.get_logger().info("Debug point:")
                 self.get_logger().info(
-                    f"{pt.distances}")
+                    f"{pt.distance}")
         self.publisher_.publish(msg_out)
 
 
