@@ -50,10 +50,9 @@ class lidarlocation(Node):
         #        f"{obj.relative_center}")
         # self.publisher_.publish(msg_out)
 
-        for obj in triangulation.tri_list:
-            for pt in obj.pt_list:
-                self.get_logger().info(
-                    f"{pt.angle}")
+        for tri in triangulation.tri_list:
+            self.get_logger().info(
+                f"{tri.distances}")
         self.publisher_.publish(msg_out)
 
 
