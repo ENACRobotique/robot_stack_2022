@@ -5,14 +5,17 @@ from lidar_location.Point import Point
 from lidar_location.Object import Object
 
 # This variable defines the minimun distance to consider that 2 points are not part of the same object
-objects_min_dist = 0.0
+objects_min_dist = 0.1
 
 
 class Object_list:
     def __init__(self, message):
         self.message = message
         self.list_points = self.message_to_points()
-        self.list_obj = self.detect_objects()
+        #self.list_obj = self.detect_objects()
+        self.list_obj = []
+        for pt in self.list_points:
+            self.list_obj.append(Object([pt]))
 
     def message_to_points(self):
         list_points = []
