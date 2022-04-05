@@ -18,10 +18,13 @@ class Triangulation:
     triangle_pylon.angles = [1.21, 1.21, 0.72]
     triangle_pylon.distances = [1.9, 3.2, 3.2]
 
+    # Defines the absolute location of the Pylons
+
     def __init__(self, message):
         self.obj_list = Object_list(message)
         self.tri_list = self.create_triangle_list()
         self.valid_triangles = self.find_triangles()
+        self.location = self.find_location()
 
     def create_triangle_list(self):
         i = 0
@@ -46,3 +49,5 @@ class Triangulation:
             if triangle.compare_triangles(self.triangle_pylon):
                 valid_list.append(triangle)
         return valid_list
+
+    # def find_location(self):

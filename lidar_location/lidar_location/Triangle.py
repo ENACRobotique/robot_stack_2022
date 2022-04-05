@@ -18,43 +18,36 @@ class Triangle:
     def get_distances(self):
         return [self.get_distance_pt(self.pt_list[0], self.pt_list[1]), self.get_distance_pt(self.pt_list[1], self.pt_list[2]), self.get_distance_pt(self.pt_list[2], self.pt_list[0])]
 
+    def get_beta(self, pt1, pt2):
+        return math.acos((self.get_distance_pt(pt1, pt2)**2 + pt1.distance**2 - pt2.distance**2) / (2 * self.get_distance_pt(pt1, pt2) * pt2.distance))
+
+    def get_gamma(self, pt1, pt2, beta):
+        return math.pi - beta - abs(pt2.angle - pt1.angle)
+
         # Returns angles between segments a-b/b-c [pt1-pt2/pt2-pt3, pt2-pt3/pt3-pt1, pt3-pt1/pt1-pt2]
+
     def get_angles(self):
-        angle_difference = abs(self.pt_list[0].angle - self.pt_list[1].angle)
+        pt1 = self.pt_list[0]
+        pt2 = self.pt_list[1]
+        pt3 = self.pt_list[2]
 
-        # Defines a and b to simplify calculations
-        if self.pt_list[0].distance - self.pt_list[1].distance > 0:
-            a = self.pt_list[1]
-            b = self.pt_list[0]
-        else:
-            a = self.pt_list[0]
-            b = self.pt_list[1]
+        beta1 = self.get_beta(pt1, pt2)
+        gamma1 = self.get_gamma(pt1, pt2, beta1)
 
-        x1 = b.distance * math.cos(angle_difference)
-        y1 = b.distance * math.sin(angle_difference)
-        x2 = a.distance - x1
-        # Reusing code from Object_list.is_break
-        y3 = self.pt_list[1].distance * \
-            math.cos(math.pi - self.pt_list[1].angle)
+        beta2 = self.get_beta(pt2, pt3)
+        gamma2 = self.get_gamma(pt2, pt3, beta2)
 
-        a1 = math.atan(y1/x2)
-        a2 = math.pi/2 - a1
-        a3 = math.pi/2 - self.pt_list[1].angle - self.pt_list[0].angle
-        a4 = math.asin(y3/(self.pt_list[1].distance))
+        beta3 = self.get_beta(pt3, pt1)
+        gamma3 = self.get_gamma(pt3, pt1, beta3)
 
-        angle_pt2 = a2 + a3 + a4
+        angle1 = gamma1 + beta2
+        angle2 = gamma2 + beta3
+        angle3 = gamma3 + beta1
 
-        a5 = math.asin(y3/(self.pt_list[2].distance))
-        a6 = math.pi - \
-            (2 * math.pi - self.pt_list[2].angle) + self.pt_list[0].angle + a1
-
-        angle_pt3 = a6 + a5
-
-        angle_pt1 = math.pi - angle_pt2 - angle_pt3
-
-        return [angle_pt1, angle_pt2, angle_pt3]
+        return [angle1, angle2, angle3]
 
     # Returns true if triangle fits within approximation values (distance-angle)
+
     def compare_triangles(self, triangle2):
         if self.compare_angles(triangle2) and self.compare_distances(triangle2):
             return True
@@ -83,18 +76,4 @@ class Triangle:
         return False
 
     def get_distance_pt(self, pt1, pt2):
-        angle_difference = abs(pt1.angle - pt2.angle)
-
-        # Defines a and b to simplify calculations
-        if pt2.distance - pt1.distance > 0:
-            a = pt2
-            b = pt1
-        else:
-            a = pt1
-            b = pt2
-
-        x1 = b.distance * math.cos(angle_difference)
-        y1 = b.distance * math.sin(angle_difference)
-        x2 = a.distance - x1
-
-        return math.sqrt(y1*y1 + x2*x2)
+        return math.sqrt(pt2.distance**2 + pt1.distance**2 - 2 * pt1.distance * pt2.distance * math.cos(abs(pt2.angle - pt1.angle)))
