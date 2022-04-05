@@ -43,7 +43,7 @@ class lidarlocation(Node):
         #msg_out = msg
         # self.get_logger().info(msg_out.angle_max)
         #triangulation = Object_list(msg_out)
-        triangulation = Triangulation(msg_out)
+        #triangulation = Triangulation(msg_out)
         self.get_logger().info("-------------")
         # for obj in triangulation.list_obj:
         #    self.get_logger().info(
@@ -59,7 +59,7 @@ class lidarlocation(Node):
 
         tri.distances[0] > 1.7 and tri.distances[0] < 2 and tri.distances[1] > 3 and tri.distances[1] < 3.4 and tri.distances[2] > 3 and tri.distances[2] < 3.4 or tri.distances[0] > 3 and tri.distances[0] < 3.4 and tri.distances[1] > 1.7 and tri.distances[1] < 2 and tri.distances[2] > 3 and tri.distances[2] < 3.4 or tri.distances[0] > 3 and tri.distances[0] < 3.4 and tri.distances[1] > 3 and tri.distances[1] < 3.4 and tri.distances[2] > 1.7 and tri.distances[2] < 2
         """
-
+        """
         for tri in triangulation.tri_list:
             if tri.distances[0] > 1.7 and tri.distances[0] < 2 and tri.distances[1] > 3 and tri.distances[1] < 3.6 and tri.distances[2] > 3 and tri.distances[2] < 3.6 or tri.distances[0] > 3 and tri.distances[0] < 3.6 and tri.distances[1] > 1.7 and tri.distances[1] < 2 and tri.distances[2] > 3 and tri.distances[2] < 3.6 or tri.distances[0] > 3 and tri.distances[0] < 3.6 and tri.distances[1] > 3 and tri.distances[1] < 3.6 and tri.distances[2] > 1.7 and tri.distances[2] < 2:
                 self.get_logger().info("Un triangle:")
@@ -72,6 +72,17 @@ class lidarlocation(Node):
                 self.get_logger().info("Les distances:")
                 self.get_logger().info(
                     f"{tri.distances}")
+        """
+
+        objl = Object_list(msg_out)
+        self.get_logger().info("Une list dobj:")
+        for obj in objl.list_obj:
+            self.get_logger().info("Un object:")
+            self.get_logger().info(
+                f"{obj.relative_center.distance}")
+            self.get_logger().info(
+                f"{obj.relative_center.angle}")
+
         self.publisher_.publish(msg_out)
 
 
