@@ -12,10 +12,13 @@ class Object_list:
     def __init__(self, message):
         self.message = message
         self.list_points = self.message_to_points()
-        #self.list_obj = self.detect_objects()
+        self.points_length = len(self.list_points)
+        self.list_obj = self.detect_objects()
+        """
         self.list_obj = []
         for pt in self.list_points:
             self.list_obj.append(Object([pt]))
+        """
 
     def message_to_points(self):
         list_points = []
@@ -64,9 +67,11 @@ class Object_list:
         # The break calculation hasd been simplified from a previous complex calculation.
         # Given the small angle between 2 points (less than 1 degree) we can assume that points
         # are aligned and thus calculate only the difference in distance between 2 points
-        points_length = len(self.list_points)
 
-        distance = self.list_points[pos_first % points_length].distance - \
-            self.list_points[(pos_first+1) % points_length].distance
+        distance = self.list_points[pos_first % self.points_length].distance - \
+            self.list_points[(pos_first+1) % self.points_length].distance
 
-        return True if distance > objects_min_dist else False
+        if distance > objects_min_dist:
+            return True
+        else:
+            return False
