@@ -11,7 +11,7 @@ jitter_distance = 0.10  # 10 centimeters
 class Triangle:
     def __init__(self, pt1, pt2, pt3):
         self.pt_list = [pt1, pt2, pt3]
-        #self.angles = self.get_angles()
+        # self.angles = self.get_angles()
         self.distances = self.get_distances()
 
     # Returns distances between [pt1 and pt2, pt2 and pt3, pt3 and pt1]
@@ -77,4 +77,4 @@ class Triangle:
         return False
 
     def get_distance_pt(self, pt1, pt2):
-        return math.sqrt(pt2.distance**2 + pt1.distance**2 - 2 * pt1.distance * pt2.distance * math.cos(abs(pt2.angle - pt1.angle)))
+        return math.sqrt(pt2.distance**2 + pt1.distance**2 - 2 * pt1.distance * pt2.distance * math.cos(pt1.angle - pt2.angle))

@@ -58,6 +58,9 @@ class lidarlocation(Node):
                     f"{pt.distance}")
                 self.get_logger().info(
                     f"{pt.angle}")
+            self.get_logger().info("Les distances:")
+            self.get_logger().info(
+                f"{tri.distances}")
         self.publisher_.publish(msg_out)
 
 
