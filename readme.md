@@ -136,6 +136,7 @@ https://roboticseabass.com/2021/04/21/docker-and-ros/
     docker container prune
 
 
-
+melvin ordi de gauche :
+    docker run -it --rm --net=host -e DISPLAY --privileged --name club_robot --volume /home/robot/Documents/robot_stack/robot_stack_2022:/enac_ws/src --volume /home/robot/Documents/rosbag:/enac_ws/bag enacrobotique/enac-base:dev bash
 
 
