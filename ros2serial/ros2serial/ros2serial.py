@@ -9,10 +9,10 @@ from tf2_msgs.msg import TFMessage
 from tf2_ros import TransformBroadcaster
 from diagnostic_msgs.msg import DiagnosticArray, DiagnosticStatus, KeyValue
 
-from interfaces_enac import __sensorvalue, __pid
+from interfaces_enac.msg import _periph_value, _pid
 
-PeriphValue = __periphvalue.PeriphValue
-Pid = __pid.Pid
+PeriphValue = _periph_value.PeriphValue
+Pid = _pid.Pid
 
 import serial
 import threading
@@ -51,12 +51,15 @@ def quaternion_from_euler(roll, pitch, yaw):
     return [qx, qy, qz, qw]
 
 class Ros2Serial(Node):
-    def __init__(self, port, timeout = 0.05, baudrate = 115200, rx_buffer_size=64, tx_buffer_size=64):
+    def __init__(self, timeout = 0.05, rx_buffer_size=64, tx_buffer_size=64):
         # default buffer size like teensy (TODO: voir si à garder pour stm32?)
         super().__init__("ros2serial")
+        self.declare_parameter('serial_port', "/dev/ttyUSB0")
+        self.declare_parameter('baudrate', 115200)
+
         #paramétrage serial
-        self.ser = serial.Serial(port=port, baudrate=baudrate, timeout=timeout)
-        self.ser.set_buffer_size(rx_buffer_size, tx_buffer_size)
+        self.ser = serial.Serial(port=self.get_parameter('serial_port').get_parameter_value().string_value, baudrate=self.get_parameter('baudrate').get_parameter_value().integer_value, timeout=timeout)
+        #self.ser.set_buffer_size(rx_buffer_size, tx_buffer_size)
         self.thread_read = threading.Thread(target=self.serial_read)
         self.listen = True
         #paramétrage ROS
@@ -81,6 +84,7 @@ class Ros2Serial(Node):
             message = self.ser.readLine()
             message = message.decode()
             if len(message) > 2:
+                print("serial_read "+message)
                 if message[0] == MESSAGE:
                     self.on_serial_msg(message[2:])
                 elif message[0] == ODOM_MOTOR:
@@ -158,11 +162,13 @@ class Ros2Serial(Node):
     def on_ros_cmd_vel(self, msg):
         vlin = msg.linear.x
         vtheta = msg.angular.z
+        print("on_ros_cmd_vel "+vlin+" "+vtheta)
         self.serial_send(CMD_VEL.format(int(vlin*1000), int(vtheta*1000)))
 
     def on_ros_periph_cmd(self, msg):
         id = msg.periph_name[:2]
         cmd = msg.value
+        print("on_ros_periph_vel "+id+" "+cmd)
         self.serial_send(CMD_VEL.format(id, cmd))
 
     def on_ros_pid(self, msg):
@@ -172,6 +178,7 @@ class Ros2Serial(Node):
         kpo = msg.kpo
         kio = msg.kio
         #kdo = msg.kdo
+        print("on_ros_pid i:"+kpv+" "+kiv+" o:"+kpo+" "+kio)
         if (kpv != 0 or kiv == 0): # or kdv != 0:
             self.serial_send(CMD_PID.format('v', kpv, kiv))
         if (kpo != 0 or kio == 0): # or kdo != 0:
