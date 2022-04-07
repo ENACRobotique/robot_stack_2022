@@ -83,6 +83,7 @@ class Ros2Serial(Node):
         """Fonction qui lit en permanence le port série.
         S'exécute dans un thread séparé"""
         print("serial_read thread launched")
+        message = ""
         while self.listen:
             try:
                 message = self.ser.readline()
@@ -98,6 +99,7 @@ class Ros2Serial(Node):
                     elif message[0] == CAPT_VAL:
                         self.on_serial_capt(message.split(' ')[1:])
             except Exception as e:
+                print(str(message)+"\n")
                 print(e)
                 print("\n")
 
@@ -105,7 +107,7 @@ class Ros2Serial(Node):
         #convertir les infor reçues au format ROS2
         msg = DiagnosticArray()
         reference = DiagnosticStatus()
-        reference.level = 0
+        reference.level = DiagnosticStatus.OK
         reference.name = "ros2serial_message"
         reference.message = arg
         reference.hardware_id = "stm32"
@@ -144,9 +146,9 @@ class Ros2Serial(Node):
         #convertir les infor reçues au format ROS2
         msg = DiagnosticArray()
         reference = DiagnosticStatus()
-        reference.level = 0
+        reference.level = DiagnosticStatus.OK
         reference.name = "ros2serial_periphDecl"
-        reference.message = arg
+        reference.message = str(arg)
         reference.hardware_id = "stm32"
         reference.values = []
         msg.status = [reference]
