@@ -2,22 +2,22 @@
 from sensor_msgs.msg import LaserScan
 import math
 from lidar_location.Point import Point
-from lidar_location.Object import Object
+from lidar_location.Amalgame import Amalgame
 
-# This variable defines the minimun distance to consider that 2 points are not part of the same object
-objects_min_dist = 0.2
+# This variable defines the minimun distance to consider that 2 points are not part of the same Amalgame 
+Amalgames_min_dist = 0.2 #meters
 
 
-class Object_list:
+class Amalgame_list:
     def __init__(self, message):
         self.message = message
         self.list_points = self.message_to_points()
         self.points_length = len(self.list_points)
-        self.list_obj = self.detect_objects()
+        self.list_obj = self.detect_Amalgames()
         """
         self.list_obj = []
         for pt in self.list_points:
-            self.list_obj.append(Object([pt]))
+            self.list_obj.append(Amalgame([pt]))
         """
 
     def message_to_points(self):
@@ -29,27 +29,27 @@ class Object_list:
             list_points.append(new_point)
         return list_points
 
-    def detect_objects(self):
+    def detect_Amalgames(self):
         # First we'll need to get the first point of the list that is a break. This will allow us to work in a fully circular way
         start_position = self.find_first_break()
         position = start_position
         list_obj = []
         points_length = len(self.list_points)
+        print("Pt depart: ", start_position)
 
         # Goes through all the list of points starting from the first break
         while position < points_length + start_position:
-            if self.list_points[position % points_length].distance > 0:
-                pos_temp = position
-                list_pt_obj = [self.list_points[pos_temp % points_length]]
-                # Creates a group of points while there's no break
-                while (not self.is_break(pos_temp)) or (pos_temp < points_length + start_position):
-                    pos_temp += 1
-                    list_pt_obj.append(
-                        self.list_points[pos_temp % points_length])
-                # at the end adds this list of points to an object
-                # if list_pt_obj[0].distance > 0:  # Removes filtered points
-                list_obj.append(Object(list_pt_obj))
-            position += 1
+            list_pt_ama = [self.list_points[position % points_length]]
+            print("BFEAK !")
+            while (not self.is_break(position)) or(position < points_length + start_position) : ## TODO: CE TRUC EST BUGEE
+                print("le break : ", self.is_break(position))
+                print("le position : ", position)
+                print("val max : ", points_length + start_position)
+                position += 1
+                list_pt_ama.append(self.list_points[position % points_length])
+
+            #if(list_pt_ama[0].distance) > 0:
+            list_obj.append(Amalgame(list_pt_ama))
         return list_obj
 
     # Returns the first point in the list that is a break
@@ -68,10 +68,10 @@ class Object_list:
         # Given the small angle between 2 points (less than 1 degree) we can assume that points
         # are aligned and thus calculate only the difference in distance between 2 points
 
-        distance = self.list_points[pos_first % self.points_length].distance - \
-            self.list_points[(pos_first+1) % self.points_length].distance
+        distance = abs(self.list_points[pos_first % self.points_length].distance - \
+            self.list_points[(pos_first+1) % self.points_length].distance)
 
-        if distance > objects_min_dist:
+        if distance > Amalgames_min_dist:
             return True
         else:
             return False
