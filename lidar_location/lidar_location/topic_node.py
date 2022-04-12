@@ -46,7 +46,7 @@ class lidarlocation(Node):
         #msg_out = msg
         # self.get_logger().info(msg_out.angle_max)
         #triangulation = Amalgame_list(msg_out)
-        #triangulation = Triangulation(msg_out)
+        triangulation = Triangulation(msg_out)
         #self.get_logger().info("-------------")
         # for obj in triangulation.list_obj:
         #    self.get_logger().info(
@@ -62,9 +62,20 @@ class lidarlocation(Node):
 
         tri.distances[0] > 1.7 and tri.distances[0] < 2 and tri.distances[1] > 3 and tri.distances[1] < 3.4 and tri.distances[2] > 3 and tri.distances[2] < 3.4 or tri.distances[0] > 3 and tri.distances[0] < 3.4 and tri.distances[1] > 1.7 and tri.distances[1] < 2 and tri.distances[2] > 3 and tri.distances[2] < 3.4 or tri.distances[0] > 3 and tri.distances[0] < 3.4 and tri.distances[1] > 3 and tri.distances[1] < 3.4 and tri.distances[2] > 1.7 and tri.distances[2] < 2
         """
+
         """
+        tri.angles[0] > 1.1 and tri.angles[0] < 1.4 and tri.angles[1] > 1.1 and tri.angles[1] < 1.3 and tri.angles[2] > 0.6 and tri.angles[2] < 0.9
+        or
+        tri.angles[0] > 1.1 and tri.angles[0] < 1.4 and tri.angles[2] > 0.6 and tri.angles[2] < 0.9 and tri.angles[1] > 1.1 and tri.angles[1] < 1.3
+        or
+        tri.angles[2] > 0.6 and tri.angles[2] < 0.9 and tri.angles[0] > 1.1 and tri.angles[0] < 1.4 and tri.angles[1] > 1.1 and tri.angles[1] < 1.3
+
+        tri.angles[0] > 1.1 and tri.angles[0] < 1.4 and tri.angles[1] > 1.1 and tri.angles[1] < 1.3 and tri.angles[2] > 0.6 and tri.angles[2] < 0.9 or tri.angles[0] > 1.1 and tri.angles[0] < 1.4 and tri.angles[2] > 0.6 and tri.angles[2] < 0.9 and tri.angles[1] > 1.1 and tri.angles[1] < 1.3 or tri.angles[2] > 0.6 and tri.angles[2] < 0.9 and tri.angles[0] > 1.1 and tri.angles[0] < 1.4 and tri.angles[1] > 1.1 and tri.angles[1] < 1.3
+        """
+        
         for tri in triangulation.tri_list:
-            if tri.distances[0] > 1.7 and tri.distances[0] < 2 and tri.distances[1] > 3 and tri.distances[1] < 3.6 and tri.distances[2] > 3 and tri.distances[2] < 3.6 or tri.distances[0] > 3 and tri.distances[0] < 3.6 and tri.distances[1] > 1.7 and tri.distances[1] < 2 and tri.distances[2] > 3 and tri.distances[2] < 3.6 or tri.distances[0] > 3 and tri.distances[0] < 3.6 and tri.distances[1] > 3 and tri.distances[1] < 3.6 and tri.distances[2] > 1.7 and tri.distances[2] < 2:
+            #self.get_logger().info("------------------------------------------------------")
+            if (tri.distances[0] > 1.7 and tri.distances[0] < 2 and tri.distances[1] > 3 and tri.distances[1] < 3.4 and tri.distances[2] > 3 and tri.distances[2] < 3.4 or tri.distances[0] > 3 and tri.distances[0] < 3.4 and tri.distances[1] > 1.7 and tri.distances[1] < 2 and tri.distances[2] > 3 and tri.distances[2] < 3.4 or tri.distances[0] > 3 and tri.distances[0] < 3.4 and tri.distances[1] > 3 and tri.distances[1] < 3.4 and tri.distances[2] > 1.7 and tri.distances[2] < 2) and (tri.angles[0] > 1.1 and tri.angles[0] < 1.4 and tri.angles[1] > 1.1 and tri.angles[1] < 1.3 and tri.angles[2] > 0.6 and tri.angles[2] < 0.9 or tri.angles[0] > 1.1 and tri.angles[0] < 1.4 and tri.angles[2] > 0.6 and tri.angles[2] < 0.9 and tri.angles[1] > 1.1 and tri.angles[1] < 1.3 or tri.angles[2] > 0.6 and tri.angles[2] < 0.9 and tri.angles[0] > 1.1 and tri.angles[0] < 1.4 and tri.angles[1] > 1.1 and tri.angles[1] < 1.3):
                 self.get_logger().info("Un triangle:")
                 for pt in tri.pt_list:
                     self.get_logger().info("Un point:")
@@ -75,8 +86,10 @@ class lidarlocation(Node):
                 self.get_logger().info("Les distances:")
                 self.get_logger().info(
                     f"{tri.distances}")
+                self.get_logger().info("Les angles:")
+                self.get_logger().info(
+                    f"{tri.angles}")
         
-        """
         
         objl = Amalgame_list(msg_out)
         #self.get_logger().info("Une list dobj:")
@@ -93,19 +106,20 @@ class lidarlocation(Node):
         
         msg_obj.ranges = list_pts
         """
+
         """
         for i in range(0, len(objl.list_obj)):
             print("[ " + str(objl.list_obj[i].relative_center.distance) + "," + str(objl.list_obj[i].relative_center.angle) + "]")
         print("++++++++++++++++++++++++++++++")
         """
 
-        
+        """
         for i in range(0, len(objl.list_obj)):
             for pt in objl.list_obj[i].list_points:
                 print("[ " + str(pt.angle) + "]")
             print("--------")
         print("++++++++++++++++++++++++++++++")
-        
+        """
 
         """
         for i in range(0, len(objl.list_obj)):
@@ -127,6 +141,8 @@ class lidarlocation(Node):
         
 
         self.publisher_.publish(msg_obj)
+
+#def determiner_position
 
 
 def main():

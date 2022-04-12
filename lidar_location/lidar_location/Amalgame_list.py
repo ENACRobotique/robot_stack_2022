@@ -35,16 +35,18 @@ class Amalgame_list:
         position = start_position
         list_obj = []
         points_length = len(self.list_points)
-        print("Pt depart: ", start_position)
+        #print("Pt depart: ", start_position)
 
         # Goes through all the list of points starting from the first break
         while position < points_length + start_position:
             list_pt_ama = [self.list_points[position % points_length]]
-            print("BFEAK !")
-            while (not self.is_break(position)) or(position < points_length + start_position) : ## TODO: CE TRUC EST BUGEE
-                print("le break : ", self.is_break(position))
-                print("le position : ", position)
-                print("val max : ", points_length + start_position)
+            #print("BFEAK !")
+            c = True
+            while c:
+                if self.is_break(position):
+                    c = False
+                if position > points_length + start_position : 
+                    c = False
                 position += 1
                 list_pt_ama.append(self.list_points[position % points_length])
 

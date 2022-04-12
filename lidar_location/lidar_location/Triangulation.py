@@ -1,4 +1,4 @@
-from lidar_location.Object_list import Object_list
+from lidar_location.Amalgame_list import Amalgame_list
 from lidar_location.Triangle import Triangle
 from lidar_location.Point import Point
 
@@ -21,7 +21,7 @@ class Triangulation:
     # Defines the absolute location of the Pylons
 
     def __init__(self, message):
-        self.obj_list = Object_list(message)
+        self.obj_list = Amalgame_list(message)
         self.tri_list = self.create_triangle_list()
         self.valid_triangles = self.find_triangles()
         #self.location = self.find_location()
