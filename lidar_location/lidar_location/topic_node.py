@@ -89,6 +89,10 @@ class lidarlocation(Node):
                 self.get_logger().info("Les angles:")
                 self.get_logger().info(
                     f"{tri.angles}")
+                positions = determiner_position(tri)
+                print("POSITION")
+                print(positions)
+                
         
         
         objl = Amalgame_list(msg_out)
@@ -142,7 +146,47 @@ class lidarlocation(Node):
 
         self.publisher_.publish(msg_obj)
 
-#def determiner_position
+def get_distance_pt(pt1, pt2):
+        return math.sqrt(pt2.distance**2 + pt1.distance**2 - 2 * pt1.distance * pt2.distance * math.cos(pt1.angle - pt2.angle))
+
+def get_beta(pt1, pt2):
+        return abs(math.acos((get_distance_pt(pt1, pt2)**2 + pt1.distance**2 - pt2.distance**2) / (2 * get_distance_pt(pt1, pt2) * pt1.distance)))%math.pi
+
+def get_gamma(pt1, pt2, beta):
+        return abs(math.pi - beta - abs(pt2.angle - pt1.angle))%math.pi
+
+def determiner_position(tri):
+    if abs(tri.distances[0]) > 1.7 and abs(tri.distances[0]) < 2 :
+        beta1 = get_beta(tri.pt_list[0], tri.pt_list[1])
+        gamma1 = get_gamma(tri.pt_list[0], tri.pt_list[1], beta1)
+        theta = math.pi/2 - beta1 
+        phi = math.pi/2 - gamma1
+        x = 2 / (math.tan(theta) + math.tan(phi))
+        y = 2 * math.tan(theta) / (math.tan(theta) + math.tan(phi))
+        return [x,y]
+
+    if abs(tri.distances[1]) > 1.7 and abs(tri.distances[1]) < 2 :
+        beta1 = get_beta(tri.pt_list[1], tri.pt_list[2])
+        gamma1 = get_gamma(tri.pt_list[1], tri.pt_list[2], beta1)
+        theta = math.pi/2 - beta1 
+        phi = math.pi/2 - gamma1
+        x = 2 / (math.tan(theta) + math.tan(phi))
+        y = 2 * math.tan(theta) / (math.tan(theta) + math.tan(phi))
+
+        return [x,y]
+
+    if abs(tri.distances[2]) > 1.7 and abs(tri.distances[2]) < 2 :
+        beta1 = get_beta(tri.pt_list[2], tri.pt_list[0])
+        gamma1 = get_gamma(tri.pt_list[2], tri.pt_list[0], beta1)
+        theta = math.pi/2 - beta1 
+        phi = math.pi/2 - gamma1
+        x = 2 / (math.tan(theta) + math.tan(phi))
+        y = 2 * math.tan(theta) / (math.tan(theta) + math.tan(phi))
+        
+        return [x,y]
+
+        
+
 
 
 def main():
