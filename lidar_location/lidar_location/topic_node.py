@@ -156,6 +156,14 @@ def get_gamma(pt1, pt2, beta):
         return abs(math.pi - beta - abs(pt2.angle - pt1.angle))%math.pi
 
 def determiner_position(tri):
+    
+    
+    
+    
+    
+    
+    
+    
     if abs(tri.distances[0]) > 1.7 and abs(tri.distances[0]) < 2 :
         #beta1 = get_beta(tri.pt_list[0], tri.pt_list[1])
         #gamma1 = get_gamma(tri.pt_list[0], tri.pt_list[1], beta1)
@@ -163,8 +171,13 @@ def determiner_position(tri):
         #phi = math.pi/2 - gamma1
         #x = 2 / (math.tan(theta) + math.tan(phi))
         #y = 2 * math.tan(theta) / (math.tan(theta) + math.tan(phi))
-        y = (tri.pt_list[0].distance**2 - tri.pt_list[1]**2 -4)/-2
-        x = (math.sqrt(tri.pt_list[1]**2-((tri.pt_list[0].distance**2 - tri.pt_list[1]**2 -4)/-2)**2))
+        teta= math.pi/2 - get_beta(tri.pt_list[0], tri.pt_list[1])
+        x= math.cos(teta)*tri.pt_list[0].distance
+        y= math.sin(teta)*tri.pt_list[0].distance
+        
+        
+        #y = (tri.pt_list[0].distance**2 - tri.pt_list[1].distance**2 -4)/-2
+        #x = (math.sqrt(tri.pt_list[1].distance**2)-y**2)
         return [x,y]
 
     if abs(tri.distances[1]) > 1.7 and abs(tri.distances[1]) < 2 :
@@ -174,9 +187,11 @@ def determiner_position(tri):
         #phi = math.pi/2 - gamma1
         #x = 2 / (math.tan(theta) + math.tan(phi))
         #y = 2 * math.tan(theta) / (math.tan(theta) + math.tan(phi))
-        y = (tri.pt_list[1].distance**2 - tri.pt_list[2]**2 -4)/-2
-        x = (math.sqrt(tri.pt_list[1]**2-((tri.pt_list[1].distance**2 - tri.pt_list[2]**2 -4)/-2)**2))
-
+        #y = (tri.pt_list[1].distance**2 - tri.pt_list[2].distance**2 -4)/-2
+        #x = (math.sqrt(tri.pt_list[2].distance**2)-y**2)
+        teta= math.pi/2 - get_beta(tri.pt_list[1], tri.pt_list[2])
+        x= math.cos(teta)*tri.pt_list[1].distance
+        y= math.sin(teta)*tri.pt_list[1].distance
         return [x,y]
 
     if abs(tri.distances[2]) > 1.7 and abs(tri.distances[2]) < 2 :
@@ -186,9 +201,11 @@ def determiner_position(tri):
         #phi = math.pi/2 - gamma1
         #x = 2 / (math.tan(theta) + math.tan(phi))
         #y = 2 * math.tan(theta) / (math.tan(theta) + math.tan(phi))
-        y = (tri.pt_list[2].distance**2 - tri.pt_list[0]**2 -4)/-2
-        x = (math.sqrt(tri.pt_list[2]**2-((tri.pt_list[2].distance**2 - tri.pt_list[0]**2 -4)/-2)**2))
-
+        #y = (tri.pt_list[2].distance**2 - tri.pt_list[0].distance**2 -4)/-2
+        #x = (math.sqrt(tri.pt_list[0].distance**2)-y**2)
+        teta= math.pi/2 - get_beta(tri.pt_list[2], tri.pt_list[0])
+        x= math.cos(teta)*tri.pt_list[2].distance
+        y= math.sin(teta)*tri.pt_list[2].distance
         
         return [x,y]
 
