@@ -4,7 +4,7 @@ name: Docker Setup Buildx - other branchs
 
 on:
   push:
-    branches: [debug]
+    branches: [ debug ]
         
 jobs:
   docker:
