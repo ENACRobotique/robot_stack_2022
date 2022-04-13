@@ -9,22 +9,22 @@ from tf2_msgs.msg import TFMessage
 from tf2_ros import TransformBroadcaster
 from diagnostic_msgs.msg import DiagnosticArray, DiagnosticStatus, KeyValue
 
-from interfaces_enac import __sensorvalue, __pid
+from interfaces_enac.msg import _periph_value, _pid
 
-PeriphValue = __periphvalue.PeriphValue
-Pid = __pid.Pid
+PeriphValue = _periph_value.PeriphValue
+Pid = _pid.Pid
 
 import serial
 import threading
 
-CMD_VEL = "v {} {}"
-CMD_STOP = "s"
-CMD_ACTU = "a {} {}"
-CMD_DECL = "d"
-CMD_PID = "g {} {} {}"
+CMD_VEL = "v {} {}\n\r"
+CMD_STOP = "s\n"
+CMD_ACTU = "a {} {}\n\r"
+CMD_DECL = "d\n\r"
+CMD_PID = "g {} {} {}\n\r"
 
 MESSAGE = "m"
-ODOM_MOTOR = "p"
+ODOM_MOTOR = "r"
 PERIPH_DECL = "b"
 CAPT_VAL = "c"
 
@@ -39,7 +39,7 @@ CAPT_VAL = "c"
 
 #commandes à récupérer du serial:
 #m <string>
-#p <double> <double> <double> <double> <double>: odométrie moteur <x> <y> <théta> <vlin> <vtheta>
+#r <double> <double> <double> <double> <double>: odométrie moteur <x> <y> <théta> <vlin> <vtheta>
 #b <string> <int> <int> <int> [R/RW] <string>: déclaration d'un actionneur (RW) ou d'un capteur (R). (ignoré: RoboKontrol)
 #c <string> <int> : retour de capteur
 
@@ -51,12 +51,15 @@ def quaternion_from_euler(roll, pitch, yaw):
     return [qx, qy, qz, qw]
 
 class Ros2Serial(Node):
-    def __init__(self, port, timeout = 0.05, baudrate = 115200, rx_buffer_size=64, tx_buffer_size=64):
+    def __init__(self, timeout = 0.05, rx_buffer_size=64, tx_buffer_size=64):
         # default buffer size like teensy (TODO: voir si à garder pour stm32?)
         super().__init__("ros2serial")
+        self.declare_parameter('serial_port', "/dev/ttyUSB0")
+        self.declare_parameter('baudrate', 57600)
+
         #paramétrage serial
-        self.ser = serial.Serial(port=port, baudrate=baudrate, timeout=timeout)
-        self.ser.set_buffer_size(rx_buffer_size, tx_buffer_size)
+        self.ser = serial.Serial(port=self.get_parameter('serial_port').get_parameter_value().string_value, baudrate=self.get_parameter('baudrate').get_parameter_value().integer_value, timeout=timeout)
+        #self.ser.set_buffer_size(rx_buffer_size, tx_buffer_size)
         self.thread_read = threading.Thread(target=self.serial_read)
         self.listen = True
         #paramétrage ROS
@@ -65,8 +68,10 @@ class Ros2Serial(Node):
         self.ros_diagnostics = self.create_publisher(DiagnosticArray, '/diagnostics', 10)
         
         self.ros_vel_listener = self.create_subscription(Twist, '/cmd_vel', self.on_ros_cmd_vel, 10)
-        self.ros_vel_listener = self.create_subscription(Pid, '/pid', self.on_ros_pid, 10)
+        self.ros_pid_listener = self.create_subscription(Pid, '/pid', self.on_ros_pid, 10)
         self.ros_periph_listener = self.create_subscription(PeriphValue, '/peripherals', self.on_ros_periph_cmd, 10)
+
+        self.start_serial_read()
 
     def start_serial_read(self):
         self.thread_read.start()
@@ -77,24 +82,32 @@ class Ros2Serial(Node):
     def serial_read(self):
         """Fonction qui lit en permanence le port série.
         S'exécute dans un thread séparé"""
+        print("serial_read thread launched")
+        message = ""
         while self.listen:
-            message = self.ser.readLine()
-            message = message.decode()
-            if len(message) > 2:
-                if message[0] == MESSAGE:
-                    self.on_serial_msg(message[2:])
-                elif message[0] == ODOM_MOTOR:
-                    self.on_serial_odom(message.split(' ')[1:])
-                elif message[0] == PERIPH_DECL:
-                    self.on_serial_periph(message)
-                elif message[0] == CAPT_VAL:
-                    self.on_serial_capt(message.split(' ')[1:])
+            try:
+                message = self.ser.readline()
+                message = message.decode()
+                if len(message) > 2:
+                    print("serial_read "+message)
+                    if message[0] == MESSAGE:
+                        self.on_serial_msg(message[2:])
+                    elif message[0] == ODOM_MOTOR:
+                        self.on_serial_odom(message.split(' ')[1:])
+                    elif message[0] == PERIPH_DECL:
+                        self.on_serial_periph(message)
+                    elif message[0] == CAPT_VAL:
+                        self.on_serial_capt(message.split(' ')[1:])
+            except Exception as e:
+                print(str(message)+"\n")
+                print(e)
+                print("\n")
 
     def on_serial_msg(self, arg): #TODO: Tester
         #convertir les infor reçues au format ROS2
         msg = DiagnosticArray()
         reference = DiagnosticStatus()
-        reference.level = 0
+        reference.level = DiagnosticStatus.OK
         reference.name = "ros2serial_message"
         reference.message = arg
         reference.hardware_id = "stm32"
@@ -104,7 +117,7 @@ class Ros2Serial(Node):
 
     def on_serial_odom(self, args):
         #convertir les infor reçues au format ROS2
-        msg = Odometry() #TODO: args
+        msg = Odometry()
         msg.header.stamp = self.get_clock().now().to_msg()
         msg.header.frame_id = "map"
         msg.child_frame_id = "robot"
@@ -113,29 +126,29 @@ class Ros2Serial(Node):
         msg.pose.pose.position.y = float(args[1])
         msg.pose.pose.position.z = 0.0
         [qx, qy, qz, qw] = quaternion_from_euler(0.0, 0.0, float(args[2]))
-        msg.pose.pose.quaternion.x = qx
-        msg.pose.pose.quaternion.y = qy
-        msg.pose.pose.quaternion.z = qz
-        msg.pose.pose.quarernion.w = qw
+        msg.pose.pose.orientation.x = qx
+        msg.pose.pose.orientation.y = qy
+        msg.pose.pose.orientation.z = qz
+        msg.pose.pose.orientation.w = qw
         #msg.pose.covariance = []
         #TwistWithCovariance
-        msg.twist.linear.x = float(args[3])
-        msg.twist.linear.y = 0.0
-        msg.twist.linear.z = 0.0
-        msg.twist.angular.x = 0.0
-        msg.twist.angular.y = 0.0
-        msg.twist.angular.z = float(args[4])
+        msg.twist.twist.linear.x = float(args[3])
+        msg.twist.twist.linear.y = 0.0
+        msg.twist.twist.linear.z = 0.0
+        msg.twist.twist.angular.x = 0.0
+        msg.twist.twist.angular.y = 0.0
+        msg.twist.twist.angular.z = float(args[4])
 
         #envoyer les infos sur le bon topic
-        self.ros_publisher_odom.publish(msg)
+        self.ros_odom.publish(msg)
     
     def on_serial_periph(self, arg):
         #convertir les infor reçues au format ROS2
         msg = DiagnosticArray()
         reference = DiagnosticStatus()
-        reference.level = 0
+        reference.level = DiagnosticStatus.OK
         reference.name = "ros2serial_periphDecl"
-        reference.message = arg
+        reference.message = str(arg)
         reference.hardware_id = "stm32"
         reference.values = []
         msg.status = [reference]
@@ -145,7 +158,7 @@ class Ros2Serial(Node):
         #convertir les infor reçues au format ROS2
         msg = PeriphValue() #TODO: args
         msg.header.stamp = self.get_clock().now().to_msg()
-        msg.sensor_name = args[0]
+        msg.periph_name = args[0]
         msg.value = int(args[1])
         #envoyer les infos sur le bon topic
         self.ros_peripherals.publish(msg)
@@ -158,12 +171,14 @@ class Ros2Serial(Node):
     def on_ros_cmd_vel(self, msg):
         vlin = msg.linear.x
         vtheta = msg.angular.z
+        print("on_ros_cmd_vel "+str(vlin)+" "+str(vtheta))
         self.serial_send(CMD_VEL.format(int(vlin*1000), int(vtheta*1000)))
 
     def on_ros_periph_cmd(self, msg):
         id = msg.periph_name[:2]
         cmd = msg.value
-        self.serial_send(CMD_VEL.format(id, cmd))
+        print("on_ros_periph_cmd "+str(id)+" "+str(cmd))
+        self.serial_send(CMD_ACTU.format(str(id), str(cmd)))
 
     def on_ros_pid(self, msg):
         kpv = msg.kpv
@@ -172,10 +187,11 @@ class Ros2Serial(Node):
         kpo = msg.kpo
         kio = msg.kio
         #kdo = msg.kdo
+        print("on_ros_pid i:"+str(kpv)+" "+str(kiv)+" o:"+str(kpo)+" "+str(kio))
         if (kpv != 0 or kiv == 0): # or kdv != 0:
-            self.serial_send(CMD_PID.format('v', kpv, kiv))
+            self.serial_send(CMD_PID.format('v', str(kpv), str(kiv)))
         if (kpo != 0 or kio == 0): # or kdo != 0:
-            self.serial_send(CMD_PID.format('o', kpo, kio))
+            self.serial_send(CMD_PID.format('o', str(kpo), str(kio)))
 
 
 def main(args=None):
@@ -184,8 +200,6 @@ def main(args=None):
     ros_to_serial = Ros2Serial()
 
     rclpy.spin(ros_to_serial)
-
-    ros_to_serial.start_serial_read()
 
     # Destroy the node explicitly
     # (optional - otherwise it will be done automatically
