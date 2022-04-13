@@ -11,11 +11,13 @@ from diagnostic_msgs.msg import DiagnosticArray, DiagnosticStatus, KeyValue
 
 from interfaces_enac import __sensorvalue, __pid
 
+from ros2serial.SerialManager import SerialManager
+
 PeriphValue = __periphvalue.PeriphValue
 Pid = __pid.Pid
 
-import serial
-import threading
+
+
 
 CMD_VEL = "v {} {}"
 CMD_STOP = "s"
@@ -52,13 +54,20 @@ def quaternion_from_euler(roll, pitch, yaw):
 
 class Ros2Serial(Node):
     def __init__(self, port, timeout = 0.05, baudrate = 115200, rx_buffer_size=64, tx_buffer_size=64):
-        # default buffer size like teensy (TODO: voir si à garder pour stm32?)
+        # default buffer size like teensy 
         super().__init__("ros2serial")
-        #paramétrage serial
-        self.ser = serial.Serial(port=port, baudrate=baudrate, timeout=timeout)
-        self.ser.set_buffer_size(rx_buffer_size, tx_buffer_size)
-        self.thread_read = threading.Thread(target=self.serial_read)
-        self.listen = True
+        #parameter to check if we need a fake serial eg RoboKontrol
+        self.fake_serial = self.get_parameter("fake_serial", False)
+        
+        self.stm_serial = SerialManager.__init__(self, port, timeout, baudrate, rx_buffer_size, tx_buffer_size)
+        #replace the basic serial reader of stm_serial with ros2 topic
+        reader = self.stm_serial.serial_read
+
+        #reference for below synthax https://stackoverflow.com/questions/394770/override-a-method-at-instance-level
+        reader = type(reader)(serial_read_ros, self.stm_serial, SerialManager)
+        if self.fake_serial.get_parameter_value().boolean_value == True:
+            self.fake_serial = SerialManager.__init__(self, port, timeout, baudrate, rx_buffer_size, tx_buffer_size)
+
         #paramétrage ROS
         self.ros_odom = self.create_publisher(Odometry, '/odom', 10)
         self.ros_peripherals = self.create_publisher(PeriphValue, '/peripherals', 10)
@@ -68,13 +77,9 @@ class Ros2Serial(Node):
         self.ros_vel_listener = self.create_subscription(Pid, '/pid', self.on_ros_pid, 10)
         self.ros_periph_listener = self.create_subscription(PeriphValue, '/peripherals', self.on_ros_periph_cmd, 10)
 
-    def start_serial_read(self):
-        self.thread_read.start()
 
-    def stop_serial_read(self):
-        self.listen = False
 
-    def serial_read(self):
+    def serial_read_ros(self):
         """Fonction qui lit en permanence le port série.
         S'exécute dans un thread séparé"""
         while self.listen:
@@ -151,9 +156,7 @@ class Ros2Serial(Node):
         self.ros_peripherals.publish(msg)
 
 
-    def serial_send(self, msg):
-        """Envoyer un message sur le port série"""
-        self.ser.write(msg.encode('utf-8'))
+
 
     def on_ros_cmd_vel(self, msg):
         vlin = msg.linear.x
