@@ -4,8 +4,10 @@ import math
 from lidar_location.Point import Point
 from lidar_location.Amalgame import Amalgame
 
-# This variable defines the minimun distance to consider that 2 points are not part of the same Amalgame 
-Amalgames_min_dist = 0.2 #meters
+# This variable defines the minimun distance to consider that 2 points are not part of the same Amalgame
+Amalgames_min_dist = 0.2  # meters
+
+Amalgame_max_size = 25  # points
 
 
 class Amalgame_list:
@@ -45,12 +47,11 @@ class Amalgame_list:
             while c:
                 if self.is_break(position):
                     c = False
-                if position > points_length + start_position : 
+                if position > points_length + start_position:
                     c = False
                 position += 1
                 list_pt_ama.append(self.list_points[position % points_length])
-
-            #if(list_pt_ama[0].distance) > 0:
+            # if(list_pt_ama[0].distance) > 0 and len(list_pt_ama) < Amalgame_max_size:
             list_obj.append(Amalgame(list_pt_ama))
         return list_obj
 
@@ -70,8 +71,8 @@ class Amalgame_list:
         # Given the small angle between 2 points (less than 1 degree) we can assume that points
         # are aligned and thus calculate only the difference in distance between 2 points
 
-        distance = abs(self.list_points[pos_first % self.points_length].distance - \
-            self.list_points[(pos_first+1) % self.points_length].distance)
+        distance = abs(self.list_points[pos_first % self.points_length].distance -
+                       self.list_points[(pos_first+1) % self.points_length].distance)
 
         if distance > Amalgames_min_dist:
             return True
