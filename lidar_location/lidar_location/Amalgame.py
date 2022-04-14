@@ -4,6 +4,8 @@ import math
 
 types_obj = ['Pylon', 'Tower', 'Friend', 'Foe', 'Unknown']
 
+angle_increment = 0.013877294957637787
+
 
 class Amalgame:
     def __init__(self, list_points):
@@ -21,6 +23,10 @@ class Amalgame:
             new_p.distance = new_p.distance + point.distance
 
         new_p.distance = new_p.distance / len(self.list_points)
-        new_p.angle = self.list_points[math.floor(len(self.list_points)/2)].angle
+        new_p.angle = self.list_points[math.floor(
+            len(self.list_points)/2)].angle
 
         return new_p
+
+    def get_size(self):
+        return 2 * self.relative_center.distance * math.tan(((len(self.list_points) - 1) * angle_increment) / 2)

@@ -7,7 +7,9 @@ from lidar_location.Amalgame import Amalgame
 # This variable defines the minimun distance to consider that 2 points are not part of the same Amalgame
 Amalgames_min_dist = 0.2  # meters
 
-Amalgame_max_size = 25  # points
+Amalgame_max_size = 0.20  # meters
+
+Amalgame_min_dist = 0.10  # meters
 
 
 class Amalgame_list:
@@ -51,8 +53,9 @@ class Amalgame_list:
                     c = False
                 position += 1
                 list_pt_ama.append(self.list_points[position % points_length])
-            # if(list_pt_ama[0].distance) > 0 and len(list_pt_ama) < Amalgame_max_size:
-            list_obj.append(Amalgame(list_pt_ama))
+            new_ama = Amalgame(list_pt_ama)
+            if new_ama.relative_center.distance > Amalgame_min_dist and new_ama.size < Amalgame_max_size:
+                list_obj.append(new_ama)
         return list_obj
 
     # Returns the first point in the list that is a break

@@ -25,6 +25,465 @@ class lidarlocation(Node):
             out.ranges[i] = filtered_data[i]
         return out
 
+    def generate_fake(self, message):
+        message.ranges = [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            1.7319999933242798,
+            1.715999960899353,
+            1.7009999752044678,
+            1.7009999752044678,
+            1.715999960899353,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            1.6540000438690186,
+            1.6380000114440918,
+            1.6230000257492065,
+            1.6230000257492065,
+            1.6380000114440918,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            1.715999960899353,
+            1.684999942779541,
+            1.684999942779541,
+            1.684999942779541,
+            1.684999942779541,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+        ]
+
+        return message
+
     def filter_out(self, message):
         out = []
         for i in range(0, len(message.ranges)):
@@ -42,7 +501,9 @@ class lidarlocation(Node):
 
     def listener_callback(self, msg):
         # self.get_logger().info(msg.angle_max)
-        msg_out = self.generate_filtered_message(msg, self.filter_out(msg))
+        #msg_out = self.generate_filtered_message(msg, self.filter_out(msg))
+        msg_out = self.generate_filtered_message(
+            msg, self.filter_out(self.generate_fake(msg)))
         # msg_out = msg
         # self.get_logger().info(msg_out.angle_max)
         # triangulation = Amalgame_list(msg_out)
@@ -89,27 +550,27 @@ class lidarlocation(Node):
 
         
         """
-
+        """
         for tri in triangulation.tri_list:
             # self.get_logger().info("------------------------------------------------------")
-            if ((tri.distances[0] > 1.7 and tri.distances[0] < 1.9) and (tri.distances[1] > 3.2 and tri.distances[1] < 3.4) and (tri.distances[2] > 3.2 and tri.distances[2] < 3.4)) or ((tri.distances[0] > 3.2 and tri.distances[0] < 3.4) and (tri.distances[1] > 1.7 and tri.distances[1] < 1.9) and (tri.distances[2] > 3.2 and tri.distances[2] < 3.4)) or ((tri.distances[0] > 3.2 and tri.distances[0] < 3.4) and (tri.distances[1] > 3.2 and tri.distances[1] < 3.4) and (tri.distances[2] > 1.7 and tri.distances[2] < 1.9)) and ((tri.angles[0] > 1.1 and tri.angles[0] < 1.4 and tri.angles[1] > 1.1 and tri.angles[1] < 1.3 and tri.angles[2] > 0.5 and tri.angles[2] < 0.7) or (tri.angles[0] > 1.1 and tri.angles[0] < 1.4 and tri.angles[2] > 0.5 and tri.angles[2] < 0.7 and tri.angles[1] > 1.1 and tri.angles[1] < 1.3) or (tri.angles[2] > 0.5 and tri.angles[2] < 0.7 and tri.angles[0] > 1.1 and tri.angles[0] < 1.4 and tri.angles[1] > 1.1 and tri.angles[1] < 1.3)):
-                self.get_logger().info("Un triangle:")
-                for pt in tri.pt_list:
-                    self.get_logger().info("Un point:")
-                    self.get_logger().info(
-                        f"{pt.distance}")
-                    self.get_logger().info(
-                        f"{pt.angle}")
-                self.get_logger().info("Les distances:")
+            # if ((tri.distances[0] > 1.7 and tri.distances[0] < 1.9) and (tri.distances[1] > 3.2 and tri.distances[1] < 3.4) and (tri.distances[2] > 3.2 and tri.distances[2] < 3.4)) or ((tri.distances[0] > 3.2 and tri.distances[0] < 3.4) and (tri.distances[1] > 1.7 and tri.distances[1] < 1.9) and (tri.distances[2] > 3.2 and tri.distances[2] < 3.4)) or ((tri.distances[0] > 3.2 and tri.distances[0] < 3.4) and (tri.distances[1] > 3.2 and tri.distances[1] < 3.4) and (tri.distances[2] > 1.7 and tri.distances[2] < 1.9)) and ((tri.angles[0] > 1.1 and tri.angles[0] < 1.4 and tri.angles[1] > 1.1 and tri.angles[1] < 1.3 and tri.angles[2] > 0.5 and tri.angles[2] < 0.7) or (tri.angles[0] > 1.1 and tri.angles[0] < 1.4 and tri.angles[2] > 0.5 and tri.angles[2] < 0.7 and tri.angles[1] > 1.1 and tri.angles[1] < 1.3) or (tri.angles[2] > 0.5 and tri.angles[2] < 0.7 and tri.angles[0] > 1.1 and tri.angles[0] < 1.4 and tri.angles[1] > 1.1 and tri.angles[1] < 1.3)):
+            self.get_logger().info("Un triangle:")
+            for pt in tri.pt_list:
+                self.get_logger().info("Un point:")
                 self.get_logger().info(
-                    f"{tri.distances}")
-                self.get_logger().info("Les angles:")
+                    f"{pt.distance}")
                 self.get_logger().info(
-                    f"{tri.angles}")
-                positions = determiner_position(tri)
-                print("POSITION")
-                print(positions)
-
+                    f"{pt.angle}")
+            self.get_logger().info("Les distances:")
+            self.get_logger().info(
+                f"{tri.distances}")
+            self.get_logger().info("Les angles:")
+            self.get_logger().info(
+                f"{tri.angles}")
+            positions = determiner_position(tri)
+            print("POSITION")
+            print(positions)
+            """
         objl = Amalgame_list(msg_out)
         # self.get_logger().info("Une list dobj:")
         list_pts = []
@@ -125,14 +586,12 @@ class lidarlocation(Node):
 
         msg_obj.ranges = list_pts
         """
-
         """
         for i in range(0, len(objl.list_obj)):
-            print("[ " + str(objl.list_obj[i].relative_center.distance) + \
+            print("[ " + str(objl.list_obj[i].relative_center.distance) +
                   "," + str(objl.list_obj[i].relative_center.angle) + "]")
         print("++++++++++++++++++++++++++++++")
         """
-
         """
         for i in range(0, len(objl.list_obj)):
             for pt in objl.list_obj[i].list_points:
@@ -141,7 +600,6 @@ class lidarlocation(Node):
         print("++++++++++++++++++++++++++++++")
         """
 
-        """
         for i in range(0, len(objl.list_obj)):
             j = 0
             for pt in objl.list_obj[i].list_points:
@@ -149,7 +607,6 @@ class lidarlocation(Node):
                 print("[ " + str(pt.angle) + "]")
             print("-------- ObJ de " + str(j) + "points")
         print("++++++++++++++++++++++++++++++")
-        """
 
         # self.get_logger().info("Un Amalgame:")
         # x = obj.relative_center.distance * math.cos(obj.relative_center.angle)
@@ -167,7 +624,7 @@ def get_distance_pt(pt1, pt2):
 
 
 def get_beta(pt1, pt2):
-    return abs(math.acos((get_distance_pt(pt1, pt2)**2 + pt1.distance**2 - pt2.distance**2) / (2 * get_distance_pt(pt1, pt2) * pt1.distance))) % math.pi
+    return abs(math.acos((1.8**2 + pt1.distance**2 - pt2.distance**2) / (2 * 1.8**2 * pt1.distance))) % math.pi
 
 
 def get_gamma(pt1, pt2, beta):
@@ -185,7 +642,6 @@ def determiner_position(tri):
         phi = math.pi/2 - \
             get_gamma(tri.pt_list[0], tri.pt_list[1],
                       get_beta(tri.pt_list[0], tri.pt_list[1]))
-
         x = math.cos(teta)*tri.pt_list[0].distance
         x2 = math.cos(phi)*tri.pt_list[1].distance
         y = math.sin(teta)*tri.pt_list[0].distance
@@ -211,9 +667,15 @@ def determiner_position(tri):
         y = math.sin(teta)*tri.pt_list[2].distance
         y2 = 2 - math.sin(phi)*tri.pt_list[0].distance
 
+    """
+    x = math.sqrt(tri.pt_list[1].distance**2 -
+                  ((tri.pt_list[0].distance**2 - tri.pt_list[1].distance**2) - 3.61) / -1.9)**2
+    y = ((tri.pt_list[0].distance**2 -
+         tri.pt_list[1].distance**2 - 3.61) / -1.9)**2
+    """
     resx = (x + x2)/2
     resy = (y + y2)/2
-    return [resx, resy, x, y, x2, y2]
+    return [x, y]
 
 
 def main():
