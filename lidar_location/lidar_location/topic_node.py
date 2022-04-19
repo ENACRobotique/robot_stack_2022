@@ -604,7 +604,7 @@ class lidarlocation(Node):
             j = 0
             for pt in objl.list_obj[i].list_points:
                 j += 1
-                print("[ " + str(pt.angle) + "]")
+                print("[ " + str(pt.distance) + ", " + str(pt.angle) + "]")
             print("-------- ObJ de " + str(j) + "points")
         print("++++++++++++++++++++++++++++++")
 
