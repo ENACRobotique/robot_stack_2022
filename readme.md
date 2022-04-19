@@ -140,3 +140,15 @@ melvin ordi de gauche :
     docker run -it --rm --net=host -e DISPLAY --privileged --name club_robot --volume /home/robot/Documents/robot_stack/robot_stack_2022:/enac_ws/src --volume /home/robot/Documents/rosbag:/enac_ws/bag enacrobotique/enac-base:dev bash
 
 
+melvin environnement virtuel : 
+docker run -it --rm --net=host -e DISPLAY --privileged --name club_robot --volume /home/ubuntu/enac_ws/src/robot_stack_2022:/enac_ws/src --volume /home/ubuntu/rosbag:/enac_ws/bag enacrobotique/enac-base:dev bash
+
+cd enac_ws/
+colcon build --packages-select lidar_location
+source install/local_setup.bash 
+ros2 run lidar_location comm_node
+
+docker exec -it club_robot bash
+cd enac_ws/
+ros2 bag play bag/rosbagfix/
+
