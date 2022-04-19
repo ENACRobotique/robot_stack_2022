@@ -12,7 +12,8 @@ docker run -it -d --net=host -e DISPLAY --name club_robot --volume /home/robot/r
 PI 4 with camera :
 docker run -it --privileged --net=host --pid=host -e DISPLAY --device=/dev/video0 enacrobotique/enac-base:prod bash
 
-ros2 run ros2serial ros2serial --ros-args -p serial_port:=/dev/ttyACM0
+ros2 run ros2serial ros2serial --ros-args -p serial_port:=/dev/ttyACM0 -p baudrate:=115200
+
 
 ## Useful commands
 
