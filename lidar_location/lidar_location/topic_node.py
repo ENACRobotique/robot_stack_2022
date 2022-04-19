@@ -501,9 +501,9 @@ class lidarlocation(Node):
 
     def listener_callback(self, msg):
         # self.get_logger().info(msg.angle_max)
-        #msg_out = self.generate_filtered_message(msg, self.filter_out(msg))
-        msg_out = self.generate_filtered_message(
-            msg, self.filter_out(self.generate_fake(msg)))
+        msg_out = self.generate_filtered_message(msg, self.filter_out(msg))
+        # msg_out = self.generate_filtered_message(
+        #    msg, self.filter_out(self.generate_fake(msg)))
         # msg_out = msg
         # self.get_logger().info(msg_out.angle_max)
         # triangulation = Amalgame_list(msg_out)
@@ -571,10 +571,30 @@ class lidarlocation(Node):
             print("POSITION")
             print(positions)
             """
-        objl = Amalgame_list(msg_out)
+        #objl = Amalgame_list(msg_out)
         # self.get_logger().info("Une list dobj:")
+        trianglel = Triangulation(msg_out)
         list_pts = []
         msg_obj = msg_out
+        """
+        for tri in trianglel.valid_triangles:
+            print("Liste des tiangles valides")
+            print("[ " + str(tri.distances) +
+                  "," + str(tri.angles) + "]")
+        print("++++++++++++++++++++++++++++++")
+        """
+        for tri in trianglel.valid_triangles:
+            print("Liste des positions valides")
+            print(determiner_position(tri))
+        print("++++++++++++++++++++++++++++++")
+
+        """
+        for tri in trianglel.tri_list:
+            print("Liste des tiangles")
+            print("[ " + str(tri.distances) +
+                  "," + str(tri.angles) + "]")
+        print("++++++++++++++++++++++++++++++")
+        """
         """
         for i in range(0, len(msg_out.ranges)):
             for obj in objl.list_obj:
@@ -588,18 +608,20 @@ class lidarlocation(Node):
         """
         """
         for i in range(0, len(objl.list_obj)):
+            print("Liste des Objets")
             print("[ " + str(objl.list_obj[i].relative_center.distance) +
                   "," + str(objl.list_obj[i].relative_center.angle) + "]")
         print("++++++++++++++++++++++++++++++")
         """
         """
         for i in range(0, len(objl.list_obj)):
+            print("Liste des poitns des objets")
             for pt in objl.list_obj[i].list_points:
                 print("[ " + str(pt.angle) + "]")
             print("--------")
         print("++++++++++++++++++++++++++++++")
         """
-
+        """
         for i in range(0, len(objl.list_obj)):
             j = 0
             for pt in objl.list_obj[i].list_points:
@@ -607,14 +629,7 @@ class lidarlocation(Node):
                 print("[ " + str(pt.distance) + ", " + str(pt.angle) + "]")
             print("-------- ObJ de " + str(j) + "points")
         print("++++++++++++++++++++++++++++++")
-
-        # self.get_logger().info("Un Amalgame:")
-        # x = obj.relative_center.distance * math.cos(obj.relative_center.angle)
-        # y = obj.relative_center.distance * math.sin(obj.relative_center.angle)
-        # self.get_logger().info(
-        #    f"{obj.relative_center.distance}")
-        # self.get_logger().info(
-        #    f"{obj.relative_center.angle}")
+        """
 
         self.publisher_.publish(msg_obj)
 
@@ -642,30 +657,30 @@ def determiner_position(tri):
         phi = math.pi/2 - \
             get_gamma(tri.pt_list[0], tri.pt_list[1],
                       get_beta(tri.pt_list[0], tri.pt_list[1]))
-        x = math.cos(teta)*tri.pt_list[0].distance
-        x2 = math.cos(phi)*tri.pt_list[1].distance
-        y = math.sin(teta)*tri.pt_list[0].distance
-        y2 = 2 - math.sin(phi)*tri.pt_list[1].distance
+        x = math.cos(teta)*tri.pt_list[0].distance - 0.1
+        x2 = math.cos(phi)*tri.pt_list[1].distance - 0.1
+        y = math.sin(teta)*tri.pt_list[0].distance + 0.05
+        y2 = 1.95 - math.sin(phi)*tri.pt_list[1].distance
 
     if abs(tri.distances[1]) > 1.7 and abs(tri.distances[1]) < 1.9:
         teta = math.pi/2 - get_beta(tri.pt_list[1], tri.pt_list[2])
         phi = math.pi/2 - \
             get_gamma(tri.pt_list[1], tri.pt_list[2],
                       get_beta(tri.pt_list[1], tri.pt_list[2]))
-        x = math.cos(teta)*tri.pt_list[1].distance
-        x2 = math.cos(phi)*tri.pt_list[2].distance
-        y = math.sin(teta)*tri.pt_list[1].distance
-        y2 = 2 - math.sin(phi)*tri.pt_list[2].distance
+        x = math.cos(teta)*tri.pt_list[1].distance - 0.1
+        x2 = math.cos(phi)*tri.pt_list[2].distance - 0.1
+        y = math.sin(teta)*tri.pt_list[1].distance + 0.05
+        y2 = 1.95 - math.sin(phi)*tri.pt_list[2].distance
 
     if abs(tri.distances[2]) > 1.7 and abs(tri.distances[2]) < 1.9:
         teta = math.pi/2 - get_beta(tri.pt_list[2], tri.pt_list[0])
         phi = math.pi/2 - \
             get_gamma(tri.pt_list[2], tri.pt_list[0],
                       get_beta(tri.pt_list[2], tri.pt_list[0]))
-        x = math.cos(teta)*tri.pt_list[2].distance
-        x2 = math.cos(phi)*tri.pt_list[0].distance
-        y = math.sin(teta)*tri.pt_list[2].distance
-        y2 = 2 - math.sin(phi)*tri.pt_list[0].distance
+        x = math.cos(teta)*tri.pt_list[2].distance - 0.1
+        x2 = math.cos(phi)*tri.pt_list[0].distance - 0.1
+        y = math.sin(teta)*tri.pt_list[2].distance + 0.05
+        y2 = 1.95 - math.sin(phi)*tri.pt_list[0].distance
 
     """
     x = math.sqrt(tri.pt_list[1].distance**2 -

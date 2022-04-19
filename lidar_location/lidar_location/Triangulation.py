@@ -15,7 +15,7 @@ class Triangulation:
     pt3.angle = 0.3
     pt3.distance = 3
     triangle_pylon = Triangle(pt1, pt2, pt3)
-    triangle_pylon.angles = [1.21, 1.21, 0.72]
+    triangle_pylon.angles = [1.26, 1.26, 0.61]
     triangle_pylon.distances = [1.9, 3.2, 3.2]
 
     # Defines the absolute location of the Pylons
@@ -46,6 +46,8 @@ class Triangulation:
     def find_triangles(self):
         valid_list = []
         for triangle in self.tri_list:
+            # print("comparing", triangle.distances,
+            #      "with", self.triangle_pylon.distances)
             if triangle.compare_triangles(self.triangle_pylon):
                 valid_list.append(triangle)
         return valid_list

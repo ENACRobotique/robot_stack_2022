@@ -44,22 +44,22 @@ class Amalgame_list:
         # Goes through all the list of points starting from the first break
         while position < points_length + start_position:
             list_pt_ama = []
-            print("BFEAK ! at position ", position)
+            #print("BFEAK ! at position ", position)
             c = True
             while c:
                 if self.is_break(position):
-                    print("Not a break")
+                    #print("Not a break")
                     c = False
                 if position > points_length + start_position:
-                    print("overshoot")
+                    # print("overshoot")
                     c = False
                 list_pt_ama.append(
                     self.list_points[position % points_length])
                 position += 1
             new_ama = Amalgame(list_pt_ama)
-            print("New amalgame")
+            #print("New amalgame")
             if new_ama.relative_center.distance > Amalgame_min_dist and new_ama.size < Amalgame_max_size:
-                print("Amalgame is fair")
+                #print("Amalgame is fair")
                 list_obj.append(new_ama)
         return list_obj
 
