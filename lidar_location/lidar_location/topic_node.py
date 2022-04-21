@@ -3,8 +3,22 @@ from lidar_location.Amalgame_list import Amalgame_list
 import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import LaserScan
-from geometry_msgs.msg import Point
+from geometry_msgs.msg import TransformStamped, Transform
 import math
+
+import numpy as np
+
+
+def quaternion_from_euler(roll, pitch, yaw):
+    qx = np.sin(roll/2) * np.cos(pitch/2) * np.cos(yaw/2) - \
+        np.cos(roll/2) * np.sin(pitch/2) * np.sin(yaw/2)
+    qy = np.cos(roll/2) * np.sin(pitch/2) * np.cos(yaw/2) + \
+        np.sin(roll/2) * np.cos(pitch/2) * np.sin(yaw/2)
+    qz = np.cos(roll/2) * np.cos(pitch/2) * np.sin(yaw/2) - \
+        np.sin(roll/2) * np.sin(pitch/2) * np.cos(yaw/2)
+    qw = np.cos(roll/2) * np.cos(pitch/2) * np.cos(yaw/2) + \
+        np.sin(roll/2) * np.sin(pitch/2) * np.sin(yaw/2)
+    return [qx, qy, qz, qw]
 
 
 class lidarlocation(Node):
@@ -17,7 +31,57 @@ class lidarlocation(Node):
             10)
         self.subscription
         self.publisher_ = self.create_publisher(LaserScan, 'filtered_scan', 10)
-        # self.publish_list_obj = self.create_publisher(LaserScan, 'list_obj', 10)
+        self.publisher_map = self.create_publisher(
+            TransformStamped, 'carte_coins', 10)
+        self.publish_position = self.create_publisher(
+            TransformStamped, 'robot_position', 10)
+        self.timer = self.create_timer(1, self.test)
+
+    def test(self):
+        msg_out = TransformStamped()
+        msg_out.header.frame_id = "map"
+        msg_out.child_frame_id = "map_3000_2000"
+        msg_out.transform.translation.x = 3.0
+        msg_out.transform.translation.y = 2.0
+        msg_out.transform.translation.z = 0.0
+        [qx, qy, qz, qw] = quaternion_from_euler(
+            0, 0, 0)
+
+        msg_out.transform.rotation.x = qx
+        msg_out.transform.rotation.y = qy
+        msg_out.transform.rotation.z = qz
+        msg_out.transform.rotation.w = qw
+        self.publisher_map.publish(msg_out)
+
+        msg_out_b = TransformStamped()
+        msg_out_b.header.frame_id = "map"
+        msg_out_b.child_frame_id = "map_0_2000"
+        msg_out_b.transform.translation.x = 0.0
+        msg_out_b.transform.translation.y = 2.0
+        msg_out_b.transform.translation.z = 0.0
+        [qxb, qyb, qzb, qwb] = quaternion_from_euler(
+            0, 0, 0)
+
+        msg_out_b.transform.rotation.x = qxb
+        msg_out_b.transform.rotation.y = qyb
+        msg_out_b.transform.rotation.z = qzb
+        msg_out_b.transform.rotation.w = qwb
+        self.publisher_map.publish(msg_out_b)
+
+        msg_out_c = TransformStamped()
+        msg_out_c.header.frame_id = "map"
+        msg_out_c.child_frame_id = "map_3000_0"
+        msg_out_c.transform.translation.x = 3.0
+        msg_out_c.transform.translation.y = 0.0
+        msg_out_c.transform.translation.z = 0.0
+        [qxc, qyc, qzc, qwc] = quaternion_from_euler(
+            0, 0, 0)
+
+        msg_out_c.transform.rotation.x = qxc
+        msg_out_c.transform.rotation.y = qyc
+        msg_out_c.transform.rotation.z = qzc
+        msg_out_c.transform.rotation.w = qwc
+        self.publisher_map.publish(msg_out_c)
 
     def generate_filtered_message(self, message, filtered_data):
         out = message
@@ -488,7 +552,7 @@ class lidarlocation(Node):
         out = []
         for i in range(0, len(message.ranges)):
             if message.ranges[i] is not None:
-                if message.ranges[i] > 3.6:
+                if message.ranges[i] > 3.3:
                     out.append(0)
                 else:
                     out.append(message.ranges[i])
@@ -496,14 +560,35 @@ class lidarlocation(Node):
                 out.append(message.ranges[i])
         return out
 
-    def echo(self, message):
-        return message
+    def send_position(self, position):
+        msg_out = TransformStamped()
+        msg_out.header.stamp = self.get_clock().now().to_msg()
+        msg_out.header.frame_id = "map"
+        msg_out.child_frame_id = "laser"
+        msg_out.transform.translation.x = position[0]
+        msg_out.transform.translation.y = position[1]
+        msg_out.transform.translation.z = 0.0
+        [qx, qy, qz, qw] = quaternion_from_euler(
+            0, 0, position[2])
+
+        msg_out.transform.rotation.x = qx
+        msg_out.transform.rotation.y = qy
+        msg_out.transform.rotation.z = qz
+        msg_out.transform.rotation.w = qw
+        self.publish_position.publish(msg_out)
+
+    def save_valid_to_file(self, tri, file):
+        file_object = open(file, 'a')
+        output = str(tri.angles[0]) + ";" + str(tri.angles[1]) + ";" + str(tri.angles[2]) + ";" + str(
+            tri.distances[0]) + ";" + str(tri.distances[1]) + ";" + str(tri.distances[2])
+        file_object.write(output)
+        # print(output)
+        file_object.close()
 
     def listener_callback(self, msg):
         # self.get_logger().info(msg.angle_max)
         msg_out = self.generate_filtered_message(msg, self.filter_out(msg))
-        # msg_out = self.generate_filtered_message(
-        #    msg, self.filter_out(self.generate_fake(msg)))
+        #msg_out = self.generate_filtered_message(msg, self.filter_out(self.generate_fake(msg)))
         # msg_out = msg
         # self.get_logger().info(msg_out.angle_max)
         # triangulation = Amalgame_list(msg_out)
@@ -571,21 +656,24 @@ class lidarlocation(Node):
             print("POSITION")
             print(positions)
             """
-        #objl = Amalgame_list(msg_out)
+        objl = Amalgame_list(msg_out)
         # self.get_logger().info("Une list dobj:")
         trianglel = Triangulation(msg_out)
         list_pts = []
         msg_obj = msg_out
-        """
+
         for tri in trianglel.valid_triangles:
             print("Liste des tiangles valides")
             print("[ " + str(tri.distances) +
                   "," + str(tri.angles) + "]")
         print("++++++++++++++++++++++++++++++")
-        """
+
         for tri in trianglel.valid_triangles:
             print("Liste des positions valides")
-            print(determiner_position(tri))
+            position = self.determiner_position(tri)
+            if position[0] > 0 and position[1] > 0:
+                print(position)
+            self.send_position(position)
         print("++++++++++++++++++++++++++++++")
 
         """
@@ -633,64 +721,115 @@ class lidarlocation(Node):
 
         self.publisher_.publish(msg_obj)
 
+    def determiner_position(self, tri):
+        x = 0
+        y = 0
+        x2 = 0
+        y2 = 0
+
+        orient = 0
+
+        for i in range(0, 2):
+            if abs(tri.distances[i]) > 1.75 and abs(tri.distances[i]) < 1.95:
+                orient = i+1
+        # Determines the sides of the shortest triangle and the 2 other sides
+        c1 = (orient + 1) % 3
+        c2 = (orient + 3) % 3
+        c3 = (orient + 2) % 3
+
+        # voir ou qu'il pense qu'elles sont les balises
+        msg_bal_1 = TransformStamped()
+        msg_bal_1.header.frame_id = "laser"
+        msg_bal_1.child_frame_id = "balise1"
+        msg_bal_1.transform.translation.x = tri.pt_list[c1].distance * math.cos(
+            tri.pt_list[c1].angle)
+        msg_bal_1.transform.translation.y = tri.pt_list[c1].distance * math.sin(
+            tri.pt_list[c1].angle)
+        msg_bal_1.transform.translation.z = 0.0
+        [qx1, qy1, qz1, qw1] = quaternion_from_euler(
+            0, 0, 0)
+
+        msg_bal_1.transform.rotation.x = qx1
+        msg_bal_1.transform.rotation.y = qy1
+        msg_bal_1.transform.rotation.z = qz1
+        msg_bal_1.transform.rotation.w = qw1
+        self.publisher_map.publish(msg_bal_1)
+
+        msg_bal_2 = TransformStamped()
+        msg_bal_2.header.frame_id = "laser"
+        msg_bal_2.child_frame_id = "balise2"
+        msg_bal_2.transform.translation.x = tri.pt_list[c2].distance * math.cos(
+            tri.pt_list[c2].angle)
+        msg_bal_2.transform.translation.y = tri.pt_list[c2].distance * math.sin(
+            tri.pt_list[c2].angle)
+        msg_bal_2.transform.translation.z = 0.0
+        [qx2, qy2, qz2, qw2] = quaternion_from_euler(
+            0, 0, 0)
+
+        msg_bal_2.transform.rotation.x = qx2
+        msg_bal_2.transform.rotation.y = qy2
+        msg_bal_2.transform.rotation.z = qz2
+        msg_bal_2.transform.rotation.w = qw2
+        self.publisher_map.publish(msg_bal_2)
+
+        msg_bal_3 = TransformStamped()
+        msg_bal_3.header.frame_id = "laser"
+        msg_bal_3.child_frame_id = "balise3"
+        msg_bal_3.transform.translation.x = tri.pt_list[c3].distance * math.cos(
+            tri.pt_list[c3].angle)
+        msg_bal_3.transform.translation.y = tri.pt_list[c3].distance * math.sin(
+            tri.pt_list[c3].angle)
+        msg_bal_3.transform.translation.z = 0.0
+        [qx3, qy3, qz3, qw3] = quaternion_from_euler(
+            0, 0, 0)
+
+        msg_bal_3.transform.rotation.x = qx3
+        msg_bal_3.transform.rotation.y = qy3
+        msg_bal_3.transform.rotation.z = qz3
+        msg_bal_3.transform.rotation.w = qw3
+        self.publisher_map.publish(msg_bal_3)
+
+        teta = math.pi/2 - get_beta(tri.pt_list[c2], tri.pt_list[c1])
+        phi = math.pi/2 - \
+            get_gamma(tri.pt_list[c2], tri.pt_list[c1],
+                      get_beta(tri.pt_list[c2], tri.pt_list[c1]))
+        x = math.cos(teta)*tri.pt_list[c1].distance - 0.1
+        x2 = math.cos(phi)*tri.pt_list[c2].distance - 0.1
+        y = math.sin(teta)*tri.pt_list[c1].distance + 0.05
+        y2 = 1.95 - math.sin(phi)*tri.pt_list[c2].distance
+
+        """
+        x = math.sqrt(tri.pt_list[c2].distance**2 -
+                    ((tri.pt_list[c1].distance**2 - tri.pt_list[c2].distance**2) - 3.61) / -1.9)**2
+        y = ((tri.pt_list[c1].distance**2 -
+            tri.pt_list[c2].distance**2 - 3.61) / -1.9)**2
+        """
+        resx = (x + x2)/2
+        resy = (y + y2)/2
+
+        alpha = math.acos(resx/tri.pt_list[c2].distance)
+        if tri.pt_list[c2].angle > alpha:
+            angle_N = tri.pt_list[c2].angle-alpha
+        else:
+            angle_N = 2*math.pi-(alpha-tri.pt_list[c2].angle)
+
+        gisement = 0.0
+        return [x, y, math.pi/2 - angle_N]
+
 
 def get_distance_pt(pt1, pt2):
-    return math.sqrt(pt2.distance**2 + pt1.distance**2 - 2 * pt1.distance * pt2.distance * math.cos(pt1.angle - pt2.angle))
+    return math.sqrt(pt1.distance**2 + pt2.distance**2 - 2*pt1.distance*pt2.distance*math.cos(abs(pt1.angle-pt2.angle)))
 
 
 def get_beta(pt1, pt2):
-    return abs(math.acos((1.8**2 + pt1.distance**2 - pt2.distance**2) / (2 * 1.8**2 * pt1.distance))) % math.pi
+    # print(pt1.distance)
+    # print(pt2.distance)
+    #print(abs((get_distance_pt(pt1, pt2)**2 + pt2.distance**2 - pt1.distance**2) / (2 * get_distance_pt(pt1, pt2) * pt2.distance)))
+    return math.acos(abs((get_distance_pt(pt1, pt2)**2 + pt2.distance**2 - pt1.distance**2) / (2 * get_distance_pt(pt1, pt2) * pt2.distance)))
 
 
 def get_gamma(pt1, pt2, beta):
-    return abs(math.pi - beta - abs(pt2.angle - pt1.angle)) % math.pi
-
-
-def determiner_position(tri):
-    x = 0
-    y = 0
-    x2 = 0
-    y2 = 0
-
-    if abs(tri.distances[0]) > 1.7 and abs(tri.distances[0]) < 1.9:
-        teta = math.pi/2 - get_beta(tri.pt_list[0], tri.pt_list[1])
-        phi = math.pi/2 - \
-            get_gamma(tri.pt_list[0], tri.pt_list[1],
-                      get_beta(tri.pt_list[0], tri.pt_list[1]))
-        x = math.cos(teta)*tri.pt_list[0].distance - 0.1
-        x2 = math.cos(phi)*tri.pt_list[1].distance - 0.1
-        y = math.sin(teta)*tri.pt_list[0].distance + 0.05
-        y2 = 1.95 - math.sin(phi)*tri.pt_list[1].distance
-
-    if abs(tri.distances[1]) > 1.7 and abs(tri.distances[1]) < 1.9:
-        teta = math.pi/2 - get_beta(tri.pt_list[1], tri.pt_list[2])
-        phi = math.pi/2 - \
-            get_gamma(tri.pt_list[1], tri.pt_list[2],
-                      get_beta(tri.pt_list[1], tri.pt_list[2]))
-        x = math.cos(teta)*tri.pt_list[1].distance - 0.1
-        x2 = math.cos(phi)*tri.pt_list[2].distance - 0.1
-        y = math.sin(teta)*tri.pt_list[1].distance + 0.05
-        y2 = 1.95 - math.sin(phi)*tri.pt_list[2].distance
-
-    if abs(tri.distances[2]) > 1.7 and abs(tri.distances[2]) < 1.9:
-        teta = math.pi/2 - get_beta(tri.pt_list[2], tri.pt_list[0])
-        phi = math.pi/2 - \
-            get_gamma(tri.pt_list[2], tri.pt_list[0],
-                      get_beta(tri.pt_list[2], tri.pt_list[0]))
-        x = math.cos(teta)*tri.pt_list[2].distance - 0.1
-        x2 = math.cos(phi)*tri.pt_list[0].distance - 0.1
-        y = math.sin(teta)*tri.pt_list[2].distance + 0.05
-        y2 = 1.95 - math.sin(phi)*tri.pt_list[0].distance
-
-    """
-    x = math.sqrt(tri.pt_list[1].distance**2 -
-                  ((tri.pt_list[0].distance**2 - tri.pt_list[1].distance**2) - 3.61) / -1.9)**2
-    y = ((tri.pt_list[0].distance**2 -
-         tri.pt_list[1].distance**2 - 3.61) / -1.9)**2
-    """
-    resx = (x + x2)/2
-    resy = (y + y2)/2
-    return [x, y]
+    return math.pi - beta - abs(pt2.angle - pt1.angle)
 
 
 def main():

@@ -3,8 +3,8 @@ import math
 
 
 class Triangle:
-    jitter_angle = 0.1  # in rads
-    jitter_distance = 0.1  # in meters
+    jitter_angle = 0.15  # in rads
+    jitter_distance = 0.15  # in meters
 
     def __init__(self, pt1, pt2, pt3):
         self.pt_list = [pt1, pt2, pt3]
@@ -16,7 +16,7 @@ class Triangle:
         return [self.get_distance_pt(self.pt_list[0], self.pt_list[1]), self.get_distance_pt(self.pt_list[1], self.pt_list[2]), self.get_distance_pt(self.pt_list[2], self.pt_list[0])]
 
     def get_beta(self, pt1, pt2):
-        return abs(math.acos((-pt1.distance**2 + self.get_distance_pt(pt1, pt2)**2 + pt2.distance**2) / (2 * self.get_distance_pt(pt1, pt2) * pt2.distance))) % math.pi
+        return math.acos(abs((self.get_distance_pt(pt1, pt2)**2 + pt2.distance**2 - pt1.distance**2) / (2 * self.get_distance_pt(pt1, pt2) * pt2.distance)))
 
     def get_gamma(self, pt1, pt2, beta):
         return abs(math.pi - beta - abs(pt2.angle - pt1.angle)) % math.pi
@@ -67,7 +67,7 @@ class Triangle:
         sorted_in = triangle2.angles
         sorted_in.sort()
 
-        for i in range(0, len(sorted_local)):
+        for i in range(0, 2):
             if abs(sorted_local[i] - sorted_in[i]) > self.jitter_angle:
                 return False
 
@@ -79,11 +79,14 @@ class Triangle:
         sorted_in = triangle2.distances
         sorted_in.sort()
 
-        for i in range(0, len(sorted_local)):
+        for i in range(0, 2):
             if abs(sorted_local[i] - sorted_in[i]) > self.jitter_distance:
                 return False
 
         return True
 
     def get_distance_pt(self, pt1, pt2):
-        return math.sqrt(pt2.distance**2 + pt1.distance**2 - 2 * pt1.distance * pt2.distance * math.cos(pt1.angle - pt2.angle))
+        if pt1.distance != pt2.distance:
+            return math.sqrt(pt1.distance**2 + pt2.distance**2 - 2*pt1.distance*pt2.distance*math.cos(abs(pt1.angle-pt2.angle)))
+        else:
+            return 0.001

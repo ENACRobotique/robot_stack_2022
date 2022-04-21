@@ -15,8 +15,10 @@ class Triangulation:
     pt3.angle = 0.3
     pt3.distance = 3
     triangle_pylon = Triangle(pt1, pt2, pt3)
-    triangle_pylon.angles = [1.26, 1.26, 0.61]
-    triangle_pylon.distances = [1.9, 3.2, 3.2]
+    triangle_pylon.angles = [1.265, 1.265, 0.612]
+    triangle_pylon.distances = [1.9, 3.324, 3.324]
+    # triangle_pylon.angles = [0.57, 1.19, 1.37]
+    # triangle_pylon.distances = [1.83, 3.25, 3.85]
 
     # Defines the absolute location of the Pylons
 
@@ -24,7 +26,7 @@ class Triangulation:
         self.obj_list = Amalgame_list(message)
         self.tri_list = self.create_triangle_list()
         self.valid_triangles = self.find_triangles()
-        #self.location = self.find_location()
+        # self.location = self.find_location()
 
     def create_triangle_list(self):
         i = 0
