@@ -65,8 +65,8 @@ class OdomData:
 
 
 class Navigator(Node):
-	_isNavigating = false
-	_isRotating = false 
+	_isNavigating = False
+	_isRotating = False 
 	
 	_max_speed = 1.0 #Meter/seconds
 	target = OdomData(0.0, 0.0, 6.28)
@@ -103,19 +103,19 @@ class Navigator(Node):
 		currentPosition.update_position(x, y, rot)
 
 		if rot - target.rot > rotationPrecision : #meter
-			self._isNavigating = false
-			self._isRotating = true
+			self._isNavigating = False
+			self._isRotating = True
 			#Need Rotation
 			self.rotate()
 			return
 		elif x - target.x <= position_precision and y - target.y <= position_precision :
-			self._isNavigating = true
-			self._isRotating = false
+			self._isNavigating = True
+			self._isRotating = False
 			self.move()
 			return
 
-		self._isNavigating = false
-		self._isRotating = false
+		self._isNavigating = False
+		self._isRotating = False
 		
 	def stop():
 		target.x = current_position.x
@@ -168,9 +168,9 @@ class Navigator(Node):
 Navigator navigator = Navigator();
 
 Navigator::Navigator(){
-	turn_done = false;
-	displacement_done = false;
-	trajectory_done = false;
+	turn_done = False;
+	displacement_done = False;
+	trajectory_done = False;
 	x_target = 0;
 	y_target = 0;
 	theta_target = 0;
@@ -185,7 +185,7 @@ void Navigator::move_to(float x, float y){
 	y_target = y;
 	move_type = DISPLACEMENT;
 	move_state = INITIAL_TURN;
-	trajectory_done = false;
+	trajectory_done = False;
 	SerialDebug.print("moving_to : ");
 	SerialDebug.print(x_target);
 	SerialDebug.print("\t");
@@ -197,7 +197,7 @@ void Navigator::move(float v, float omega){
 	omega_target = clamp(-OMEGA_MAX, OMEGA_MAX, omega);
 	move_type = DISPLACEMENT;
 	move_state = VELOCITY;
-	trajectory_done = true;
+	trajectory_done = True;
 	SerialDebug.print("velocity movement: ");
 	SerialDebug.print(v_target);
 	SerialDebug.print("\t");
@@ -228,7 +228,7 @@ void Navigator::turn_to(float theta){ // En degrés
 
 	move_type = TURN;
 	move_state = INITIAL_TURN;
-	trajectory_done = false;
+	trajectory_done = False;
 }
 
 void Navigator::throw_to(float x, float y, float theta){
@@ -237,7 +237,7 @@ void Navigator::throw_to(float x, float y, float theta){
 	theta_target = theta;
 	move_type = THROW;
 	move_state = CRUISE;
-	trajectory_done = false;
+	trajectory_done = False;
 	/*SerialDebug.print("throwing_to : ");
 	SerialDebug.print(x_target);
 	SerialDebug.print("\t");
@@ -367,7 +367,7 @@ void Navigator::update(){
 				switch(move_type){
 				case TURN:
 					move_state = STOPPED;
-					trajectory_done = true;
+					trajectory_done = True;
 					break;
 				case DISPLACEMENT:
 					move_state = CRUISE;
@@ -392,7 +392,7 @@ void Navigator::update(){
 			if(displacement_done){
 				MotorControl::set_cons(0,0);
 				move_state=STOPPED;
-				trajectory_done = true;
+				trajectory_done = True;
 				break;
 			}
 
@@ -425,10 +425,10 @@ void Navigator::forceStop(){
 bool Navigator::moveForward(){
 	int dir = scalaire(cos(odometry_motor.get_pos_theta()),sin(odometry_motor.get_pos_theta()),x_target - odometry_motor.get_pos_x(),y_target - odometry_motor.get_pos_y());
 	if(dir>0){
-		return true;
+		return True;
 	}
 	else{
-		return false;
+		return False;
 	}
 }
 
