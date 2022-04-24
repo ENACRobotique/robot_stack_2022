@@ -7,10 +7,10 @@ xhost local:root
 ```
 For the rest : 
 ```
-docker run -it -d --net=host -e DISPLAY --name club_robot --volume /home/robot/ros_aruco/src/robot_stack_2022:/enac_ws/src --volume /home/robot/bag_files:/enac_ws/bag enacrobotique/enac-base bash
+docker run -it -d --net=host -e DISPLAY --name club_robot --volume /home/robot/ros_aruco/src/robot_stack_2022:/enac_ws/src --volume /home/robot/bag_files:/enac_ws/bag enacrobotique/enac-base:dev bash
 ```
 PI 4 with camera :
-docker run -it --privileged --net=host --pid=host -e DISPLAY --device=/dev/video0 enacrobotique/enac-base:prod bash
+docker run -it --privileged --name club_robot --net=host --pid=host -e DISPLAY --device=/dev/video0 enacrobotique/enac-base:prod bash
 
 ros2 run ros2serial ros2serial --ros-args -p serial_port:=/dev/ttyACM0 -p baudrate:=115200
 
