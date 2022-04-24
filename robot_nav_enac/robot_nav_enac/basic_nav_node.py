@@ -95,8 +95,8 @@ class Navigator(Node):
 	def updatePosition(self, msg):
 		#Update position here
 		x = msg.pose.pose.position.x
-        y = msg.pose.pose.position.y
-        rot = z_euler_from_quaternions(msg.pose.pose.orientation.x,
+		y = msg.pose.pose.position.y
+		rot = z_euler_from_quaternions(msg.pose.pose.orientation.x,
         												msg.pose.pose.orientation.y,
         												msg.pose.pose.orientation.z,
         												msg.pose.pose.orientation.w)
@@ -134,11 +134,11 @@ class Navigator(Node):
 		msg = Twist()
 
 		msg.twist.linear.x = 0.0
-        msg.twist.linear.y = 0.0
-        msg.twist.linear.z = 0.0
-        msg.twist.angular.x = 0.0
-        msg.twist.angular.y = 0.0
-        msg.twist.angular.z = float(speed)
+		msg.twist.linear.y = 0.0
+		msg.twist.linear.z = 0.0
+		msg.twist.angular.x = 0.0
+		msg.twist.angular.y = 0.0
+		msg.twist.angular.z = float(speed)
 
 		self.velocity_publisher.publish(msg)
 
