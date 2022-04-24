@@ -39,81 +39,86 @@ def z_euler_from_quaternions(qx, qy, qz, qw):
     return np.atan2(t3, t4)
 
 class OdomData:
-	x = 0.0
-	y = 0.0
-	rot_rad = 360
 
-	previous_x = 0.0
-	previous_y = 0.0
-	previous_rot_rad = 360
-
-	def __init__(self, x, y ,rot):
+	def __init__(self, x, y, rotation):
 		self.x = x
 		self.y = y
-		self.rot = rot
+		self.rotation_rad = rotation
+		self.previous_x = x
+		self.previous_y = y
+		self.previous_rotation_rad = rotation
 
-	def update_position(self, x, y , rot):
+
+	def update_position(self, x, y , rotation):
 		self.previous_x = self.x
 		self.previous_y = self.y
-		self.previous_rot_rad = self.rot_rad
+		self.previous_rotation_rad = self.rotation_rad
 
 		self.x = x
 		self.y = y
-		self.rot_rad = rot
+		self.rotation_rad = rotation
 	
-
-#self.serial_send(CMD_VEL.format(int(vlin*1000), int(vtheta*1000)))
-
 
 class Navigator(Node):
 	
+	#### Goal Pose : rotation de fin de déplacement??
 	
-	def __init__(self, xTarget, yTarget, rotTarget, maxSpeed):
+	def __init__(self, xTarget, yTarget, rotationTarget, maxSpeed):
+		super().__init__('navigator')
 
 		self._isNavigating = False
 		self._isRotating = False 
 
-		self._max_speed = 1.0 #Meter/seconds
-		self.target = OdomData(0.0, 0.0, 6.28)
+		self._max_speed = maxSpeed
 		self.current_position = OdomData(0.0, 0.0, 6.28)
+		self.target = OdomData(0.0, 0.0, 6.28)
 
-		self.odom_topic = None
-		self.velocity_publisher = None 
+		self.odom_topic = self.create_subscription(Odometry, "/odom", self.updatePosition, 10)
+		self.goal_pose_topic = self.create_subscription(Pose, "/goal_pose", self.setTarget, 10)
+		self.velocity_publisher = self.velocity_publisher = self.create_publisher(Twist, '/cmd_vel', 10)
 
-		self.rotationPrecision = 0.05 
+		self.rotationationPrecision = 0.05 
 		self.position_precision = 0.05
 
 		#Stop point to be computed, to know when starting to stop (in regards of PID)
-		self.stopPoint = OdomData(0.0, 0.0, 360)
+		#self.stopPoint = OdomData(0.0, 0.0, 360)
 
-		super().__init__('navigator')
-
-		self.odom_topic = self.create_subscription(Odometry, "/odom", self.updatePosition, 10)
-
-		self.target.x = xTarget
-		self.target.y = yTarget
-		self.target.rot = rotTarget
-
-		self.velocity_publisher = self.create_publisher(Twist, '/cmd_vel', 10)
 	
 		#self.stopPoint = stopLoc() #Thread it after successful tests	
+	
+	def setTarget(self, msg):
+		x = msg.pose.pose.position.x
+		y = msg.pose.pose.position.y
+		rotation = z_euler_from_quaternions(msg.pose.pose.orientation.x,
+        												msg.pose.pose.orientation.y,
+        												msg.pose.pose.orientation.z,
+        												msg.pose.pose.orientation.w)
+		target.update_position(x, y, rotation)
+
 
 	def updatePosition(self, msg):
 		#Update position here
 		x = msg.pose.pose.position.x
 		y = msg.pose.pose.position.y
-		rot = z_euler_from_quaternions(msg.pose.pose.orientation.x,
+		rotation = z_euler_from_quaternions(msg.pose.pose.orientation.x,
         												msg.pose.pose.orientation.y,
         												msg.pose.pose.orientation.z,
         												msg.pose.pose.orientation.w)
-		currentPosition.update_position(x, y, rot)
+		currentPosition.update_position(x, y, rotation)
 
-		if rot - target.rot > rotationPrecision : #meter
+		speed = msg.twist.twist.linear.x
+
+		if rotation - target.rotation > rotationationPrecision : #meter
+			if speed >= 0.01 :
+				self.stop()
+				return
+			
 			self._isNavigating = False
 			self._isRotating = True
-			#Need Rotation
+			#Need rotationation
 			self.rotate()
 			return
+
 		elif x - target.x <= position_precision and y - target.y <= position_precision :
 			self._isNavigating = True
 			self._isRotating = False
@@ -124,15 +129,14 @@ class Navigator(Node):
 		self._isRotating = False
 		
 	def stop():
-		target.x = current_position.x
-		target.y = current_position.y
-		target.rot = current_position.rot_rad
+		msg = Twist()
+		#publish empty message to velocity to stop robot
+		self.velocity_publisher.publish(msg)
 	
 	def rotate():
-		relative_rot_rad = current_position.rot_rad  - target.rot_rad
+		relative_rotation_rad = current_position.rotation_rad  - target.rotation_rad
 
-		speed = 0
-		if (relative_rot_rad <= 0):
+		if (relative_rotation_rad <= 0):
 			speed = -2
 		else:
 			speed = 2
@@ -147,6 +151,27 @@ class Navigator(Node):
 		msg.twist.angular.z = float(speed)
 
 		self.velocity_publisher.publish(msg)
+	
+	def move():
+		distance = ( (current_position.x - target.x)**2 + (current_position.y - target.y)**2 )**0.5
+
+		#TODO : speed curve depending on distance
+		speed = 0.5 #m/s
+
+		if distance <= 0.1 : 
+			#To Test
+			self.stop()
+		else:
+			msg = Twist()
+
+			msg.twist.linear.x = float(speed)
+			msg.twist.linear.y = 0.0
+			msg.twist.linear.z = 0.0
+			msg.twist.angular.x = 0.0
+			msg.twist.angular.y = 0.0
+			msg.twist.angular.z = 0.0
+
+			self.velocity_publisher.publish(msg)
 
 def main():
     rclpy.init()
@@ -313,7 +338,7 @@ float Navigator::compute_cons_speed()
 
 float Navigator::compute_cons_omega()
 {
-	float omega_cons, angle_fore, alpha, t_rotation_stop;
+	float omega_cons, angle_fore, alpha, t_rotationation_stop;
 	int sgn;
 
 	if(move_type == DISPLACEMENT){
@@ -329,7 +354,7 @@ float Navigator::compute_cons_omega()
 	else{
 		sgn = -1;
 	}
-	t_rotation_stop = abs(odometry_motor.get_omega())/ACCEL_OMEGA_MAX;
+	t_rotationation_stop = abs(odometry_motor.get_omega())/ACCEL_OMEGA_MAX;
 	angle_fore = center_radian(odometry_motor.get_pos_theta() + sgn*(abs(odometry_motor.get_omega())*t_rotation_stop -1/2*ACCEL_OMEGA_MAX*pow(t_rotation_stop,2)));
 	if(abs(center_radian(angle_fore - alpha)) < ADMITTED_ANGLE_ERROR){
 		omega_cons = sgn*max(0,abs(odometry_motor.get_omega()) - NAVIGATOR_PERIOD*ACCEL_OMEGA_MAX);
