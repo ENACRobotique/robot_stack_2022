@@ -1,3 +1,4 @@
+import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import Twist
 from nav_msgs.msg import Odometry
@@ -65,23 +66,28 @@ class OdomData:
 
 
 class Navigator(Node):
-	_isNavigating = False
-	_isRotating = False 
 	
-	_max_speed = 1.0 #Meter/seconds
-	target = OdomData(0.0, 0.0, 6.28)
-	current_position = OdomData(0.0, 0.0, 6.28)
-
-	odom_topic = None
-	velocity_publisher = None 
-
-	rotationPrecision = 0.05 
-	position_precision = 0.05
-
-	#Stop point to be computed, to know when starting to stop (in regards of PID)
-	stopPoint = OdomData(0.0, 0.0, 360)
 	
 	def __init__(self, xTarget, yTarget, rotTarget, maxSpeed):
+
+		self._isNavigating = False
+		self._isRotating = False 
+
+		self._max_speed = 1.0 #Meter/seconds
+		self.target = OdomData(0.0, 0.0, 6.28)
+		self.current_position = OdomData(0.0, 0.0, 6.28)
+
+		self.odom_topic = None
+		self.velocity_publisher = None 
+
+		self.rotationPrecision = 0.05 
+		self.position_precision = 0.05
+
+		#Stop point to be computed, to know when starting to stop (in regards of PID)
+		self.stopPoint = OdomData(0.0, 0.0, 360)
+
+		super().__init__('navigator')
+
 		self.odom_topic = self.create_subscription(Odometry, "/odom", self.updatePosition, 10)
 
 		self.target.x = xTarget
@@ -90,7 +96,7 @@ class Navigator(Node):
 
 		self.velocity_publisher = self.create_publisher(Twist, '/cmd_vel', 10)
 	
-		self.stopPoint = stopLoc() #Thread it after successful tests	
+		#self.stopPoint = stopLoc() #Thread it after successful tests	
 
 	def updatePosition(self, msg):
 		#Update position here
@@ -142,7 +148,19 @@ class Navigator(Node):
 
 		self.velocity_publisher.publish(msg)
 
+def main():
+    rclpy.init()
+    node = Navigator(0,0,0,0)
+    try:
+        rclpy.spin(node)
+    except KeyboardInterrupt:
+        pass
 
+    rclpy.shutdown()
+
+
+if __name__ == '__main__':
+    main()
 
 
 
