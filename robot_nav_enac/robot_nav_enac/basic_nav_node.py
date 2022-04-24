@@ -1,3 +1,7 @@
+from rclpy.node import Node
+from geometry_msgs.msg import Twist
+from nav_msgs.msg import Odometry
+
 """
 input synthax :
 s       stop
@@ -28,51 +32,118 @@ Input : take a destination position + rotation [ROS odometrie classic msg] + Max
 Result : Move Robot and stop at the right point, In case of update, stop robot and restart with new data
 """
 
+def z_euler_from_quaternions(qx, qy, qz, qw):
+    t3 = +2.0 * (qw * qz + qx * qy)
+    t4 = +1.0 - 2.0 * (qy * qy + qz * qz)
+    return np.atan2(t3, t4)
+
 class OdomData:
 	x = 0.0
 	y = 0.0
-	rot = 360
+	rot_rad = 360
+
+	previous_x = 0.0
+	previous_y = 0.0
+	previous_rot_rad = 360
 
 	def __init__(self, x, y ,rot):
 		self.x = x
 		self.y = y
 		self.rot = rot
 
+	def update_position(self, x, y , rot):
+		self.previous_x = self.x
+		self.previous_y = self.y
+		self.previous_rot_rad = self.rot_rad
+
+		self.x = x
+		self.y = y
+		self.rot_rad = rot
+	
+
+#self.serial_send(CMD_VEL.format(int(vlin*1000), int(vtheta*1000)))
 
 
-class Navigator:
+class Navigator(Node):
 	_isNavigating = false
 	_isRotating = false 
 	
-	_maxSpeed = 1.0 #Meter/seconds
-	target = OdomData(0.0, 0.0, 360)
+	_max_speed = 1.0 #Meter/seconds
+	target = OdomData(0.0, 0.0, 6.28)
+	current_position = OdomData(0.0, 0.0, 6.28)
+
+	odom_topic = None
+	velocity_publisher = None 
+
+	rotationPrecision = 0.05 
+	position_precision = 0.05
 
 	#Stop point to be computed, to know when starting to stop (in regards of PID)
 	stopPoint = OdomData(0.0, 0.0, 360)
 	
 	def __init__(self, xTarget, yTarget, rotTarget, maxSpeed):
-		target.x = xTarget
-		target.y = yTarget
-		target.rot = rotTarget
-		_maxSpeed = maxSpeed
+		self.odom_topic = self.create_subscription(Odometry, "/odom", self.updatePosition, 10)
+
+		self.target.x = xTarget
+		self.target.y = yTarget
+		self.target.rot = rotTarget
+
+		self.velocity_publisher = self.create_publisher(Twist, '/cmd_vel', 10)
 	
-		stopPoint = stopLoc() #Thread it after successful tests	
+		self.stopPoint = stopLoc() #Thread it after successful tests	
 
+	def updatePosition(self, msg):
+		#Update position here
+		x = msg.pose.pose.position.x
+        y = msg.pose.pose.position.y
+        rot = z_euler_from_quaternions(msg.pose.pose.orientation.x,
+        												msg.pose.pose.orientation.y,
+        												msg.pose.pose.orientation.z,
+        												msg.pose.pose.orientation.w)
+		currentPosition.update_position(x, y, rot)
 
-	def stopLoc():
-		pass
+		if rot - target.rot > rotationPrecision : #meter
+			self._isNavigating = false
+			self._isRotating = true
+			#Need Rotation
+			self.rotate()
+			return
+		elif x - target.x <= position_precision and y - target.y <= position_precision :
+			self._isNavigating = true
+			self._isRotating = false
+			self.move()
+			return
 
+		self._isNavigating = false
+		self._isRotating = false
+		
 	def stop():
-		pass
-		_isNavigating = false
+		target.x = current_position.x
+		target.y = current_position.y
+		target.rot = current_position.rot_rad
 	
 	def rotate():
-		_isRotating = true
-		pass
-		_isRotating = false
+		relative_rot_rad = current_position.rot_rad  - target.rot_rad
 
-	def accelerate():
-		pass
+		speed = 0
+		if (relative_rot_rad <= 0):
+			speed = -2
+		else:
+			speed = 2
+		
+		msg = Twist()
+
+		msg.twist.linear.x = 0.0
+        msg.twist.linear.y = 0.0
+        msg.twist.linear.z = 0.0
+        msg.twist.angular.x = 0.0
+        msg.twist.angular.y = 0.0
+        msg.twist.angular.z = float(speed)
+
+		self.velocity_publisher.publish(msg)
+
+
+
 
 
 
