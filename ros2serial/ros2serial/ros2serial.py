@@ -1,3 +1,4 @@
+from curses import baudrate
 import numpy as np
 import rclpy
 from rclpy.node import Node
@@ -57,8 +58,10 @@ class Ros2Serial(Node):
         self.declare_parameter('serial_port', "/dev/ttyUSB0")
         self.declare_parameter('baudrate', 57600)
 
-        #paramétrage serial
-        self.ser = serial.Serial(port=self.get_parameter('serial_port').get_parameter_value().string_value, baudrate=self.get_parameter('baudrate').get_parameter_value().integer_value, timeout=timeout)
+        #paramétrage serial and BLOCK the code until the serial port is available
+        self.ser = self.init_serial(timeout)
+        #serial.Serial(port=self.get_parameter('serial_port').get_parameter_value().string_value, baudrate=self.get_parameter('baudrate').get_parameter_value().integer_value, timeout=timeout)
+
         #self.ser.set_buffer_size(rx_buffer_size, tx_buffer_size)
         self.thread_read = threading.Thread(target=self.serial_read)
         self.listen = True
@@ -73,6 +76,24 @@ class Ros2Serial(Node):
 
         self.start_serial_read()
 
+    def init_serial(self, timeout = 0.05):
+        """
+            open serial if available and if not, wait until the serial port is connected
+        """
+        port_name = self.get_parameter('serial_port').get_parameter_value().string_value
+        baudrate_name = self.get_parameter('baudrate').get_parameter_value().integer_value
+        try:
+            ser = serial.Serial(port=port_name, baudrate=baudrate_name, timeout=timeout)
+            return ser
+        except serial.serialutil.SerialException:
+            self.get_logger().error("Serial port not available, waiting for it to be connected...")
+            while True:
+                try:
+                    ser = serial.Serial(port=port_name, baudrate=baudrate, timeout=timeout)
+                    return ser
+                except serial.serialutil.SerialException:
+                    pass
+                
     def start_serial_read(self):
         self.thread_read.start()
 
