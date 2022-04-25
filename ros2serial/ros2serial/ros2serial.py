@@ -59,7 +59,9 @@ class Ros2Serial(Node):
         self.declare_parameter('baudrate', 57600)
 
         #paramétrage serial and BLOCK the code until the serial port is available
-        self.ser = self.init_serial(timeout)
+        port_name = self.get_parameter('serial_port').get_parameter_value().string_value
+        baudrate_name = self.get_parameter('baudrate').get_parameter_value().integer_value
+        self.ser = self.init_serial(port_name, baudrate_name, timeout)
         #serial.Serial(port=self.get_parameter('serial_port').get_parameter_value().string_value, baudrate=self.get_parameter('baudrate').get_parameter_value().integer_value, timeout=timeout)
 
         #self.ser.set_buffer_size(rx_buffer_size, tx_buffer_size)
@@ -76,12 +78,10 @@ class Ros2Serial(Node):
 
         self.start_serial_read()
 
-    def init_serial(self, timeout = 0.05):
+    def init_serial(self, port_name, baudrate_name, timeout = 0.05):
         """
             open serial if available and if not, wait until the serial port is connected
         """
-        port_name = self.get_parameter('serial_port').get_parameter_value().string_value
-        baudrate_name = self.get_parameter('baudrate').get_parameter_value().integer_value
         try:
             ser = serial.Serial(port=port_name, baudrate=baudrate_name, timeout=timeout)
             return ser
@@ -93,7 +93,7 @@ class Ros2Serial(Node):
                     return ser
                 except serial.serialutil.SerialException:
                     pass
-                
+
     def start_serial_read(self):
         self.thread_read.start()
 
@@ -121,7 +121,10 @@ class Ros2Serial(Node):
                         self.on_serial_capt(message.split(' ')[1:])
             except Exception as e:
                 print(str(message)+"\n")
-                print(e)
+                print(type(e))
+                #TODO pseudo code : if type(e) == type(disconnected):
+                #self.ser = self.init_serial() #blocks loop until reconnected
+                #is_connected = False #-> eviter print en boucle infinie
                 print("\n")
 
     def on_serial_msg(self, arg): #TODO: Tester
