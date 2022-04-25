@@ -1,3 +1,4 @@
+from distutils.log import error
 import numpy as np
 import rclpy
 from rclpy.node import Node
@@ -67,10 +68,12 @@ class Ros2Serial(Node):
         self.thread_read = threading.Thread(target=self.serial_read)
         self.listen = True
         #paramétrage ROS
+        self.ros_raw_serial = self.create_publisher(String, "/raw_serial", 10)
         self.ros_odom = self.create_publisher(Odometry, '/odom', 10)
         self.ros_peripherals = self.create_publisher(PeriphValue, '/peripherals', 10)
         self.ros_diagnostics = self.create_publisher(DiagnosticArray, '/diagnostics', 10)
         
+        self.ros_send_serial = self.create_subscription(String, "/send_serial", self.raw_serial_callback, 10)
         self.ros_vel_listener = self.create_subscription(Twist, '/cmd_vel', self.on_ros_cmd_vel, 10)
         self.ros_pid_listener = self.create_subscription(Pid, '/pid', self.on_ros_pid, 10)
         self.ros_periph_listener = self.create_subscription(PeriphValue, '/peripherals', self.on_ros_periph_cmd, 10)
@@ -81,20 +84,17 @@ class Ros2Serial(Node):
         """
             open serial if available and if not, wait until the serial port is connected
         """
-        try:
-            ser = serial.Serial(port=self.port_name, baudrate=self.baudrate_name, timeout=timeout)
-            self.on_serial_connected()
-            return ser
-        except serial.serialutil.SerialException:
-            self.get_logger().error("Serial port not available, waiting for it to be connected...")
-            self.on_serial_disconnected()
-            while True:
-                try:
-                    ser = serial.Serial(port=self.port_name, baudrate=self.baudrate_name, timeout=timeout)
-                    self.on_serial_connected()
-                    return ser
-                except serial.serialutil.SerialException:
-                    pass
+        error_msg_sent = False
+        while True:
+            try:
+                ser = serial.Serial(port=self.port_name, baudrate=self.baudrate_name, timeout=timeout)
+                self.on_serial_connected()
+                return ser
+            except serial.serialutil.SerialException:
+                if not error_msg_sent:
+                    self.get_logger().error("Serial port not available, waiting for it to be connected...")
+                    self.on_serial_disconnected()
+                    error_msg_sent = True
 
     def start_serial_read(self):
         self.thread_read.start()
@@ -122,12 +122,20 @@ class Ros2Serial(Node):
                         self.on_serial_periph(message)
                     elif message[0] == CAPT_VAL:
                         self.on_serial_capt(message.split(' ')[1:])
+                #publish for debug purpose the raw serial message from the stm32 serial port
+                self.ros_raw_serial.publish(String(data=message))
             except serial.serialutil.SerialException: #if the serial port is disconnected, try to reconnect
                 self.init_serial() #blocks loop until reconnected
             except Exception as e:
                 print(str(message)+"\n")
                 print(type(e))
                 print("\n")
+    def raw_serial_callback(self, arg):
+        """
+            callback for the ros2serial/send_serial topic
+        """
+        self.get_logger().info("send_serial: "+arg.data)
+        self.serial_send(arg.data)
 
     def on_serial_msg(self, arg): #TODO: Tester
         #convertir les infor reçues au format ROS2
