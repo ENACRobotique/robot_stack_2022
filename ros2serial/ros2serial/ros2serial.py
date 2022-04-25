@@ -89,7 +89,7 @@ class Ros2Serial(Node):
             self.get_logger().error("Serial port not available, waiting for it to be connected...")
             while True:
                 try:
-                    ser = serial.Serial(port=port_name, baudrate=baudrate, timeout=timeout)
+                    ser = serial.Serial(port=port_name, baudrate=baudrate_name, timeout=timeout)
                     return ser
                 except serial.serialutil.SerialException:
                     pass
