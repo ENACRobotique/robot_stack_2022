@@ -1,4 +1,3 @@
-from curses import baudrate
 import numpy as np
 import rclpy
 from rclpy.node import Node
@@ -59,9 +58,9 @@ class Ros2Serial(Node):
         self.declare_parameter('baudrate', 57600)
 
         #paramétrage serial and BLOCK the code until the serial port is available
-        port_name = self.get_parameter('serial_port').get_parameter_value().string_value
-        baudrate_name = self.get_parameter('baudrate').get_parameter_value().integer_value
-        self.ser = self.init_serial(port_name, baudrate_name, timeout)
+        self.port_name = self.get_parameter('serial_port').get_parameter_value().string_value
+        self.baudrate_name = self.get_parameter('baudrate').get_parameter_value().integer_value
+        self.ser = self.init_serial(self.port_name, self.baudrate_name, timeout)
         #serial.Serial(port=self.get_parameter('serial_port').get_parameter_value().string_value, baudrate=self.get_parameter('baudrate').get_parameter_value().integer_value, timeout=timeout)
 
         #self.ser.set_buffer_size(rx_buffer_size, tx_buffer_size)
@@ -78,18 +77,21 @@ class Ros2Serial(Node):
 
         self.start_serial_read()
 
-    def init_serial(self, port_name, baudrate_name, timeout = 0.05):
+    def init_serial(self, timeout = 0.05):
         """
             open serial if available and if not, wait until the serial port is connected
         """
         try:
-            ser = serial.Serial(port=port_name, baudrate=baudrate_name, timeout=timeout)
+            ser = serial.Serial(port=self.port_name, baudrate=self.baudrate_name, timeout=timeout)
+            self.on_serial_connected()
             return ser
         except serial.serialutil.SerialException:
             self.get_logger().error("Serial port not available, waiting for it to be connected...")
+            self.on_serial_disconnected()
             while True:
                 try:
-                    ser = serial.Serial(port=port_name, baudrate=baudrate_name, timeout=timeout)
+                    ser = serial.Serial(port=self.port_name, baudrate=self.baudrate_name, timeout=timeout)
+                    self.on_serial_connected()
                     return ser
                 except serial.serialutil.SerialException:
                     pass
@@ -103,7 +105,8 @@ class Ros2Serial(Node):
     def serial_read(self):
         """Fonction qui lit en permanence le port série.
         S'exécute dans un thread séparé"""
-        print("serial_read thread launched")
+
+        self.get_logger().info("serial_read thread launched")
         message = ""
         while self.listen:
             try:
@@ -119,12 +122,11 @@ class Ros2Serial(Node):
                         self.on_serial_periph(message)
                     elif message[0] == CAPT_VAL:
                         self.on_serial_capt(message.split(' ')[1:])
+            except serial.serialutil.SerialException: #if the serial port is disconnected, try to reconnect
+                self.init_serial() #blocks loop until reconnected
             except Exception as e:
                 print(str(message)+"\n")
                 print(type(e))
-                #TODO pseudo code : if type(e) == type(disconnected):
-                #self.ser = self.init_serial() #blocks loop until reconnected
-                #is_connected = False #-> eviter print en boucle infinie
                 print("\n")
 
     def on_serial_msg(self, arg): #TODO: Tester
@@ -174,6 +176,28 @@ class Ros2Serial(Node):
         reference.name = "ros2serial_periphDecl"
         reference.message = str(arg)
         reference.hardware_id = "stm32"
+        reference.values = []
+        msg.status = [reference]
+        self.ros_diagnostics.publish(msg)
+
+    def on_serial_connected(self):
+        msg = DiagnosticArray()
+        reference = DiagnosticStatus()
+        reference.level = DiagnosticStatus.OK
+        reference.name = "ros2serial_connected"
+        reference.message = "Serial port connected"
+        reference.hardware_id = "raspberry"
+        reference.values = []
+        msg.status = [reference]
+        self.ros_diagnostics.publish(msg)
+
+    def on_serial_disconnected(self):
+        msg = DiagnosticArray()
+        reference = DiagnosticStatus()
+        reference.level = DiagnosticStatus.ERROR
+        reference.name = "ros2serial_disconnected"
+        reference.message = "Serial port disconnected"
+        reference.hardware_id = "raspberry"
         reference.values = []
         msg.status = [reference]
         self.ros_diagnostics.publish(msg)
