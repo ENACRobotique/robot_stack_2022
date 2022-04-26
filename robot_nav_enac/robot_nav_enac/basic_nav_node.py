@@ -1,6 +1,6 @@
 import rclpy
 from rclpy.node import Node
-from geometry_msgs.msg import Twist
+from geometry_msgs.msg import Twist, Pose
 from nav_msgs.msg import Odometry
 
 """
@@ -49,7 +49,7 @@ class OdomData:
 		self.previous_rotation_rad = rotation
 
 
-	def update_position(self, x, y , rotation):
+	def updataOdomData(self, x, y , rotation):
 		self.previous_x = self.x
 		self.previous_y = self.y
 		self.previous_rotation_rad = self.rotation_rad
@@ -93,7 +93,7 @@ class Navigator(Node):
         												msg.pose.pose.orientation.y,
         												msg.pose.pose.orientation.z,
         												msg.pose.pose.orientation.w)
-		target.update_position(x, y, rotation)
+		target.updataOdomData(x, y, rotation)
 
 
 	def updatePosition(self, msg):
@@ -104,7 +104,7 @@ class Navigator(Node):
         												msg.pose.pose.orientation.y,
         												msg.pose.pose.orientation.z,
         												msg.pose.pose.orientation.w)
-		currentPosition.update_position(x, y, rotation)
+		currentPosition.updataOdomData(x, y, rotation)
 
 		speed = msg.twist.twist.linear.x
 
