@@ -76,10 +76,12 @@ class Navigator(Node):
 		self.current_position = OdomData(0.0, 0.0, 6.28)
 		self.target = OdomData(0.0, 0.0, 6.28)
 
-		self.odom_topic = self.create_subscription(TransformStamped, "/odom", self.updatePosition, 10) #odom fused by robot_localization or fed directly when debug
+		#self.odom_topic = self.create_subscription(TransformStamped, "/odom", self.updatePosition, 10) #odom fused by robot_localization or fed directly when debug
+		#self.wheel_topic = self.create_subscription(Odometry, "/encoder", self.updateSpeed, 10) #used to get speed from encoder
+		self.odom_topic = self.create_subscription(Odometry, "/odom", self.updatePosition, 10)
 		self.goal_pose_topic = self.create_subscription(Pose, "/goal_pose", self.setTarget, 10)
 		self.velocity_publisher = self.velocity_publisher = self.create_publisher(Twist, '/cmd_vel', 10)
-
+		
 		self.rotationationPrecision = 0.05 
 		self.position_precision = 0.05
 
@@ -102,17 +104,25 @@ class Navigator(Node):
 
 	def updatePosition(self, msg):
 		#Update position here
-		x = msg.transform.translation.x
-		y = msg.transform.translation.y
-		rotation = z_euler_from_quaternions(msg.transform.rotation.x,
-											msg.transform.rotation.y,
-											msg.transform.rotation.z,
-											msg.transform.rotation.w)
-		self.currentPosition.updataOdomData(x, y, rotation)
+		#TODO : uncomment when TF is working
+		#x = msg.transform.translation.x
+		#y = msg.transform.translation.y
+		#rotation = z_euler_from_quaternions(msg.transform.rotation.x,
+		#									msg.transform.rotation.y,
+		#									msg.transform.rotation.z,
+		#									msg.transform.rotation.w)
+		#self.current_position.updataOdomData(x, y, rotation)
+		x = msg.pose.pose.position.x
+		y = msg.pose.pose.position.y
+		rotation = z_euler_from_quaternions(msg.pose.pose.orientation.x,
+											msg.pose.pose.orientation.y,
+											msg.pose.pose.orientation.z,
+											msg.pose.pose.orientation.w)
+		self.current_position.updataOdomData(x, y, rotation)
 
-		speed = msg.linear.x
+		speed = msg.twist.twist.linear.x
 
-		if rotation - self.target.rotation > self.rotationationPrecision : #meter
+		if rotation - self.target.rotation_rad > self.rotationationPrecision : #meter
 			if speed >= 0.01 :
 				self.stop()
 				return
@@ -168,12 +178,12 @@ class Navigator(Node):
 		else:
 			msg = Twist()
 
-			msg.twist.linear.x = float(speed)
-			msg.twist.linear.y = 0.0
-			msg.twist.linear.z = 0.0
-			msg.twist.angular.x = 0.0
-			msg.twist.angular.y = 0.0
-			msg.twist.angular.z = 0.0
+			msg.linear.x = float(speed)
+			msg.linear.y = 0.0
+			msg.linear.z = 0.0
+			msg.angular.x = 0.0
+			msg.angular.y = 0.0
+			msg.angular.z = 0.0
 
 			self.velocity_publisher.publish(msg)
 
