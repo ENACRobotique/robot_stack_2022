@@ -1,7 +1,10 @@
+import numpy as np
+
 import rclpy
 from rclpy.node import Node
-from geometry_msgs.msg import Twist, Pose
+from geometry_msgs.msg import Twist, Pose, TransformStamped
 from nav_msgs.msg import Odometry
+
 
 """
 input synthax :
@@ -36,7 +39,7 @@ Result : Move Robot and stop at the right point, In case of update, stop robot a
 def z_euler_from_quaternions(qx, qy, qz, qw):
     t3 = +2.0 * (qw * qz + qx * qy)
     t4 = +1.0 - 2.0 * (qy * qy + qz * qz)
-    return np.atan2(t3, t4)
+    return np.arctan2(t3, t4)
 
 class OdomData:
 
@@ -73,7 +76,7 @@ class Navigator(Node):
 		self.current_position = OdomData(0.0, 0.0, 6.28)
 		self.target = OdomData(0.0, 0.0, 6.28)
 
-		self.odom_topic = self.create_subscription(Odometry, "/odom", self.updatePosition, 10)
+		self.odom_topic = self.create_subscription(TransformStamped, "/odom", self.updatePosition, 10) #odom fused by robot_localization or fed directly when debug
 		self.goal_pose_topic = self.create_subscription(Pose, "/goal_pose", self.setTarget, 10)
 		self.velocity_publisher = self.velocity_publisher = self.create_publisher(Twist, '/cmd_vel', 10)
 
@@ -87,28 +90,29 @@ class Navigator(Node):
 		#self.stopPoint = stopLoc() #Thread it after successful tests	
 	
 	def setTarget(self, msg):
-		x = msg.pose.pose.position.x
-		y = msg.pose.pose.position.y
-		rotation = z_euler_from_quaternions(msg.pose.pose.orientation.x,
-        												msg.pose.pose.orientation.y,
-        												msg.pose.pose.orientation.z,
-        												msg.pose.pose.orientation.w)
-		target.updataOdomData(x, y, rotation)
+		#fetch goal_pose message and update target pose
+		x = msg.position.x
+		y = msg.position.y
+		rotation = z_euler_from_quaternions(msg.orientation.x,
+											msg.orientation.y,
+											msg.orientation.z,
+											msg.orientation.w)
+		self.target.updataOdomData(x, y, rotation)
 
 
 	def updatePosition(self, msg):
 		#Update position here
-		x = msg.pose.pose.position.x
-		y = msg.pose.pose.position.y
-		rotation = z_euler_from_quaternions(msg.pose.pose.orientation.x,
-        												msg.pose.pose.orientation.y,
-        												msg.pose.pose.orientation.z,
-        												msg.pose.pose.orientation.w)
-		currentPosition.updataOdomData(x, y, rotation)
+		x = msg.transform.translation.x
+		y = msg.transform.translation.y
+		rotation = z_euler_from_quaternions(msg.transform.rotation.x,
+											msg.transform.rotation.y,
+											msg.transform.rotation.z,
+											msg.transform.rotation.w)
+		self.currentPosition.updataOdomData(x, y, rotation)
 
-		speed = msg.twist.twist.linear.x
+		speed = msg.linear.x
 
-		if rotation - target.rotation > rotationationPrecision : #meter
+		if rotation - self.target.rotation > self.rotationationPrecision : #meter
 			if speed >= 0.01 :
 				self.stop()
 				return
@@ -119,7 +123,7 @@ class Navigator(Node):
 			self.rotate()
 			return
 
-		elif x - target.x <= position_precision and y - target.y <= position_precision :
+		elif x - self.target.x <= self.position_precision and y - self.target.y <= self.position_precision :
 			self._isNavigating = True
 			self._isRotating = False
 			self.move()
@@ -128,13 +132,13 @@ class Navigator(Node):
 		self._isNavigating = False
 		self._isRotating = False
 		
-	def stop():
+	def stop(self):
 		msg = Twist()
 		#publish empty message to velocity to stop robot
 		self.velocity_publisher.publish(msg)
 	
-	def rotate():
-		relative_rotation_rad = current_position.rotation_rad  - target.rotation_rad
+	def rotate(self):
+		relative_rotation_rad = self.current_position.rotation_rad  - self.target.rotation_rad
 
 		if (relative_rotation_rad <= 0):
 			speed = -2
@@ -152,8 +156,8 @@ class Navigator(Node):
 
 		self.velocity_publisher.publish(msg)
 	
-	def move():
-		distance = ( (current_position.x - target.x)**2 + (current_position.y - target.y)**2 )**0.5
+	def move(self):
+		distance = ( (self.current_position.x - self.target.x)**2 + (self.current_position.y - self.target.y)**2 )**0.5
 
 		#TODO : speed curve depending on distance
 		speed = 0.5 #m/s
