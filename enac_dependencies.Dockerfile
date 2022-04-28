@@ -90,6 +90,6 @@ RUN apt install -y ros-galactic-rqt ros-galactic-rqt-common-plugins
 
 
 RUN echo "source /opt/ros/galactic/setup.bash" >> ~/.bashrc
-RUN echo "source /driver_ws/install/local_setup.bash" >> ~/.bashrc
+#RUN echo "source /driver_ws/install/local_setup.bash" >> ~/.bashrc
 
 
