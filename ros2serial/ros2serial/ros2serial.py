@@ -73,18 +73,27 @@ class Ros2Serial(Node):
         self.thread_read = threading.Thread(target=self.serial_read)
         self.listen = True
         #paramétrage ROS
+        self.test_pub = self.create_publisher(String, "/test_ros_serial", 10)
+        self.test_sub = self.create_subscription(String, "/test_ros_serial", self.on_test, 10)
+
+        print("######")
+        self.test_pub.publish(String(data="j'adore ROS"))
+        print("++++++++++++++++")
         self.ros_raw_serial = self.create_publisher(String, "/raw_serial", 10)
+        self.ros_send_serial = self.create_publisher(String, "/send_serial", 10) #msg sent to robot
         self.ros_odom = self.create_publisher(Odometry, '/odom', 10)
         self.ros_peripherals = self.create_publisher(PeriphValue, '/peripherals', 10)
         self.ros_diagnostics = self.create_publisher(DiagnosticArray, '/diagnostics', 10)
         
-        self.ros_send_serial = self.create_subscription(String, "/send_serial", self.raw_serial_callback, 10)
+
         self.ros_vel_listener = self.create_subscription(Twist, '/cmd_vel', self.on_ros_cmd_vel, 10)
         self.ros_pid_listener = self.create_subscription(Pid, '/pid', self.on_ros_pid, 10)
         self.ros_periph_listener = self.create_subscription(PeriphValue, '/peripherals', self.on_ros_periph_cmd, 10)
 
         self.start_serial_read()
 
+    def on_test(self, msg):
+        print(msg)
     def init_serial(self, timeout = 0.05):
         """
             open serial if available and if not, wait until the serial port is connected
@@ -129,6 +138,7 @@ class Ros2Serial(Node):
                     elif message[0] == CAPT_VAL:
                         self.on_serial_capt(message.split(' ')[1:])
                 #publish for debug purpose the raw serial message from the stm32 serial port
+                #self.get_logger().debug("received_serial: "+message)
                 self.ros_raw_serial.publish(String(data=message))
             except serial.serialutil.SerialException as e: #if the serial port is disconnected, try to reconnect
                 self.ser.close()
@@ -137,12 +147,6 @@ class Ros2Serial(Node):
                 print(str(message)+"\n")
                 print(type(e))
                 print("\n")
-    def raw_serial_callback(self, arg):
-        """
-            callback for the ros2serial/send_serial topic
-        """
-        self.get_logger().info("send_serial: "+arg.data)
-        self.serial_send(arg.data)
 
     def on_serial_msg(self, arg): #TODO: Tester
         #convertir les infor reçues au format ROS2
@@ -227,6 +231,7 @@ class Ros2Serial(Node):
         #convertir les infor reçues au format ROS2
         msg = PeriphValue() #TODO: args
         msg.header.stamp = self.get_clock().now().to_msg()
+        msg.header.frame_id = "stm32"
         msg.periph_name = args[0]
         msg.value = int(args[1])
         #envoyer les infos sur le bon topic
@@ -235,6 +240,8 @@ class Ros2Serial(Node):
 
     def serial_send(self, msg):
         """Envoyer un message sur le port série"""
+        self.get_logger().debug("send_serial: "+msg)
+        self.ros_send_serial.publish(String(data=msg))
         self.ser.write(msg.encode('utf-8'))
 
     def on_ros_cmd_vel(self, msg):
@@ -244,10 +251,11 @@ class Ros2Serial(Node):
         self.serial_send(CMD_VEL.format(int(vlin*1000), int(vtheta*1000)))
 
     def on_ros_periph_cmd(self, msg):
-        id = msg.periph_name[:2]
-        cmd = msg.value
-        print("on_ros_periph_cmd "+str(id)+" "+str(cmd))
-        self.serial_send(CMD_ACTU.format(str(id), str(cmd)))
+        if (msg.header.frame_id != "stm32"):#to prevent looping from self messages
+            id = msg.periph_name[:2]
+            cmd = msg.value
+            print("on_ros_periph_cmd "+str(id)+" "+str(cmd))
+            self.serial_send(CMD_ACTU.format(str(id), str(cmd)))
 
     def on_ros_pid(self, msg):
         kpv = msg.kpv
