@@ -36,12 +36,14 @@ CAPT_VAL = "c"
 #   le deuxième est un chiffre d'identification.
 #d : demande de description des actionneurs (ignoré: RoboKontrol)
 #g [o/v] <int> <int> : changement des valeurs des PIDs (kp et ki)
+#i <string> : envoie d'un test d'intégration avec son nom
 
 #commandes à récupérer du serial:
 #m <string>
 #r <double> <double> <double> <double> <double>: odométrie moteur <x> <y> <théta> <vlin> <vtheta>
 #b <string> <int> <int> <int> [R/RW] <string>: déclaration d'un actionneur (RW) ou d'un capteur (R). (ignoré: RoboKontrol)
 #c <string> <int> : retour de capteur
+#t <string> <string> <bool> : retour de test, avec un éventuel message et un booléen de succès
 
 #Exemples de déclaration : 
 """
@@ -92,12 +94,6 @@ class Ros2Serial(Node):
             self.raw_serial_pub = self.create_publisher(String, "raw_serial", 10)
 
         #paramétrage ROS
-        self.test_pub = self.create_publisher(String, "/test_ros_serial", 10)
-        self.test_sub = self.create_subscription(String, "/test_ros_serial", self.on_test, 10)
-
-        print("######")
-        self.test_pub.publish(String(data="j'adore ROS"))
-        print("++++++++++++++++")
         self.ros_raw_serial = self.create_publisher(String, "/raw_serial", 10)
         self.ros_send_serial = self.create_publisher(String, "/send_serial", 10) #msg sent to robot
         self.ros_odom = self.create_publisher(Odometry, '/odom', 10)
@@ -111,8 +107,6 @@ class Ros2Serial(Node):
 
         self.start_serial_read()
 
-    def on_test(self, msg):
-        print(msg)
     def init_serial(self, timeout = 0.05):
         """
             open serial if available and if not, wait until the serial port is connected

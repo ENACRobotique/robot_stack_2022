@@ -1,7 +1,7 @@
 
 import string
 import numpy as np
-from diagnostic_msgs.msg import DiagnosticArray, DiagnosticStatus
+from diagnostic_msgs.msg import DiagnosticArray, DiagnosticStatus, KeyValue
 
 def quaternion_from_euler(roll, pitch, yaw):
     qx = np.sin(roll/2) * np.cos(pitch/2) * np.cos(yaw/2) - np.cos(roll/2) * np.sin(pitch/2) * np.sin(yaw/2)
@@ -33,3 +33,14 @@ def send_diagnostic_data(level:int, name:string, message="OK", origin="raspberry
     reference.hardware_id = origin
     reference.values = []
     msg.status = [reference]
+"""
+def create_diagnostic_single_msg(level:int, name:string, message="OK", value="" origin="raspberry"):
+    reference = DiagnosticStatus()
+    reference.level = get_diagnostic_level(level)
+    reference.name = name
+    reference.message = message
+    reference.hardware_id = origin
+    reference.values = [] KeyValue
+    return reference
+    
+    """
