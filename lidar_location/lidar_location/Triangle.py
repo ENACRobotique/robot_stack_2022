@@ -10,7 +10,7 @@ class Triangle:
         self.pt_list = [pt1, pt2, pt3]
         self.angles = self.get_angles()
         self.distances = self.get_distances()
-        self.sort()
+        #self.sort()
 
     # Returns distances between [pt1 and pt2, pt2 and pt3, pt3 and pt1]
     def get_distances(self):
@@ -72,22 +72,23 @@ class Triangle:
             return False
 
     def compare_angles(self, triangle2):
+        
         sorted_local = self.angles
-        sorted_local.sort()
+        #sorted_local.sort()
         sorted_in = triangle2.angles
-        sorted_in.sort()
+        #sorted_in.sort()
 
         for i in range(0, 2):
             if abs(sorted_local[i] - sorted_in[i]) > self.jitter_angle:
                 return False
-
+        
         return True
 
     def compare_distances(self, triangle2):
         sorted_local = self.distances
-        sorted_local.sort()
+        #sorted_local.sort()
         sorted_in = triangle2.distances
-        sorted_in.sort()
+        #sorted_in.sort()
 
         for i in range(0, 2):
             if abs(sorted_local[i] - sorted_in[i]) > self.jitter_distance:
