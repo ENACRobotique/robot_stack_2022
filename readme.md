@@ -60,6 +60,18 @@ obtenir l'addresse IP WSL
 docker run -it --rm -p "9090:9090" --name club_robot --gpus all --env="NVIDIA_DRIVER_CAPABILITIES=all" --env="DISPLAY=172.29.208.1:0.0" --env="QT_X11_NO_MITSHM=1" --env="LIBGL_ALWAYS_INDIRECT=0" --volume D:\Sync\Code\Robotique\CDR2022\robot_stack_2022:/enac_ws/src --volume "C:\Users\Jonathan\Downloads\Aruco data":/enac_ws/bag enacrobotique/enac-base bash
 ```
 
+melvin environnement virtuel : 
+docker run -it --rm --net=host -e DISPLAY --privileged --name club_robot --volume /home/ubuntu/enac_ws/src/robot_stack_2022:/enac_ws/src --volume /home/ubuntu/rosbag:/enac_ws/bag enacrobotique/enac-base:dev bash
+
+cd enac_ws/
+colcon build --packages-select lidar_location
+source install/local_setup.bash 
+ros2 run lidar_location comm_node
+
+docker exec -it club_robot bash
+cd enac_ws/
+ros2 bag play bag/rosbagfix/
+
 ### pour faire marcher foxglove (sous windows):
 
 replacer --net=host par 
