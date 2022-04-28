@@ -22,9 +22,10 @@ class Amalgame:
         for point in self.list_points:
             new_p.distance = new_p.distance + point.distance
 
-        new_p.distance = new_p.distance / len(self.list_points)
+        new_p.distance = new_p.distance / (len(self.list_points))
         new_p.angle = self.list_points[math.floor(
             len(self.list_points)/2)].angle
+        new_p.set_abs_pos_robot()
 
         return new_p
 

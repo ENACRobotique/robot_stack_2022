@@ -1,3 +1,4 @@
+import math
 
 class Point:
     def __init__(self):
@@ -5,6 +6,7 @@ class Point:
         self.distance = 0  # en m
         self.pos_x = 0  # Position de l'element une fois determine
         self.pos_y = 0
+        self.set_abs_pos_robot()
 
     # Retourne l'angle relatif du point en fonction de sa position et le pas de l'angle
     def set_angle(self, increment, position):
@@ -14,4 +16,7 @@ class Point:
     def get_position_rel(self):
         return [self.angle, self.distance]
 
-    # def set_abs_pos(self, x, y)
+    def set_abs_pos_robot(self):
+        self.pos_x = self.distance * math.cos(self.angle)
+        self.pos_y = self.distance * math.sin(self.angle)
+

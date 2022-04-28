@@ -90,6 +90,10 @@ class lidarlocation(Node):
         return out
 
     def generate_fake(self, message):
+        #TODO : retirer les points de ce vrai msg qui sont pas les 3 poteaux (à la limite en garder 1 ou 2)
+        #message.ranges = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.3890000581741333, 1.3730000257492065, 1.3580000400543213, 1.3580000400543213, 1.3580000400543213, 1.3890000581741333, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.9470000267028809, 1.930999994277954, 1.930999994277954, 1.9470000267028809, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+        #                  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.218000054359436, 1.2029999494552612, 1.2489999532699585, 1.2960000038146973, 1.3730000257492065, 1.3890000581741333, 1.3890000581741333, 1.3730000257492065, 3.249000072479248, 3.2339999675750732, 3.2179999351501465, 3.2179999351501465, 0.0, 0.0, 0.0, 0.0, 3.265000104904175, 2.4739999771118164, 2.4119999408721924, 2.4739999771118164, 0.0, 3.2339999675750732, 3.2179999351501465, 3.2179999351501465, 2.490000009536743, 2.4739999771118164, 2.4739999771118164, 2.4590001106262207, 2.4590001106262207, 2.443000078201294, 2.443000078201294, 2.427999973297119, 2.427999973297119, 2.4119999408721924, 2.3970000743865967, 2.3970000743865967, 2.3970000743865967, 2.38100004196167, 2.38100004196167, 2.38100004196167, 2.38100004196167, 2.38100004196167, 2.365999937057495, 2.365999937057495, 2.4119999408721924, 2.4119999408721924, 2.427999973297119, 2.443000078201294, 2.4739999771118164, 2.490000009536743, 2.5209999084472656, 2.5360000133514404, 2.552000045776367, 2.5829999446868896, 2.628999948501587, 2.6600000858306885, 2.690999984741211, 2.7219998836517334, 2.753000020980835, 2.7839999198913574, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.590000033378601, 1.5750000476837158, 1.559000015258789, 1.559000015258789, 1.5750000476837158]
+        
         message.ranges = [
             0.0,
             0.0,
@@ -545,6 +549,7 @@ class lidarlocation(Node):
             0.0,
             0.0
         ]
+        
 
         return message
 
@@ -587,8 +592,9 @@ class lidarlocation(Node):
 
     def listener_callback(self, msg):
         # self.get_logger().info(msg.angle_max)
-        msg_out = self.generate_filtered_message(msg, self.filter_out(msg))
-        #msg_out = self.generate_filtered_message(msg, self.filter_out(self.generate_fake(msg)))
+        #msg_out = self.generate_filtered_message(msg, self.filter_out(msg))
+        msg_out = self.generate_filtered_message(
+            msg, self.filter_out(self.generate_fake(msg)))
         # msg_out = msg
         # self.get_logger().info(msg_out.angle_max)
         # triangulation = Amalgame_list(msg_out)
@@ -599,42 +605,6 @@ class lidarlocation(Node):
         #        f"{obj.relative_center}")
         # self.publisher_.publish(msg_out)
 
-        """
-        tri.distances[0] > 1.7 and tri.distances[0] < 2 and tri.distances[
-            1] > 3 and tri.distances[1] < 3.4 and tri.distances[2] > 3 and tri.distances[2] < 3.4
-        or
-        tri.distances[0] > 3 and tri.distances[0] < 3.4 and tri.distances[
-            1] > 1.7 and tri.distances[1] < 2 and tri.distances[2] > 3 and tri.distances[2] < 3.4
-        or
-        tri.distances[0] > 3 and tri.distances[0] < 3.4 and tri.distances[
-            1] > 3 and tri.distances[1] < 3.4 and tri.distances[2] > 1.7 and tri.distances[2] < 2
-
-        tri.distances[0] > 1.7 and tri.distances[0] < 2 and tri.distances[1] > 3 and tri.distances[1] < 3.4 and tri.distances[2] > 3 and tri.distances[2] < 3.4 or tri.distances[0] > 3 and tri.distances[0] < 3.4 and tri.distances[
-            1] > 1.7 and tri.distances[1] < 2 and tri.distances[2] > 3 and tri.distances[2] < 3.4 or tri.distances[0] > 3 and tri.distances[0] < 3.4 and tri.distances[1] > 3 and tri.distances[1] < 3.4 and tri.distances[2] > 1.7 and tri.distances[2] < 2
-        """
-
-        """
-        tri.angles[0] > 1.1 and tri.angles[0] < 1.4 and tri.angles[1] > 1.1 and tri.angles[1] < 1.3 and tri.angles[2] > 0.6 and tri.angles[2] < 0.9
-        or
-        tri.angles[0] > 1.1 and tri.angles[0] < 1.4 and tri.angles[2] > 0.6 and tri.angles[2] < 0.9 and tri.angles[1] > 1.1 and tri.angles[1] < 1.3
-        or
-        tri.angles[2] > 0.6 and tri.angles[2] < 0.9 and tri.angles[0] > 1.1 and tri.angles[0] < 1.4 and tri.angles[1] > 1.1 and tri.angles[1] < 1.3
-
-        tri.angles[0] > 1.1 and tri.angles[0] < 1.4 and tri.angles[1] > 1.1 and tri.angles[1] < 1.3 and tri.angles[2] > 0.6 and tri.angles[2] < 0.9 or tri.angles[0] > 1.1 and tri.angles[0] < 1.4 and tri.angles[
-            2] > 0.6 and tri.angles[2] < 0.9 and tri.angles[1] > 1.1 and tri.angles[1] < 1.3 or tri.angles[2] > 0.6 and tri.angles[2] < 0.9 and tri.angles[0] > 1.1 and tri.angles[0] < 1.4 and tri.angles[1] > 1.1 and tri.angles[1] < 1.3
-        
-        dist1_low = 3.3
-            dist1_high = 3.35
-            angle1_low = 1.2
-            angle1_high = 1.3
-            dist2_low = 1.7
-            dist2_high = 1.9
-            angle2_low = 0.55
-            angle2_high = 0.7
-            if ((tri.distances[0] > dist2_low and tri.distances[0] < dist2_high) and (tri.distances[1] > dist1_low and tri.distances[1] < dist1_high) and (tri.distances[2] > dist1_low and tri.distances[2] < dist1_high)) or ((tri.distances[0] > dist1_low and tri.distances[0] < dist1_high) and (tri.distances[1] > dist2_low and tri.distances[1] < dist2_high) and (tri.distances[2] > dist1_low and tri.distances[2] < dist1_high)) or ((tri.distances[0] > dist1_low and tri.distances[0] < dist1_high) and (tri.distances[1] > dist1_low and tri.distances[1] < dist1_high) and (tri.distances[2] > dist2_low and tri.distances[2] < dist2_high)) and ((tri.angles[0] > angle1_low and tri.angles[0] < angle1_high) and (tri.angles[1] > angle1_low and tri.angles[1] < angle1_high) and (tri.angles[2] > angle2_low and tri.angles[2] < angle2_high)) or ((tri.angles[0] > angle1_low and tri.angles[0] < angle1_high) and (tri.angles[2] > angle2_low and tri.angles[2] < angle2_high) and (tri.angles[1] > angle1_low and tri.angles[1] < angle1_high)) or ((tri.angles[2] > angle2_low and tri.angles[2] < angle2_high) and (tri.angles[0] > angle1_low and tri.angles[0] < angle1_high) and (tri.angles[1] > angle1_low and tri.angles[1] < angle1_high)):
-
-        
-        """
         """
         for tri in triangulation.tri_list:
             # self.get_logger().info("------------------------------------------------------")
@@ -824,7 +794,7 @@ def get_distance_pt(pt1, pt2):
 def get_beta(pt1, pt2):
     # print(pt1.distance)
     # print(pt2.distance)
-    #print(abs((get_distance_pt(pt1, pt2)**2 + pt2.distance**2 - pt1.distance**2) / (2 * get_distance_pt(pt1, pt2) * pt2.distance)))
+    # print(abs((get_distance_pt(pt1, pt2)**2 + pt2.distance**2 - pt1.distance**2) / (2 * get_distance_pt(pt1, pt2) * pt2.distance)))
     return math.acos(abs((get_distance_pt(pt1, pt2)**2 + pt2.distance**2 - pt1.distance**2) / (2 * get_distance_pt(pt1, pt2) * pt2.distance)))
 
 
