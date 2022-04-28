@@ -33,5 +33,3 @@ RUN cd /enac_ws &&\
 VOLUME [ "/enac_ws/src" , "/enac_ws/bag"]
 
 RUN echo "source /enac_ws/install/local_setup.bash" >> /root/.bashrc
-
-#ENTRYPOINT ["/bin/bash", "ros2", "run", "ros2serial", "ros2serial"]
