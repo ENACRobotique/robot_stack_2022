@@ -1,5 +1,3 @@
-from distutils.log import error
-import numpy as np
 import rclpy
 from rclpy.node import Node
 from std_msgs.msg import String
@@ -10,6 +8,7 @@ from tf2_msgs.msg import TFMessage
 from tf2_ros import TransformBroadcaster
 from diagnostic_msgs.msg import DiagnosticArray, DiagnosticStatus, KeyValue
 
+from ros2serial.conversions import quaternion_from_euler
 from interfaces_enac.msg import _periph_value, _pid
 
 PeriphValue = _periph_value.PeriphValue
@@ -44,12 +43,25 @@ CAPT_VAL = "c"
 #b <string> <int> <int> <int> [R/RW] <string>: déclaration d'un actionneur (RW) ou d'un capteur (R). (ignoré: RoboKontrol)
 #c <string> <int> : retour de capteur
 
-def quaternion_from_euler(roll, pitch, yaw):
-    qx = np.sin(roll/2) * np.cos(pitch/2) * np.cos(yaw/2) - np.cos(roll/2) * np.sin(pitch/2) * np.sin(yaw/2)
-    qy = np.cos(roll/2) * np.sin(pitch/2) * np.cos(yaw/2) + np.sin(roll/2) * np.cos(pitch/2) * np.sin(yaw/2)
-    qz = np.cos(roll/2) * np.cos(pitch/2) * np.sin(yaw/2) - np.sin(roll/2) * np.sin(pitch/2) * np.cos(yaw/2)
-    qw = np.cos(roll/2) * np.cos(pitch/2) * np.cos(yaw/2) + np.sin(roll/2) * np.sin(pitch/2) * np.sin(yaw/2)
-    return [qx, qy, qz, qw]
+#Exemples de déclaration : 
+"""
+c s1 130
+c LR 99.00
+c a4 607
+c a5 349
+c a6 678
+c a7 349
+c e1 0
+c e2 0
+m Color = v
+c mv 1
+c mr 1
+c hv 0
+c hr 0
+c sc 0
+"""
+
+
 
 class Ros2Serial(Node):
     def __init__(self, timeout = 0.05, rx_buffer_size=64, tx_buffer_size=64):
