@@ -72,6 +72,13 @@ class Ros2Serial(Node):
         #self.ser.set_buffer_size(rx_buffer_size, tx_buffer_size)
         self.thread_read = threading.Thread(target=self.serial_read)
         self.listen = True
+
+        #ros parameter to add raw_serial feed
+        raw_serial_param = self.declare_parameter("enable_raw_serial", True)
+        self.enable_raw_serial = raw_serial_param.get_parameter_value().value
+        if self.enable_raw_serial.get_parameter_value().value:
+            self.raw_serial_pub = self.create_publisher(String, "raw_serial", 10)
+
         #paramétrage ROS
         self.test_pub = self.create_publisher(String, "/test_ros_serial", 10)
         self.test_sub = self.create_subscription(String, "/test_ros_serial", self.on_test, 10)
@@ -243,6 +250,8 @@ class Ros2Serial(Node):
         self.get_logger().debug("send_serial: "+msg)
         self.ros_send_serial.publish(String(data=msg))
         self.ser.write(msg.encode('utf-8'))
+        if self.enable_raw_serial:
+            self.raw_serial_pub.publish('node>ser  |  ' + msg)
 
     def on_ros_cmd_vel(self, msg):
         vlin = msg.linear.x
