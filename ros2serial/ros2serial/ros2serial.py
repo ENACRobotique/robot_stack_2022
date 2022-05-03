@@ -257,7 +257,7 @@ class Ros2Serial(Node):
         self.ros_send_serial.publish(String(data=msg))
         self.ser.write(msg.encode('utf-8'))
         if self.enable_raw_serial:
-            self.raw_serial_pub.publish('node>ser  |  ' + msg)
+            self.raw_serial_pub.publish(String(data=f'node>ser  |  {msg}'))
 
     def on_ros_cmd_vel(self, msg):
         vlin = msg.linear.x
