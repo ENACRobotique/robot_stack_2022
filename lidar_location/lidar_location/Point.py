@@ -13,6 +13,10 @@ class Point:
         # Increment represente l'increment en radians de chaque point
         self.angle = increment * position
 
+    # Retourne l'angle relatif du point 
+    def get_angle(self):
+        return self.angle
+
     def get_position_rel(self):
         return [self.angle, self.distance]
 

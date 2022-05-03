@@ -73,10 +73,10 @@ class Triangle:
 
     def compare_angles(self, triangle2):
         
-        sorted_local = self.angles
-        #sorted_local.sort()
-        sorted_in = triangle2.angles
-        #sorted_in.sort()
+        sorted_local = self.angles.copy()
+        sorted_local.sort()
+        sorted_in = triangle2.angles.copy()
+        sorted_in.sort()
 
         for i in range(0, 2):
             if abs(sorted_local[i] - sorted_in[i]) > self.jitter_angle:
@@ -85,10 +85,10 @@ class Triangle:
         return True
 
     def compare_distances(self, triangle2):
-        sorted_local = self.distances
-        #sorted_local.sort()
-        sorted_in = triangle2.distances
-        #sorted_in.sort()
+        sorted_local = self.distances.copy()
+        sorted_local.sort()
+        sorted_in = triangle2.distances.copy()
+        sorted_in.sort()
 
         for i in range(0, 2):
             if abs(sorted_local[i] - sorted_in[i]) > self.jitter_distance:
@@ -102,10 +102,10 @@ class Triangle:
         else:
             return 0.001
 
-    def sort(self):
+    """def sort(self):
         for i in range(0, 2):
             for j in range(0, 2):
                 if self.pt_list[i].angle > self.pt_list[j].angle:
                     inter = self.pt_list[i]
                     self.pt_list[i] = self.pt_list[j]
-                    self.pt_list[j] = inter
+                    self.pt_list[j] = inter"""
