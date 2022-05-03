@@ -90,7 +90,7 @@ class Ros2Serial(Node):
         #ros parameter to add raw_serial feed
         raw_serial_param = self.declare_parameter("enable_raw_serial", True)
         self.enable_raw_serial = raw_serial_param.get_parameter_value().bool_value
-        if self.enable_raw_serial.get_parameter_value().bool_value:
+        if self.enable_raw_serial:
             self.raw_serial_pub = self.create_publisher(String, "raw_serial", 10)
 
         #paramétrage ROS
