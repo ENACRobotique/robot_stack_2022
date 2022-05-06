@@ -20,6 +20,7 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
+            'nav = robot_nav_enac.basic_nav_node:main'
         ],
     },
 )

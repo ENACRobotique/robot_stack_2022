@@ -14,7 +14,7 @@ def generate_launch_description():
         executable='ros2serial',
         name='ros_serial',
         parameters=[
-            {'port': '/dev/ttyACM0', 
+            {'serial_port': '/dev/ttyACM0', 
             'baud': 115200},
         ],
     ) 
