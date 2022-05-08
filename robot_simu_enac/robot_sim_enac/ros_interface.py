@@ -80,6 +80,7 @@ def convert_to_data_type(to_convert):
             to_convert.rotation.z
         )
     elif type(to_convert) == Odometry:
+        
         raise NotImplementedError()
         return PositionOrientedTimed(
             to_convert.position.x * 1000,
