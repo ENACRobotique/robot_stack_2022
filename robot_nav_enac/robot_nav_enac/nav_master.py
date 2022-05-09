@@ -29,9 +29,12 @@ Navtypes :
 class Navigator(Node):
     def __init__(self):
         super().__init__('navigator')
+
         self.target_position = OdomData(0, 0, 0) #TODO : set it to initial position from state machine on beggining
         self.cur_position = OdomData(0, 0, 0)
         self.cur_speed = OdomData(0,0,0)
+        self.fixed_obstacle = [] #TODO : to fill on init
+        self.dynamic_obstacle = [] 
 
         #instantiate nav types available
         self.stop = Stop()
@@ -86,7 +89,7 @@ class Navigator(Node):
         self.target.updataOdomData(x, y, rotation)
 
         #set target to the nav_type selected
-        self.nav_type.set_target(OdomDataObject)
+        self.nav_type.set_target(self.target, self.fixed_obstacle + self.dynamic_obstacle)
 
 
     def on_odom_callback(self, msg):
@@ -107,11 +110,11 @@ class Navigator(Node):
         									msg.pose.pose.orientation.y,
         									msg.pose.pose.orientation.z,
         									msg.pose.pose.orientation.w)
-        self.current_position.updataOdomData(x, y, rotation)
 
-        speed = msg.twist.twist.linear.x
+        self.cur_position.updataOdomData(x, y, rotation)
+        self.cur_speed.updataOdomData(msg.twist.twist.linear.x, 0, msg.twist.twist.angular.z)
 
-        self.nav_type.update_odom(self.publish_nav, msg.pose.pose.position, msg.twist.twist.linear.x) #TODO voir quel type de données mettre (OdomData ??)
+        self.nav_type.update_odom(self.publish_nav, self.cur_position, self.cur_speed) #TODO voir quel type de données mettre (OdomData ??)
 
     def publish_nav(self, linear_speed, angular_speed):
         msg = Twist()
