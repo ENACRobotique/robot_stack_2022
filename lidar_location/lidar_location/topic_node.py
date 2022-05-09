@@ -792,7 +792,7 @@ class lidarlocation(Node):
         k = 0
         i = 0
         j = 0
-        print(0, len(tri.pt_list))
+        
         # detectiin du plus petit coté et calcul de position
         """for i in range(0, len(tri.pt_list)):
             for j in range(0, i):
@@ -813,27 +813,42 @@ class lidarlocation(Node):
         print(i, j)
         """
         # détermination des bons indices grace aux petits cotés
-        if(self.calculate_distance_xy(
-                tri.pt_list[0].pos_x, tri.pt_list[0].pos_y, tri.pt_list[1].pos_x, tri.pt_list[1].pos_y) > 1.6 and self.calculate_distance_xy(
+        if(calculate_distance_xy(
+                tri.pt_list[0].pos_x, tri.pt_list[0].pos_y, tri.pt_list[1].pos_x, tri.pt_list[1].pos_y) > 1.6 and calculate_distance_xy(
                 tri.pt_list[0].pos_x, tri.pt_list[0].pos_y, tri.pt_list[1].pos_x, tri.pt_list[1].pos_y) < 1.9):
+            print("A")
             j = 0
             i = 1
             k = 2
-        if(self.calculate_distance_xy(
-                tri.pt_list[1].pos_x, tri.pt_list[1].pos_y, tri.pt_list[2].pos_x, tri.pt_list[2].pos_y) > 1.6 and self.calculate_distance_xy(
+        elif(calculate_distance_xy(
+                tri.pt_list[1].pos_x, tri.pt_list[1].pos_y, tri.pt_list[2].pos_x, tri.pt_list[2].pos_y) > 1.6 and calculate_distance_xy(
                 tri.pt_list[1].pos_x, tri.pt_list[1].pos_y, tri.pt_list[2].pos_x, tri.pt_list[2].pos_y) < 1.9):
+            print("B")
             j = 1
             i = 2
             k = 0
 
-        if(self.calculate_distance_xy(
-                tri.pt_list[2].pos_x, tri.pt_list[2].pos_y, tri.pt_list[0].pos_x, tri.pt_list[0].pos_y) > 1.6 and self.calculate_distance_xy(
+        elif(calculate_distance_xy(
+                tri.pt_list[2].pos_x, tri.pt_list[2].pos_y, tri.pt_list[0].pos_x, tri.pt_list[0].pos_y) > 1.6 and calculate_distance_xy(
                 tri.pt_list[2].pos_x, tri.pt_list[2].pos_y, tri.pt_list[0].pos_x, tri.pt_list[0].pos_y) < 1.9):
+            print("C")
             j = 2
             i = 0
             k = 1
+        else:
+            print("D")
+            print(calculate_distance_xy(
+                tri.pt_list[2].pos_x, tri.pt_list[2].pos_y, tri.pt_list[0].pos_x, tri.pt_list[0].pos_y))
+            print(calculate_distance_xy(
+                tri.pt_list[1].pos_x, tri.pt_list[1].pos_y, tri.pt_list[2].pos_x, tri.pt_list[2].pos_y))
+            print(calculate_distance_xy(
+                tri.pt_list[0].pos_x, tri.pt_list[0].pos_y, tri.pt_list[1].pos_x, tri.pt_list[1].pos_y))
+            j = 0
+            i = 1
+            k = 2   
 
-        print(tri.pt_list[i].distance, tri.pt_list[j].distance)
+        
+        #print(tri.pt_list[i].distance, tri.pt_list[j].distance)
 
         teta = math.pi/2 - get_beta(tri.pt_list[j], tri.pt_list[i])
         phi = math.pi/2 - \
@@ -905,14 +920,15 @@ class lidarlocation(Node):
         resx = (x + x2)/2
         resy = (y + y2)/2
 
-        alpha = math.acos(resx/tri.pt_list[j].distance)
-        if tri.pt_list[j].angle > alpha:
-            angle_N = tri.pt_list[j].angle-alpha
+        """alpha = math.acos(x/tri.pt_list[i].distance)
+        if tri.pt_list[i].angle > alpha:
+            angle_N = tri.pt_list[i].angle-alpha
         else:
-            angle_N = 2*math.pi-(alpha-tri.pt_list[j].angle)
+            angle_N = 2*math.pi-(alpha-tri.pt_list[i].angle)
 
         gisement = 0.0
-        return [x, y, math.pi/2 - angle_N]
+        """
+        return [x, y, x2,y2]
 
 
 def get_distance_pt(pt1, pt2):
@@ -920,10 +936,10 @@ def get_distance_pt(pt1, pt2):
 
 
 def get_beta(pt1, pt2):
-    print(pt1.distance)
-    print(pt2.distance)
-    print(abs((get_distance_pt(pt1, pt2)**2 + pt2.distance**2 -
-          pt1.distance**2) / (2 * get_distance_pt(pt1, pt2) * pt2.distance)))
+    #print(pt1.distance)
+    #print(pt2.distance)
+    #print(abs((get_distance_pt(pt1, pt2)**2 + pt2.distance**2 -
+    #      pt1.distance**2) / (2 * get_distance_pt(pt1, pt2) * pt2.distance)))
     return math.acos(abs((get_distance_pt(pt1, pt2)**2 + pt2.distance**2 - pt1.distance**2) / (2 * get_distance_pt(pt1, pt2) * pt2.distance)))
 
 
