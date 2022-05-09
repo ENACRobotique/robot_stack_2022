@@ -1,6 +1,7 @@
 class OdomData:
 
 	def __init__(self, x, y, rotation):
+        #No Y if speed
 		self.x = x
 		self.y = y
 		self.rotation_rad = rotation
@@ -22,10 +23,10 @@ class NavigationType():
     def __init__(self, fixed_obstacles = None):
         pass
 
-    def set_target(self, target_pose, dynamic_obstacles = None):
+    def set_target(self, target_pose:OdomData, dynamic_obstacles = None):
         pass
 
-    def update_odom(self, callback_speed, position, speed):
+    def update_odom(self, callback_speed, position:OdomData, speed:OdomData):
         """_summary_
 
         Args:
