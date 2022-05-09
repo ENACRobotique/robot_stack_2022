@@ -1,0 +1,11 @@
+- Fait Concaténation des 2 (astar et nouvelle IHM)
+- Ajout de nouvelle fonction ( dans IHM voir la dernière version)
+- Modification de l'Astar --> AStar_V3_S qui devient le nouveau basique 
+
+Problèmes :
+- IL faudra qu'on regarde pourquoi le tableau est remis à 0 à chaque fois -->  Apres normalement Obstacle intégré
+à l'IHM finale.
+- Toujours le problème de GIT
+
+A Faire : 
+- Ajout des Obstacle rectangles et Lignes (avec le ISin ...)

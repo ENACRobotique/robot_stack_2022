@@ -1,0 +1,12 @@
+
+- Assemblage des codes (IHM + ASTAR)
+- Recupérer temps de traitement Astar (temps courants)
+- Ajouter Obstacle (Coin et Rectangle)
+- Recupérer temps de traitement Astar (temps courants) (moins de 200 ms sinon bzr) --> Option à rajouter https://python.developpez.com/faq/?page=Optimisation#:~:text=Pour%20mesurer%20le%20temps%20d,le%20temps%20CPU%20en%20secondes.
+
+
+
+Test : 
+- Pour tester les obstacles de la map (point de départ)
+    Depart = Points(5,5)
+    Arrive = Points(200,5)
