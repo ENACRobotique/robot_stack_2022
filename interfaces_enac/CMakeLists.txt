@@ -32,6 +32,7 @@ rosidl_generate_interfaces(interfaces_enac
   "msg/PeriphValue.msg"
   "msg/Pid.msg"
   "msg/Obstacles.msg"
+  "msg/SetNavigation.msg"
   DEPENDENCIES builtin_interfaces geometry_msgs std_msgs
  )
 
