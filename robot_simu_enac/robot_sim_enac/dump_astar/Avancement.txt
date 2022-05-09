@@ -1,0 +1,6 @@
+Sauvegarde intéressante : 
+- IHM_SN_V5 ---> fichier avec Rectangle + Cercle Fonctionnelle
+
+Tâches : 
+- Ajouter Obstacle (Coin)
+- Faire fonction MapInit() qui permet de placer les obstacles toujours présent sur la table (les rectangles ...)

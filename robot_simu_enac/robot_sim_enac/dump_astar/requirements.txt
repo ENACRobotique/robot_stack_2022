@@ -1,0 +1,4 @@
+matplotlip>=3.0
+tkinter>=3.6
+
+#install matplotlib above 3.5.2
