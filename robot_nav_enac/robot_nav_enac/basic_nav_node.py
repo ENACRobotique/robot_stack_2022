@@ -1,5 +1,7 @@
 import numpy as np
 
+from math import atan2, cos, sin
+
 import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import Twist, Pose, TransformStamped
@@ -86,8 +88,8 @@ class Navigator(Node):
 		self.goal_pose_topic = self.create_subscription(Pose, "/goal_pose", self.setTarget, 10)
 		self.velocity_publisher = self.velocity_publisher = self.create_publisher(Twist, '/cmd_vel', 10)
 		
-		self.rotationationPrecision = 0.05 
-		self.position_precision = 0.05
+		self.rotation_precision = 0.05 
+		self.position_precision = 0.1
 
 		#Stop point to be computed, to know when starting to stop (in regards of PID)
 		#self.stopPoint = OdomData(0.0, 0.0, 360)
@@ -126,58 +128,68 @@ class Navigator(Node):
 
 		speed = msg.twist.twist.linear.x
 
+		is_not_at_target = abs(x - self.target.x) >= self.position_precision or abs(y - self.target.y) >= self.position_precision
+		rotation_to_target = 1 #calculate rotation between target position and current position
 		#TODO : faire une bonne formule qui normalise + valeur absolu
-		if rotation - self.target.rotation_rad > self.rotationationPrecision : #meter
-			if speed >= 0.01 :
-				self.stop()
-				return
-			
+		if self.diff_angle(rotation_to_target, rotation) > self.rotation_precision and is_not_at_target: #first rotation
 			self._isNavigating = False
 			self._isRotating = True
-			#Need rotationation
-			self.rotate()
+			#Need rotation
+			self.rotate(rotation_to_target)
 			return
 
-		elif abs(x - self.target.x) >= self.position_precision or abs(y - self.target.y) >= self.position_precision :
+		elif self.diff_angle(rotation_to_target, rotation) <= self.rotation_precision and is_not_at_target : #aligned to path
 			self._isNavigating = True
 			self._isRotating = False
 			self.move()
 			return
+		elif not is_not_at_target and self.diff_angle(self.target.rotation_rad, rotation) > self.rotation_precision: #final alignment
+			self._isNavigating = False
+			self._isRotating = True
+			#Need rotation
+			self.rotate(self.target.rotation_rad)
+			return
+		else:
+			self.stop()
+			return
 
-		self._isNavigating = False
-		self._isRotating = False
+		#	if speed >= 0.01 :
+		#		self.stop()
+		#		return
+		#self._isNavigating = False
+		#self._isRotating = False
 		
 	def stop(self):
 		msg = Twist()
 		#publish empty message to velocity to stop robot
 		self.velocity_publisher.publish(msg)
 	
-	def rotate(self):
-		relative_rotation_rad = self.current_position.rotation_rad  - self.target.rotation_rad
+	def rotate(self, target):
+		relative_rotation_rad = self.diff_angle(target, self.current_position.rotation_rad)
 
 		if (relative_rotation_rad <= 0):
-			speed = -2
+			rot_speed = -2
 		else:
-			speed = 2
+			rot_speed = 2
 		
 		msg = Twist()
 
-		msg.twist.linear.x = 0.0
-		msg.twist.linear.y = 0.0
-		msg.twist.linear.z = 0.0
-		msg.twist.angular.x = 0.0
-		msg.twist.angular.y = 0.0
-		msg.twist.angular.z = float(speed)
+		msg.linear.x = 0.0
+		msg.linear.y = 0.0
+		msg.linear.z = 0.0
+		msg.angular.x = 0.0
+		msg.angular.y = 0.0
+		msg.angular.z = float(rot_speed)
 
 		self.velocity_publisher.publish(msg)
 	
 	def move(self):
-		distance = ( (self.current_position.x - self.target.x)**2 + (self.current_position.y - self.target.y)**2 )**0.5
+		distance = ((self.current_position.x - self.target.x)**2 + (self.current_position.y - self.target.y)**2 )**0.5
 
 		#TODO : speed curve depending on distance
 		speed = 0.5 #m/s
 
-		if distance <= 0.1 : 
+		if distance < 0.1 : 
 			#To Test
 			self.stop()
 		else:
@@ -192,10 +204,9 @@ class Navigator(Node):
 
 			self.velocity_publisher.publish(msg)
 
-	def diff_angle(angle1, angle2):
-		#todo : normaliser
-		if angle1 > angle2:
-			pass
+	def diff_angle(self, target, current):
+		#https://stackoverflow.com/questions/1878907/how-can-i-find-the-difference-between-two-angles
+		return atan2(sin(target-current), cos(target-current))
 
 def main():
     rclpy.init()
