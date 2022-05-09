@@ -764,20 +764,9 @@ class lidarlocation(Node):
         """
 
         self.publisher_.publish(msg_obj)
-    #à partir de l'amalgame de la tour indentifier l'indice des balices
-    """def determiner_indice_balise_from_tour(self,tri,tour):
-        for i in range(0, len(tri.pt_list)):
-            if((calculate_distance_xy(tri.pt_list[i].pos_x, tri.pt_list[i].pos_y,tour.pos_x,tour.pos_y)>1.5) and (calculate_distance_xy(tri.pt_list[i].pos_x, tri.pt_list[i].pos_y,tour.pos_x,tour.pos_y)<1.7)):
-            #je veux que ce point soit d'indice j
-                j=i
-            if((calculate_distance_xy(tri.pt_list[(i+1)%3].pos_x, tri.pt_list[(i+1)%3].pos_y,tour.pos_x,tour.pos_y)>2.4) and (calculate_distance_xy(tri.pt_list[(i+1)%3].pos_x, tri.pt_list[(i+1)%3].pos_y,tour.pos_x,tour.pos_y)<2.6)):
-            #je veux que ce point soit d'indice i
-                i=i+1    
-            if((calculate_distance_xy(tri.pt_list[(i+2)%3].pos_x, tri.pt_list[(i+2)%3].pos_y,tour.pos_x,tour.pos_y)>1.7) and (calculate_distance_xy(tri.pt_list[(i+2)%3].pos_x, tri.pt_list[(i+2)%3].pos_y,tour.pos_x,tour.pos_y)<1.9)):
-            #je veux que ce point soit d'indice k    
-                k=i+2
+
     # def determiner_position_from_pts(self, list_pts):
-    """
+
     def determiner_position(self, tri):
         x = 0
         y = 0
@@ -792,63 +781,68 @@ class lidarlocation(Node):
         # Determines the sides of the shortest triangle and the 2 other sides
         i = (orient + 1) % 3
         j = (orient + 3) % 3
-        k = (orient + 2) % 3
+        c3 = (orient + 2) % 3
         """
-        i=0
-        j=0
-        k=0
-        
 
-        # Tri des points par angle tri dans le sens inverse des aiguilles d'une montre
+        # Tri des points par angle
         # print(tri.pt_list)
         tri.pt_list = sorted(tri.pt_list, key=Point.get_angle)
-        print("test",calculate_distance_xy(tri.pt_list[0].pos_x, tri.pt_list[0].pos_y, tri.pt_list[1].pos_x, tri.pt_list[1].pos_y))
         # print(tri.pt_list)
-        if((calculate_distance_xy(tri.pt_list[0].pos_x, tri.pt_list[0].pos_y, tri.pt_list[1].pos_x, tri.pt_list[1].pos_y)>1.6) and (calculate_distance_xy(tri.pt_list[0].pos_x, tri.pt_list[0].pos_y, tri.pt_list[1].pos_x, tri.pt_list[1].pos_y)<1.9)):
-            print("k")
-            j=0
-            i=1
-            k=2
-        if((calculate_distance_xy(tri.pt_list[1].pos_x, tri.pt_list[1].pos_y, tri.pt_list[2].pos_x, tri.pt_list[2].pos_y)>1.6) and (calculate_distance_xy(tri.pt_list[1].pos_x, tri.pt_list[1].pos_y, tri.pt_list[2].pos_x, tri.pt_list[2].pos_y)<1.9)):
-            print("j")
-            j=1
-            i=2
-            k=0
-        if((calculate_distance_xy(tri.pt_list[2].pos_x, tri.pt_list[2].pos_y, tri.pt_list[0].pos_x, tri.pt_list[0].pos_y)>1.6) and (calculate_distance_xy(tri.pt_list[2].pos_x, tri.pt_list[2].pos_y, tri.pt_list[0].pos_x, tri.pt_list[0].pos_y)<1.9)):
-            print("l")
-            j=2
-            i=0
-            k=1
-        else:
-            j=0
-            i=1
-            k=2            
 
-        
-        #print(0, len(tri.pt_list))
+        k = 0
+        i = 0
+        j = 0
+        print(0, len(tri.pt_list))
         # detectiin du plus petit coté et calcul de position
         """for i in range(0, len(tri.pt_list)):
             for j in range(0, i):
                 d = abs(calculate_distance_xy(
                     tri.pt_list[i].pos_x, tri.pt_list[i].pos_y, tri.pt_list[j].pos_y, tri.pt_list[j].pos_x))
-                #print(i, j, d)
+                print(i, j, d)
                 if (d > 1.7) and (d < 1.9):
                     break
         if i == j:
             print("pas  trouvé!!")
             raise
-        """    
-        #print(i, j)
-        print(tri.pt_list[i].distance, tri.pt_list[j].distance,tri.pt_list[k].distance)
+        if((i==0 and j==1) or(i==1 and j==0)):
+            k=2
+         if((i==0 and j==2) or(i==2 and j==0)):
+            k=1
+         if((i==1 and j==2) or(i==2 and j==1)):
+            k=0
+        print(i, j)
+        """
+        # détermination des bons indices grace aux petits cotés
+        if(self.calculate_distance_xy(
+                tri.pt_list[0].pos_x, tri.pt_list[0].pos_y, tri.pt_list[1].pos_x, tri.pt_list[1].pos_y) > 1.6 and self.calculate_distance_xy(
+                tri.pt_list[0].pos_x, tri.pt_list[0].pos_y, tri.pt_list[1].pos_x, tri.pt_list[1].pos_y) < 1.9):
+            j = 0
+            i = 1
+            k = 2
+        if(self.calculate_distance_xy(
+                tri.pt_list[1].pos_x, tri.pt_list[1].pos_y, tri.pt_list[2].pos_x, tri.pt_list[2].pos_y) > 1.6 and self.calculate_distance_xy(
+                tri.pt_list[1].pos_x, tri.pt_list[1].pos_y, tri.pt_list[2].pos_x, tri.pt_list[2].pos_y) < 1.9):
+            j = 1
+            i = 2
+            k = 0
+
+        if(self.calculate_distance_xy(
+                tri.pt_list[2].pos_x, tri.pt_list[2].pos_y, tri.pt_list[0].pos_x, tri.pt_list[0].pos_y) > 1.6 and self.calculate_distance_xy(
+                tri.pt_list[2].pos_x, tri.pt_list[2].pos_y, tri.pt_list[0].pos_x, tri.pt_list[0].pos_y) < 1.9):
+            j = 2
+            i = 0
+            k = 1
+
+        print(tri.pt_list[i].distance, tri.pt_list[j].distance)
 
         teta = math.pi/2 - get_beta(tri.pt_list[j], tri.pt_list[i])
         phi = math.pi/2 - \
             get_gamma(tri.pt_list[i], tri.pt_list[j],
                       get_beta(tri.pt_list[i], tri.pt_list[j]))
-        x = math.cos(teta)*tri.pt_list[i].distance - 0.1
-        x2 = math.cos(phi)*tri.pt_list[j].distance - 0.1
-        y = math.sin(teta)*tri.pt_list[i].distance + 0.05
-        y2 = 1.95 - math.sin(phi)*tri.pt_list[j].distance
+        x = math.cos(teta)*tri.pt_list[j].distance - 0.1
+        x2 = math.cos(phi)*tri.pt_list[i].distance - 0.1
+        y = math.sin(teta)*tri.pt_list[j].distance + 0.05
+        y2 = 1.95 - math.sin(phi)*tri.pt_list[i].distance
 
         # voir ou qu'il pense qu'elles sont les balises
         msg_bal_1 = TransformStamped()
