@@ -5,7 +5,17 @@ from rclpy.node import Node
 from geometry_msgs.msg import Twist, Pose, TransformStamped
 from nav_msgs.msg import Odometry
 
-""" 
+from interfaces_enac.msg import _set_navigation
+from interfaces_enac.msg import _obstacles
+
+from robot_nav_enac.Stop import Stop
+from robot_nav_enac.StraightPath import StraightPath
+from robot_nav_enac.PurePursuit import PurePursuit
+
+SetNavigation = _set_navigation.SetNavigation
+Obstacles = _obstacles.Obstacles
+
+"""
 Navtypes :
     0 : stop
     1 : StraigthPath (without planification, no basic obstacle stop yet)
@@ -14,137 +24,85 @@ Navtypes :
     4 : WallStop (without planification, no basic obstacle stop yet)
 """
 
-class OdomData:
-
-	def __init__(self, x, y, rotation):
-		self.x = x
-		self.y = y
-		self.rotation_rad = rotation
-		self.previous_x = x
-		self.previous_y = y
-		self.previous_rotation_rad = rotation
-
-
-	def updataOdomData(self, x, y , rotation):
-		self.previous_x = self.x
-		self.previous_y = self.y
-		self.previous_rotation_rad = self.rotation_rad
-
-		self.x = x
-		self.y = y
-		self.rotation_rad = rotation
-	
 
 class Navigator(Node):
-	
-	#### Goal Pose : rotation de fin de déplacement??
-	
-	def __init__(self, xTarget, yTarget, rotationTarget, maxSpeed):
-		super().__init__('navigator')
+    def __init__(self):
+        super().__init__('navigator')
 
-		
+        self.stop = Stop()
+        self.straight_path = StraightPath()
 
-		#Stop point to be computed, to know when starting to stop (in regards of PID)
-		#self.stopPoint = OdomData(0.0, 0.0, 360)
-
-	
-		#self.stopPoint = stopLoc() #Thread it after successful tests	
-	
-	def setTarget(self, msg):
-		#fetch goal_pose message and update target pose
-		x = msg.position.x
-		y = msg.position.y
-		rotation = z_euler_from_quaternions(msg.orientation.x,
-											msg.orientation.y,
-											msg.orientation.z,
-											msg.orientation.w)
-		self.target.updataOdomData(x, y, rotation)
+        self.nav_type = self.stop
+        self.nav_type_int = 0
 
 
-	def updatePosition(self, msg):
-		#Update position here
-		#TODO : uncomment when TF is working
-		#x = msg.transform.translation.x
-		#y = msg.transform.translation.y
-		#rotation = z_euler_from_quaternions(msg.transform.rotation.x,
+        # subscribe to nav
+        navigation_subscriber = self.create_subscription(
+            SetNavigation, 'set_nav', self.on_nav_callback, 10)
+        #subscribe to odom
+        odom_subscriber = self.create_subscription(
+            Odometry, 'odom', self.on_odom_callback, 10)
+        #subscribe to obstacles
+        obstacle_subscriber = self.create_subscription(
+            Obstacles, 'obstacles', self.on_obstacle_callback, 10)
+        #publish to velocity
+        self.velocity_publisher = self.create_publisher(Twist, 'cmd_vel')
+
+    def on_obstacle_callback(self, msg):
+        #TODO : maintain a list of dynamic obstacles and send it to PurePursuit astar planification on callback
+        pass
+
+    def on_nav_callback(self, msg):
+        if self.nav_type_int != msg.nav_type:
+            self.nav_type = msg.nav_type
+            if self.nav_type == 0:
+                self.nav_type = self.stop()
+            elif self.nav_type == 1:
+                self.nav_type = self.straight_path
+                #self.nav_type.set_target = cur_position or reset button??
+
+    
+        x = msg.position.x
+        y = msg.position.y
+        rotation = z_euler_from_quaternions(msg.orientation.x,
+        									msg.orientation.y,
+        									msg.orientation.z,
+        									msg.orientation.w)
+        self.target.updataOdomData(x, y, rotation)
+
+        #self.nav_type.set_target(OdomDataObject)
+
+
+    def on_odom_callback(self, msg):
+		# Update position here
+		# TODO : uncomment when TF is working
+		# x = msg.transform.translation.x
+		# y = msg.transform.translation.y
+		# rotation = z_euler_from_quaternions(msg.transform.rotation.x,
 		#									msg.transform.rotation.y,
 		#									msg.transform.rotation.z,
 		#									msg.transform.rotation.w)
-		#self.current_position.updataOdomData(x, y, rotation)
-		x = msg.pose.pose.position.x
-		y = msg.pose.pose.position.y
-		rotation = z_euler_from_quaternions(msg.pose.pose.orientation.x,
-											msg.pose.pose.orientation.y,
-											msg.pose.pose.orientation.z,
-											msg.pose.pose.orientation.w)
-		self.current_position.updataOdomData(x, y, rotation)
+		# self.current_position.updataOdomData(x, y, rotation)
+        x = msg.pose.pose.position.x
+        y = msg.pose.pose.position.y
+        rotation = z_euler_from_quaternions(msg.pose.pose.orientation.x,
+        									msg.pose.pose.orientation.y,
+        									msg.pose.pose.orientation.z,
+        									msg.pose.pose.orientation.w)
+        self.current_position.updataOdomData(x, y, rotation)
 
-		speed = msg.twist.twist.linear.x
+        speed = msg.twist.twist.linear.x
 
-		if rotation - self.target.rotation_rad > self.rotationationPrecision : #meter
-			if speed >= 0.01 :
-				self.stop()
-				return
-			
-			self._isNavigating = False
-			self._isRotating = True
-			#Need rotationation
-			self.rotate()
-			return
+        self.nav_type.update_odom(self.publish_nav, msg.pose.pose.position, msg.twist.twist.linear.x) #TODO voir quel type de données mettre (OdomData ??)
 
-		elif x - self.target.x <= self.position_precision and y - self.target.y <= self.position_precision :
-			self._isNavigating = True
-			self._isRotating = False
-			self.move()
-			return
+    def publish_nav(self, linear_speed, angular_speed):
+        msg = Twist()
+        msg.linear.x = linear_speed
+        msg.angular.z = angular_speed
+        self.velocity_publisher.publish(msg)
 
-		self._isNavigating = False
-		self._isRotating = False
-		
-	def stop(self):
-		msg = Twist()
-		#publish empty message to velocity to stop robot
-		self.velocity_publisher.publish(msg)
 	
-	def rotate(self):
-		relative_rotation_rad = self.current_position.rotation_rad  - self.target.rotation_rad
 
-		if (relative_rotation_rad <= 0):
-			speed = -2
-		else:
-			speed = 2
-		
-		msg = Twist()
-
-		msg.twist.linear.x = 0.0
-		msg.twist.linear.y = 0.0
-		msg.twist.linear.z = 0.0
-		msg.twist.angular.x = 0.0
-		msg.twist.angular.y = 0.0
-		msg.twist.angular.z = float(speed)
-
-		self.velocity_publisher.publish(msg)
-	
-	def move(self):
-		distance = ( (self.current_position.x - self.target.x)**2 + (self.current_position.y - self.target.y)**2 )**0.5
-
-		#TODO : speed curve depending on distance
-		speed = 0.5 #m/s
-
-		if distance <= 0.1 : 
-			#To Test
-			self.stop()
-		else:
-			msg = Twist()
-
-			msg.linear.x = float(speed)
-			msg.linear.y = 0.0
-			msg.linear.z = 0.0
-			msg.angular.x = 0.0
-			msg.angular.y = 0.0
-			msg.angular.z = 0.0
-
-			self.velocity_publisher.publish(msg)
 
 def main():
     rclpy.init()
