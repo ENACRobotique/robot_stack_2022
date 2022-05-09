@@ -47,7 +47,7 @@ class Robot:
         #self.com.register_msg_callback('position_cmd', PositionOriented, self.nav.set_pos_objective)
         #self.com.register_msg_callback('actuator_cmd', self.actuators.handle_cmd, Actuators)
 
-        #self.com.update_data_continuous("odom", PositionOrientedTimed, self.get_odom_report, 0.1)
+        self.com.update_data_continuous("odom", PositionOrientedTimed, self.get_odom_report, 0.1)
         self.com.update_data_continuous("tf", PositionOriented, self.get_transform_report, 0.03) #0.03 - ~30hz
 
     def __enter__(self):
@@ -100,12 +100,10 @@ def main(args=None):
     entry points for ros
     """
     robot = Robot("robot_sim")
-    while True:
-        robot.run()
+    robot.run()
 
 if __name__ == '__main__':
-    robot = Robot()
-    robot.run()
+    main()
     """
     if len(sys.argv) != 2:
         print("Using default name : robot_sim")

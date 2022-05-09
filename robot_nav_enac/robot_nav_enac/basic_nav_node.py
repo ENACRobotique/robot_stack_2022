@@ -36,6 +36,10 @@ Input : take a destination position + rotation [ROS odometrie classic msg] + Max
 Result : Move Robot and stop at the right point, In case of update, stop robot and restart with new data
 """
 
+#TODO: NORMALISER LES ANGLES
+#TODO: RAMPES DE VITESSE
+
+
 def z_euler_from_quaternions(qx, qy, qz, qw):
     t3 = +2.0 * (qw * qz + qx * qy)
     t4 = +1.0 - 2.0 * (qy * qy + qz * qz)
@@ -122,6 +126,7 @@ class Navigator(Node):
 
 		speed = msg.twist.twist.linear.x
 
+		#TODO : faire une bonne formule qui normalise + valeur absolu
 		if rotation - self.target.rotation_rad > self.rotationationPrecision : #meter
 			if speed >= 0.01 :
 				self.stop()
@@ -133,7 +138,7 @@ class Navigator(Node):
 			self.rotate()
 			return
 
-		elif x - self.target.x <= self.position_precision and y - self.target.y <= self.position_precision :
+		elif abs(x - self.target.x) >= self.position_precision or abs(y - self.target.y) >= self.position_precision :
 			self._isNavigating = True
 			self._isRotating = False
 			self.move()
@@ -186,6 +191,11 @@ class Navigator(Node):
 			msg.angular.z = 0.0
 
 			self.velocity_publisher.publish(msg)
+
+	def diff_angle(angle1, angle2):
+		#todo : normaliser
+		if angle1 > angle2:
+			pass
 
 def main():
     rclpy.init()

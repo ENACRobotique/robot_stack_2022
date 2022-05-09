@@ -42,5 +42,23 @@ class State():
         """
         self.is_done = True
 
+class StoreActuator():
+    def __init__(self) -> None:
+        self.on_update_value = None
+        self.values = {}
+        pass
+    def connect_to_ros(self, on_update_value):
+        self.on_update_value = on_update_value
 
+    def update_value(self, id, position:int):
+        try:
+            on_update_value()
+        except Exception as e:
+            print(e)
+            print("it's possible that the on_update_value of the store has not been set due to not calling connect_to_ros")
 
+    def get_value(self, key):
+        if self.values[key] == None:
+            print("error missing value")
+        else:
+            return self.values[key]
