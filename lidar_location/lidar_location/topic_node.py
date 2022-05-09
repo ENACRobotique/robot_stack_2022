@@ -764,9 +764,20 @@ class lidarlocation(Node):
         """
 
         self.publisher_.publish(msg_obj)
-
+    #à partir de l'amalgame de la tour indentifier l'indice des balices
+    """def determiner_indice_balise_from_tour(self,tri,tour):
+        for i in range(0, len(tri.pt_list)):
+            if((calculate_distance_xy(tri.pt_list[i].pos_x, tri.pt_list[i].pos_y,tour.pos_x,tour.pos_y)>1.5) and (calculate_distance_xy(tri.pt_list[i].pos_x, tri.pt_list[i].pos_y,tour.pos_x,tour.pos_y)<1.7)):
+            #je veux que ce point soit d'indice j
+                j=i
+            if((calculate_distance_xy(tri.pt_list[(i+1)%3].pos_x, tri.pt_list[(i+1)%3].pos_y,tour.pos_x,tour.pos_y)>2.4) and (calculate_distance_xy(tri.pt_list[(i+1)%3].pos_x, tri.pt_list[(i+1)%3].pos_y,tour.pos_x,tour.pos_y)<2.6)):
+            #je veux que ce point soit d'indice i
+                i=i+1    
+            if((calculate_distance_xy(tri.pt_list[(i+2)%3].pos_x, tri.pt_list[(i+2)%3].pos_y,tour.pos_x,tour.pos_y)>1.7) and (calculate_distance_xy(tri.pt_list[(i+2)%3].pos_x, tri.pt_list[(i+2)%3].pos_y,tour.pos_x,tour.pos_y)<1.9)):
+            #je veux que ce point soit d'indice k    
+                k=i+2
     # def determiner_position_from_pts(self, list_pts):
-
+    """
     def determiner_position(self, tri):
         x = 0
         y = 0
@@ -781,40 +792,63 @@ class lidarlocation(Node):
         # Determines the sides of the shortest triangle and the 2 other sides
         i = (orient + 1) % 3
         j = (orient + 3) % 3
-        c3 = (orient + 2) % 3
+        k = (orient + 2) % 3
         """
+        i=0
+        j=0
+        k=0
         
-        #Tri des points par angle
-        #print(tri.pt_list)
+
+        # Tri des points par angle tri dans le sens inverse des aiguilles d'une montre
+        # print(tri.pt_list)
         tri.pt_list = sorted(tri.pt_list, key=Point.get_angle)
-        #print(tri.pt_list)
+        print("test",calculate_distance_xy(tri.pt_list[0].pos_x, tri.pt_list[0].pos_y, tri.pt_list[1].pos_x, tri.pt_list[1].pos_y))
+        # print(tri.pt_list)
+        if((calculate_distance_xy(tri.pt_list[0].pos_x, tri.pt_list[0].pos_y, tri.pt_list[1].pos_x, tri.pt_list[1].pos_y)>1.6) and (calculate_distance_xy(tri.pt_list[0].pos_x, tri.pt_list[0].pos_y, tri.pt_list[1].pos_x, tri.pt_list[1].pos_y)<1.9)):
+            print("k")
+            j=0
+            i=1
+            k=2
+        if((calculate_distance_xy(tri.pt_list[1].pos_x, tri.pt_list[1].pos_y, tri.pt_list[2].pos_x, tri.pt_list[2].pos_y)>1.6) and (calculate_distance_xy(tri.pt_list[1].pos_x, tri.pt_list[1].pos_y, tri.pt_list[2].pos_x, tri.pt_list[2].pos_y)<1.9)):
+            print("j")
+            j=1
+            i=2
+            k=0
+        if((calculate_distance_xy(tri.pt_list[2].pos_x, tri.pt_list[2].pos_y, tri.pt_list[0].pos_x, tri.pt_list[0].pos_y)>1.6) and (calculate_distance_xy(tri.pt_list[2].pos_x, tri.pt_list[2].pos_y, tri.pt_list[0].pos_x, tri.pt_list[0].pos_y)<1.9)):
+            print("l")
+            j=2
+            i=0
+            k=1
+        else:
+            j=0
+            i=1
+            k=2            
 
-        c3=2
-
-        i = 0
-        j = 0
-        print(0,len(tri.pt_list) )
+        
+        #print(0, len(tri.pt_list))
         # detectiin du plus petit coté et calcul de position
-        for i in range(0,len(tri.pt_list)):
-            for j in range(0,i):
-                d = abs(calculate_distance_xy(tri.pt_list[i].pos_x, tri.pt_list[i].pos_y, tri.pt_list[j].pos_y, tri.pt_list[j].pos_x))
-                print(i, j, d)
+        """for i in range(0, len(tri.pt_list)):
+            for j in range(0, i):
+                d = abs(calculate_distance_xy(
+                    tri.pt_list[i].pos_x, tri.pt_list[i].pos_y, tri.pt_list[j].pos_y, tri.pt_list[j].pos_x))
+                #print(i, j, d)
                 if (d > 1.7) and (d < 1.9):
                     break
         if i == j:
             print("pas  trouvé!!")
             raise
-
-        print(i, j)
+        """    
+        #print(i, j)
+        print(tri.pt_list[i].distance, tri.pt_list[j].distance,tri.pt_list[k].distance)
 
         teta = math.pi/2 - get_beta(tri.pt_list[j], tri.pt_list[i])
         phi = math.pi/2 - \
             get_gamma(tri.pt_list[i], tri.pt_list[j],
-                    get_beta(tri.pt_list[i], tri.pt_list[j]))
-        x = math.cos(teta)*tri.pt_list[j].distance - 0.1
-        x2 = math.cos(phi)*tri.pt_list[i].distance - 0.1
-        y = math.sin(teta)*tri.pt_list[j].distance + 0.05
-        y2 = 1.95 - math.sin(phi)*tri.pt_list[i].distance
+                      get_beta(tri.pt_list[i], tri.pt_list[j]))
+        x = math.cos(teta)*tri.pt_list[i].distance - 0.1
+        x2 = math.cos(phi)*tri.pt_list[j].distance - 0.1
+        y = math.sin(teta)*tri.pt_list[i].distance + 0.05
+        y2 = 1.95 - math.sin(phi)*tri.pt_list[j].distance
 
         # voir ou qu'il pense qu'elles sont les balises
         msg_bal_1 = TransformStamped()
@@ -854,10 +888,10 @@ class lidarlocation(Node):
         msg_bal_3 = TransformStamped()
         msg_bal_3.header.frame_id = "laser"
         msg_bal_3.child_frame_id = "balise3"
-        msg_bal_3.transform.translation.x = tri.pt_list[c3].distance * math.cos(
-            tri.pt_list[c3].angle)
-        msg_bal_3.transform.translation.y = tri.pt_list[c3].distance * math.sin(
-            tri.pt_list[c3].angle)
+        msg_bal_3.transform.translation.x = tri.pt_list[k].distance * math.cos(
+            tri.pt_list[k].angle)
+        msg_bal_3.transform.translation.y = tri.pt_list[k].distance * math.sin(
+            tri.pt_list[k].angle)
         msg_bal_3.transform.translation.z = 0.0
         [qx3, qy3, qz3, qw3] = quaternion_from_euler(
             0, 0, 0)
@@ -868,7 +902,6 @@ class lidarlocation(Node):
         msg_bal_3.transform.rotation.w = qw3
         self.publisher_map.publish(msg_bal_3)
 
-        
         """
         x = math.sqrt(tri.pt_list[j].distance**2 -
                     ((tri.pt_list[i].distance**2 - tri.pt_list[j].distance**2) - 3.61) / -1.9)**2
@@ -895,15 +928,17 @@ def get_distance_pt(pt1, pt2):
 def get_beta(pt1, pt2):
     print(pt1.distance)
     print(pt2.distance)
-    print(abs((get_distance_pt(pt1, pt2)**2 + pt2.distance**2 - pt1.distance**2) / (2 * get_distance_pt(pt1, pt2) * pt2.distance)))
+    print(abs((get_distance_pt(pt1, pt2)**2 + pt2.distance**2 -
+          pt1.distance**2) / (2 * get_distance_pt(pt1, pt2) * pt2.distance)))
     return math.acos(abs((get_distance_pt(pt1, pt2)**2 + pt2.distance**2 - pt1.distance**2) / (2 * get_distance_pt(pt1, pt2) * pt2.distance)))
 
 
 def get_gamma(pt1, pt2, beta):
     return math.pi - beta - abs(pt2.angle - pt1.angle)
 
+
 def calculate_distance_xy(x1, y1, x2, y2):
-            return math.sqrt((x1-x2)*(x1-x2)+(y1-y2)*(y1-y2))
+    return math.sqrt((x1-x2)*(x1-x2)+(y1-y2)*(y1-y2))
 
 
 def main():
