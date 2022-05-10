@@ -91,469 +91,6 @@ class lidarlocation(Node):
             out.ranges[i] = filtered_data[i]
         return out
 
-    def generate_fake(self, message):
-        # TODO : retirer les points de ce vrai msg qui sont pas les 3 poteaux (à la limite en garder 1 ou 2)
-        # message.ranges = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.3890000581741333, 1.3730000257492065, 1.3580000400543213, 1.3580000400543213, 1.3580000400543213, 1.3890000581741333, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.9470000267028809, 1.930999994277954, 1.930999994277954, 1.9470000267028809, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-        #                  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.218000054359436, 1.2029999494552612, 1.2489999532699585, 1.2960000038146973, 1.3730000257492065, 1.3890000581741333, 1.3890000581741333, 1.3730000257492065, 3.249000072479248, 3.2339999675750732, 3.2179999351501465, 3.2179999351501465, 0.0, 0.0, 0.0, 0.0, 3.265000104904175, 2.4739999771118164, 2.4119999408721924, 2.4739999771118164, 0.0, 3.2339999675750732, 3.2179999351501465, 3.2179999351501465, 2.490000009536743, 2.4739999771118164, 2.4739999771118164, 2.4590001106262207, 2.4590001106262207, 2.443000078201294, 2.443000078201294, 2.427999973297119, 2.427999973297119, 2.4119999408721924, 2.3970000743865967, 2.3970000743865967, 2.3970000743865967, 2.38100004196167, 2.38100004196167, 2.38100004196167, 2.38100004196167, 2.38100004196167, 2.365999937057495, 2.365999937057495, 2.4119999408721924, 2.4119999408721924, 2.427999973297119, 2.443000078201294, 2.4739999771118164, 2.490000009536743, 2.5209999084472656, 2.5360000133514404, 2.552000045776367, 2.5829999446868896, 2.628999948501587, 2.6600000858306885, 2.690999984741211, 2.7219998836517334, 2.753000020980835, 2.7839999198913574, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.590000033378601, 1.5750000476837158, 1.559000015258789, 1.559000015258789, 1.5750000476837158]
-
-        message.ranges = [
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            1.7319999933242798,
-            1.715999960899353,
-            1.7009999752044678,
-            1.7009999752044678,
-            1.715999960899353,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            1.6540000438690186,
-            1.6380000114440918,
-            1.6230000257492065,
-            1.6230000257492065,
-            1.6380000114440918,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            1.715999960899353,
-            1.684999942779541,
-            1.684999942779541,
-            1.684999942779541,
-            1.684999942779541,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0
-        ]
-
-        return message
-
     def filter_out(self, message):
         out = []
         for i in range(0, len(message.ranges)):
@@ -592,41 +129,7 @@ class lidarlocation(Node):
         # self.get_logger().info(msg_out.angle_max)
         # triangulation = Amalgame_list(msg_out)
         triangulation = Triangulation(msg_out)
-        # self.get_logger().info("-------------")
-        # for obj in triangulation.list_obj:
-        #    self.get_logger().info(
-        #        f"{obj.relative_center}")
-        # self.publisher_.publish(msg_out)
 
-        """
-        for tri in triangulation.tri_list:
-            # self.get_logger().info("------------------------------------------------------")
-            # if ((tri.distances[0] > 1.7 and tri.distances[0] < 1.9) and (tri.distances[1] > 3.2 and tri.distances[1] < 3.4) and (tri.distances[2] > 3.2 and tri.distances[2] < 3.4)) or ((tri.distances[0] > 3.2 and tri.distances[0] < 3.4) and (tri.distances[1] > 1.7 and tri.distances[1] < 1.9) and (tri.distances[2] > 3.2 and tri.distances[2] < 3.4)) or ((tri.distances[0] > 3.2 and tri.distances[0] < 3.4) and (tri.distances[1] > 3.2 and tri.distances[1] < 3.4) and (tri.distances[2] > 1.7 and tri.distances[2] < 1.9)) and ((tri.angles[0] > 1.1 and tri.angles[0] < 1.4 and tri.angles[1] > 1.1 and tri.angles[1] < 1.3 and tri.angles[2] > 0.5 and tri.angles[2] < 0.7) or (tri.angles[0] > 1.1 and tri.angles[0] < 1.4 and tri.angles[2] > 0.5 and tri.angles[2] < 0.7 and tri.angles[1] > 1.1 and tri.angles[1] < 1.3) or (tri.angles[2] > 0.5 and tri.angles[2] < 0.7 and tri.angles[0] > 1.1 and tri.angles[0] < 1.4 and tri.angles[1] > 1.1 and tri.angles[1] < 1.3)):
-            self.get_logger().info("Un triangle:")
-            for pt in tri.pt_list:
-                self.get_logger().info("Un point:")
-                self.get_logger().info(
-                    f"{pt.distance}")
-                self.get_logger().info(
-                    f"{pt.angle}")
-            self.get_logger().info("Les distances:")
-            self.get_logger().info(
-                f"{tri.distances}")
-            self.get_logger().info("Les angles:")
-            self.get_logger().info(
-                f"{tri.angles}")
-            positions = determiner_position(tri)
-            print("POSITION")
-            print(positions)
-            """
-        """
-        is_poteau_on_right = True
-         ▲
-        ▲ ▲
-       ▲   ▲          □ POTEAU
-      ▲     ▲
-
-        """
         # DEPLACER LE CODE
         is_poteau_on_right = False
 
@@ -692,255 +195,161 @@ class lidarlocation(Node):
             if position[0] > 0 and position[1] > 0:
                 print(position)
                 self.send_position(position)
+        
         # Trier la liste par angle modulo pi
-
-# avoir un lillian qui fait un faux triangle de la bonne taille
-# filtrer les amalgames trop gros
-
-# -> Avoir que quelques triangles valides
-
-# -> Voir où est le poteau : A gauche ou à droite du triangle et distances cohérentes -> N'avoir plus qun' triangle valide
-
-# Idée : calculer le centre du triangle et voir si il tombe sur la table
-
         list_pts = []
         msg_obj = msg_out
 
-        # for tri in trianglel.valid_triangles:
-        #    print("Liste des tiangles valides")
-        #    print("[ " + str(tri.distances) +
-        #          "," + str(tri.angles) + "]")
-        # print("++++++++++++++++++++++++++++++")
-        #
-        # for tri in trianglel.valid_triangles:
-        #    print("Liste des positions valides")
-        #    position = self.determiner_position(tri)
-        #    if position[0] > 0 and position[1] > 0:
-        #        print(position)
-        #    self.send_position(position)
-        # print("++++++++++++++++++++++++++++++")
-
-        """
-        for tri in trianglel.tri_list:
-            print("Liste des tiangles")
-            print("[ " + str(tri.distances) +
-                  "," + str(tri.angles) + "]")
-        print("++++++++++++++++++++++++++++++")
-        """
-        """
-        for i in range(0, len(msg_out.ranges)):
-            for obj in objl.list_obj:
-                if abs(obj.relative_center.angle - i * msg_out.angle_increment) < 0.1 :
-                    list_pts.append(obj.relative_center.distance)
-                else:
-                    list_pts.append(0.0)
-
-
-        msg_obj.ranges = list_pts
-        """
-        """
-        for i in range(0, len(objl.list_obj)):
-            print("Liste des Objets")
-            print("[ " + str(objl.list_obj[i].relative_center.distance) +
-                  "," + str(objl.list_obj[i].relative_center.angle) + "]")
-        print("++++++++++++++++++++++++++++++")
-        """
-        """
-        for i in range(0, len(objl.list_obj)):
-            print("Liste des poitns des objets")
-            for pt in objl.list_obj[i].list_points:
-                print("[ " + str(pt.angle) + "]")
-            print("--------")
-        print("++++++++++++++++++++++++++++++")
-        """
-        """
-        for i in range(0, len(objl.list_obj)):
-            j = 0
-            for pt in objl.list_obj[i].list_points:
-                j += 1
-                print("[ " + str(pt.distance) + ", " + str(pt.angle) + "]")
-            print("-------- ObJ de " + str(j) + "points")
-        print("++++++++++++++++++++++++++++++")
-        """
-
         self.publisher_.publish(msg_obj)
 
-    # def determiner_position_from_pts(self, list_pts):
 
     def determiner_position(self, tri):
-        x = 0
-        y = 0
-        x2 = 0
-        y2 = 0
-
-        """orient = 0
-
-        for i in range(0, 2):
-            if abs(tri.distances[i]) > 1.75 and abs(tri.distances[i]) < 1.95:
-                orient = i+1
-        # Determines the sides of the shortest triangle and the 2 other sides
-        i = (orient + 1) % 3
-        j = (orient + 3) % 3
-        c3 = (orient + 2) % 3
-        """
-
-        # Tri des points par angle
-        # print(tri.pt_list)
-        tri.pt_list = sorted(tri.pt_list, key=Point.get_angle)
-        # print(tri.pt_list)
-
-        k = 0
-        i = 0
-        j = 0
         
-        # detectiin du plus petit coté et calcul de position
-        """for i in range(0, len(tri.pt_list)):
-            for j in range(0, i):
-                d = abs(calculate_distance_xy(
-                    tri.pt_list[i].pos_x, tri.pt_list[i].pos_y, tri.pt_list[j].pos_y, tri.pt_list[j].pos_x))
-                print(i, j, d)
-                if (d > 1.7) and (d < 1.9):
-                    break
-        if i == j:
-            print("pas  trouvé!!")
-            raise
-        if((i==0 and j==1) or(i==1 and j==0)):
-            k=2
-         if((i==0 and j==2) or(i==2 and j==0)):
-            k=1
-         if((i==1 and j==2) or(i==2 and j==1)):
-            k=0
-        print(i, j)
-        """
-        # détermination des bons indices grace aux petits cotés
-        if(calculate_distance_xy(
-                tri.pt_list[0].pos_x, tri.pt_list[0].pos_y, tri.pt_list[1].pos_x, tri.pt_list[1].pos_y) > 1.6 and calculate_distance_xy(
-                tri.pt_list[0].pos_x, tri.pt_list[0].pos_y, tri.pt_list[1].pos_x, tri.pt_list[1].pos_y) < 1.9):
-            print("A")
-            j = 0
-            i = 1
-            k = 2
-        elif(calculate_distance_xy(
-                tri.pt_list[1].pos_x, tri.pt_list[1].pos_y, tri.pt_list[2].pos_x, tri.pt_list[2].pos_y) > 1.6 and calculate_distance_xy(
-                tri.pt_list[1].pos_x, tri.pt_list[1].pos_y, tri.pt_list[2].pos_x, tri.pt_list[2].pos_y) < 1.9):
-            print("B")
-            j = 1
-            i = 2
+        #potentiellement suppr
+        positionsx= array([0,0,0])
+        positionsy= array([0,0,0])
+        t=0   
+        for t in range 2:
+            x = 0
+            y = 0
+            x2 = 0
+            y2 = 0
+
+            # Tri des points par angle
+            # print(tri.pt_list)
+            tri.pt_list = sorted(tri.pt_list, key=Point.get_angle)
+            # print(tri.pt_list)
+
             k = 0
-
-        elif(calculate_distance_xy(
-                tri.pt_list[2].pos_x, tri.pt_list[2].pos_y, tri.pt_list[0].pos_x, tri.pt_list[0].pos_y) > 1.6 and calculate_distance_xy(
-                tri.pt_list[2].pos_x, tri.pt_list[2].pos_y, tri.pt_list[0].pos_x, tri.pt_list[0].pos_y) < 1.9):
-            print("C")
-            j = 2
             i = 0
-            k = 1
-        else:
-            print("D")
-            print(calculate_distance_xy(
-                tri.pt_list[2].pos_x, tri.pt_list[2].pos_y, tri.pt_list[0].pos_x, tri.pt_list[0].pos_y))
-            print(calculate_distance_xy(
-                tri.pt_list[1].pos_x, tri.pt_list[1].pos_y, tri.pt_list[2].pos_x, tri.pt_list[2].pos_y))
-            print(calculate_distance_xy(
-                tri.pt_list[0].pos_x, tri.pt_list[0].pos_y, tri.pt_list[1].pos_x, tri.pt_list[1].pos_y))
             j = 0
-            i = 1
-            k = 2   
+            
+            # détermination des bons indices grace aux petits cotés
+            if(calculate_distance_xy(
+                    tri.pt_list[0].pos_x, tri.pt_list[0].pos_y, tri.pt_list[1].pos_x, tri.pt_list[1].pos_y) > 1.6 and calculate_distance_xy(
+                    tri.pt_list[0].pos_x, tri.pt_list[0].pos_y, tri.pt_list[1].pos_x, tri.pt_list[1].pos_y) < 1.9):
+                print("A")
+                j = 0
+                i = 1
+                k = 2
+            elif(calculate_distance_xy(
+                    tri.pt_list[1].pos_x, tri.pt_list[1].pos_y, tri.pt_list[2].pos_x, tri.pt_list[2].pos_y) > 1.6 and calculate_distance_xy(
+                    tri.pt_list[1].pos_x, tri.pt_list[1].pos_y, tri.pt_list[2].pos_x, tri.pt_list[2].pos_y) < 1.9):
+                print("B")
+                j = 1
+                i = 2
+                k = 0
 
-        
-        #print(tri.pt_list[i].distance, tri.pt_list[j].distance)
-
-        teta = math.pi/2 - get_beta(tri.pt_list[j], tri.pt_list[i])
-        phi = math.pi/2 - \
-            get_gamma(tri.pt_list[i], tri.pt_list[j],
-                      get_beta(tri.pt_list[i], tri.pt_list[j]))
-        x = math.cos(teta)*tri.pt_list[j].distance - 0.1
-        x2 = math.cos(phi)*tri.pt_list[i].distance - 0.1
-        y = math.sin(teta)*tri.pt_list[j].distance + 0.05
-        y2 = 1.95 - math.sin(phi)*tri.pt_list[i].distance
-
-        # voir ou qu'il pense qu'elles sont les balises
-        msg_bal_1 = TransformStamped()
-        msg_bal_1.header.frame_id = "laser"
-        msg_bal_1.child_frame_id = "balise1"
-        msg_bal_1.transform.translation.x = tri.pt_list[i].distance * math.cos(
-            tri.pt_list[i].angle)
-        msg_bal_1.transform.translation.y = tri.pt_list[i].distance * math.sin(
-            tri.pt_list[i].angle)
-        msg_bal_1.transform.translation.z = 0.0
-        [qx1, qy1, qz1, qw1] = quaternion_from_euler(
-            0, 0, 0)
-
-        msg_bal_1.transform.rotation.x = qx1
-        msg_bal_1.transform.rotation.y = qy1
-        msg_bal_1.transform.rotation.z = qz1
-        msg_bal_1.transform.rotation.w = qw1
-        self.publisher_map.publish(msg_bal_1)
-
-        msg_bal_2 = TransformStamped()
-        msg_bal_2.header.frame_id = "laser"
-        msg_bal_2.child_frame_id = "balise2"
-        msg_bal_2.transform.translation.x = tri.pt_list[j].distance * math.cos(
-            tri.pt_list[j].angle)
-        msg_bal_2.transform.translation.y = tri.pt_list[j].distance * math.sin(
-            tri.pt_list[j].angle)
-        msg_bal_2.transform.translation.z = 0.0
-        [qx2, qy2, qz2, qw2] = quaternion_from_euler(
-            0, 0, 0)
-
-        msg_bal_2.transform.rotation.x = qx2
-        msg_bal_2.transform.rotation.y = qy2
-        msg_bal_2.transform.rotation.z = qz2
-        msg_bal_2.transform.rotation.w = qw2
-        self.publisher_map.publish(msg_bal_2)
-
-        msg_bal_3 = TransformStamped()
-        msg_bal_3.header.frame_id = "laser"
-        msg_bal_3.child_frame_id = "balise3"
-        msg_bal_3.transform.translation.x = tri.pt_list[k].distance * math.cos(
-            tri.pt_list[k].angle)
-        msg_bal_3.transform.translation.y = tri.pt_list[k].distance * math.sin(
-            tri.pt_list[k].angle)
-        msg_bal_3.transform.translation.z = 0.0
-        [qx3, qy3, qz3, qw3] = quaternion_from_euler(
-            0, 0, 0)
-
-        msg_bal_3.transform.rotation.x = qx3
-        msg_bal_3.transform.rotation.y = qy3
-        msg_bal_3.transform.rotation.z = qz3
-        msg_bal_3.transform.rotation.w = qw3
-        self.publisher_map.publish(msg_bal_3)
-
-        """
-        x = math.sqrt(tri.pt_list[j].distance**2 -
-                    ((tri.pt_list[i].distance**2 - tri.pt_list[j].distance**2) - 3.61) / -1.9)**2
-        y = ((tri.pt_list[i].distance**2 -
-            tri.pt_list[j].distance**2 - 3.61) / -1.9)**2
-        """
-        resx = (x + x2)/2
-        resy = (y + y2)/2
-
-        """alpha = math.acos(x/tri.pt_list[i].distance)
-        if tri.pt_list[i].angle > alpha:
-            angle_N = tri.pt_list[i].angle-alpha
-        
-
+            elif(calculate_distance_xy(
+                    tri.pt_list[2].pos_x, tri.pt_list[2].pos_y, tri.pt_list[0].pos_x, tri.pt_list[0].pos_y) > 1.6 and calculate_distance_xy(
+                    tri.pt_list[2].pos_x, tri.pt_list[2].pos_y, tri.pt_list[0].pos_x, tri.pt_list[0].pos_y) < 1.9):
+                print("C")
+                j = 2
+                i = 0
+                k = 1
+            else:
+                print("D")
+                print(calculate_distance_xy(
+                    tri.pt_list[2].pos_x, tri.pt_list[2].pos_y, tri.pt_list[0].pos_x, tri.pt_list[0].pos_y))
+                print(calculate_distance_xy(
+                    tri.pt_list[1].pos_x, tri.pt_list[1].pos_y, tri.pt_list[2].pos_x, tri.pt_list[2].pos_y))
+                print(calculate_distance_xy(
+                    tri.pt_list[0].pos_x, tri.pt_list[0].pos_y, tri.pt_list[1].pos_x, tri.pt_list[1].pos_y))
+                j = 0
+                i = 1
+                k = 2   
 
             
-        else:
-            angle_N = 2*math.pi-(alpha-tri.pt_list[i].angle)
+            #print(tri.pt_list[i].distance, tri.pt_list[j].distance)
 
-        gisement = 0.0
-        """
-        #orientation angle
-        if(y<1):
-            alpha= math.asin((1-y)/tri.pt_list[k].distance)
-            orientation=2*math.pi-(tri.pt_list[k].angle-alpha)   
-                
-        elif(y>1):
-            alpha= math.asin((y-1)/tri.pt_list[k].distance)
-            orientation=2*math.pi-(tri.pt_list[k].angle+alpha)     
-        return [x, y, x2,y2,orientation]
+            teta = math.pi/2 - get_beta(tri.pt_list[j], tri.pt_list[i])
+            phi = math.pi/2 - \
+                get_gamma(tri.pt_list[i], tri.pt_list[j],
+                        get_beta(tri.pt_list[i], tri.pt_list[j]))
+            x = math.cos(teta)*tri.pt_list[j].distance - 0.1
+            x2 = math.cos(phi)*tri.pt_list[i].distance - 0.1
+            y = math.sin(teta)*tri.pt_list[j].distance + 0.05
+            y2 = 1.95 - math.sin(phi)*tri.pt_list[i].distance
+
+            # voir ou qu'il pense qu'elles sont les balises
+            msg_bal_1 = TransformStamped()
+            msg_bal_1.header.frame_id = "laser"
+            msg_bal_1.child_frame_id = "balise1"
+            msg_bal_1.transform.translation.x = tri.pt_list[i].distance * math.cos(
+                tri.pt_list[i].angle)
+            msg_bal_1.transform.translation.y = tri.pt_list[i].distance * math.sin(
+                tri.pt_list[i].angle)
+            msg_bal_1.transform.translation.z = 0.0
+            [qx1, qy1, qz1, qw1] = quaternion_from_euler(
+                0, 0, 0)
+
+            msg_bal_1.transform.rotation.x = qx1
+            msg_bal_1.transform.rotation.y = qy1
+            msg_bal_1.transform.rotation.z = qz1
+            msg_bal_1.transform.rotation.w = qw1
+            self.publisher_map.publish(msg_bal_1)
+
+            msg_bal_2 = TransformStamped()
+            msg_bal_2.header.frame_id = "laser"
+            msg_bal_2.child_frame_id = "balise2"
+            msg_bal_2.transform.translation.x = tri.pt_list[j].distance * math.cos(
+                tri.pt_list[j].angle)
+            msg_bal_2.transform.translation.y = tri.pt_list[j].distance * math.sin(
+                tri.pt_list[j].angle)
+            msg_bal_2.transform.translation.z = 0.0
+            [qx2, qy2, qz2, qw2] = quaternion_from_euler(
+                0, 0, 0)
+
+            msg_bal_2.transform.rotation.x = qx2
+            msg_bal_2.transform.rotation.y = qy2
+            msg_bal_2.transform.rotation.z = qz2
+            msg_bal_2.transform.rotation.w = qw2
+            self.publisher_map.publish(msg_bal_2)
+
+            msg_bal_3 = TransformStamped()
+            msg_bal_3.header.frame_id = "laser"
+            msg_bal_3.child_frame_id = "balise3"
+            msg_bal_3.transform.translation.x = tri.pt_list[k].distance * math.cos(
+                tri.pt_list[k].angle)
+            msg_bal_3.transform.translation.y = tri.pt_list[k].distance * math.sin(
+                tri.pt_list[k].angle)
+            msg_bal_3.transform.translation.z = 0.0
+            [qx3, qy3, qz3, qw3] = quaternion_from_euler(
+                0, 0, 0)
+
+            msg_bal_3.transform.rotation.x = qx3
+            msg_bal_3.transform.rotation.y = qy3
+            msg_bal_3.transform.rotation.z = qz3
+            msg_bal_3.transform.rotation.w = qw3
+            self.publisher_map.publish(msg_bal_3)
+
+            resx = (x + x2)/2
+            resy = (y + y2)/2
+
+            #orientation angle
+            orientation=0
+            if( (y<1) and (1-y)/tri.pt_list[k].distance<1 and (1-y)/tri.pt_list[k].distance>-1):
+                alpha= math.asin((1-y)/tri.pt_list[k].distance)
+                orientation=2*math.pi-(tri.pt_list[k].angle-alpha)   
+                    
+            elif((y>1) and (1-y)/tri.pt_list[k].distance<1 and (1-y)/tri.pt_list[k].distance>-1):
+                alpha= math.asin((y-1)/tri.pt_list[k].distance)
+                orientation=2*math.pi-(tri.pt_list[k].angle+alpha)
+    #potentiellement suppr
+        positionsx[t]=x
+        positionsy[t]=y   
+    moyenne_positionx=0
+    moyenne_positionx=0
+    for y in range 2:
+        moyenne_positionx+=positionx[t]
+        moyenne_positiony+=positiony[t]
+
+    moyenne_positionx=moyenne_positionx/3
+    moyenne_positiony=moyenne_positiony/3
+
+
+
+    return [x, y, x2,y2,orientation]
 
 
 def get_distance_pt(pt1, pt2):
