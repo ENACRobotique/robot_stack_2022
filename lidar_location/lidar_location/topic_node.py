@@ -923,12 +923,24 @@ class lidarlocation(Node):
         """alpha = math.acos(x/tri.pt_list[i].distance)
         if tri.pt_list[i].angle > alpha:
             angle_N = tri.pt_list[i].angle-alpha
+        
+
+
+            
         else:
             angle_N = 2*math.pi-(alpha-tri.pt_list[i].angle)
 
         gisement = 0.0
         """
-        return [x, y, x2,y2]
+        #orientation angle
+        if(y<1):
+            alpha= math.asin((1-y)/tri.pt_list[k].distance)
+            orientation=2*math.pi-(tri.pt_list[k].angle-alpha)   
+                
+        elif(y>1):
+            alpha= math.asin((y-1)/tri.pt_list[k].distance)
+            orientation=2*math.pi-(tri.pt_list[k].angle+alpha)     
+        return [x, y, x2,y2,orientation]
 
 
 def get_distance_pt(pt1, pt2):
