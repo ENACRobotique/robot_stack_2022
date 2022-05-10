@@ -10,6 +10,11 @@ def quaternion_from_euler(roll, pitch, yaw):
     qw = np.cos(roll/2) * np.cos(pitch/2) * np.cos(yaw/2) + np.sin(roll/2) * np.sin(pitch/2) * np.sin(yaw/2)
     return [qx, qy, qz, qw]
 
+def z_euler_from_quaternions(qx, qy, qz, qw):
+    t3 = +2.0 * (qw * qz + qx * qy)
+    t4 = +1.0 - 2.0 * (qy * qy + qz * qz)
+    return np.arctan2(t3, t4)
+
 def get_diagnostic_level(level:int):
     if level == 0:
         return DiagnosticStatus.OK

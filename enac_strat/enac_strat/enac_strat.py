@@ -1,3 +1,4 @@
+from enac_strat.enac_strat.conversions import z_euler_from_quaternions
 import rclpy
 from rclpy.node import Node
 from std_msgs.msg import String
@@ -19,38 +20,76 @@ from statemachine import StateMachine, State
 #see for documentation https://github.com/fgmacedo/python-statemachine
 
 class StratStateMachine(StateMachine):
-    init = State('Init', initial=True)
-    yellow = State('Yellow')
-    red = State('Red')
+    init = State('Init', initial=True) #état de préparation pré-tirette
+    outhome = State('Out_Home') #état de sortie de la zone de départ
     
-    slowdown = green.to(yellow)
-    stop = yellow.to(red)
-    go = red.to(green)
+    start = init.to(outhome)
 
-class Strategy(Node):
+
+class Strategy(Node, StateMachine):
+
+    #états
+    init = State('Init', initial=True) #état de préparation pré-tirette
+    outhome = State('Out_Home') #état de sortie de la zone de départ
+    
+    #transitions
+    start = init.to(outhome)
+
+    #valeurs stockées
+    x = 140 #appuyé sur le rebord
+    y = 1140 # l'encodeur noir est sur le bord intérieur de la bande jaune
+    theta = 0
+    vlin = 0
+    vtheta = 0
+    periphs = {}
+
     def __init__(self):
         # default buffer size like teensy (TODO: voir si à garder pour stm32?)
         super().__init__("enac_strat")
-
-        #ros parameter to add raw_serial feed
-        raw_serial_param = self.declare_parameter("enable_raw_serial", True)
-        self.enable_raw_serial = raw_serial_param.get_parameter_value().bool_value
-        if self.enable_raw_serial:
-            self.raw_serial_pub = self.create_publisher(String, "raw_serial", 10)
+        self.state_machine = StratStateMachine(self.on_start)
 
         #paramétrage ROS
-        self.ros_raw_serial = self.create_publisher(String, "/raw_serial", 10)
-        self.ros_send_serial = self.create_publisher(String, "/send_serial", 10) #msg sent to robot
-        self.ros_odom = self.create_publisher(Odometry, '/odom', 10)
-        self.ros_peripherals = self.create_publisher(PeriphValue, '/peripherals', 10)
-        self.ros_diagnostics = self.create_publisher(DiagnosticArray, '/diagnostics', 10)
+        self.ros_periph_pub = self.create_publisher(PeriphValue, '/peripherals', 10)
+        self.ros_diag_pub = self.create_publisher(DiagnosticArray, '/diagnostics', 10)
+        self.ros_vel_pub = self.create_subscription(Twist, '/cmd_vel', 10)
         
-
-        self.ros_vel_listener = self.create_subscription(Twist, '/cmd_vel', self.on_ros_cmd_vel, 10)
-        self.ros_pid_listener = self.create_subscription(Pid, '/pid', self.on_ros_pid, 10)
-        self.ros_periph_listener = self.create_subscription(PeriphValue, '/peripherals', self.on_ros_periph_cmd, 10)
+        self.ros_odom_sub = self.create_subscription(Odometry, '/odom', self.on_ros_odom, 10)
+        self.ros_periph_sub = self.create_subscription(PeriphValue, '/peripherals', self.on_ros_periph, 10)
 
         self.start_serial_read()
+    
+    def on_ros_periph(self, msg):
+        if (msg.header.frame_id == "stm32"):#to prevent looping from self messages
+            id = msg.periph_name[:2]
+            cmd = msg.value
+            print("on_ros_periph "+str(id)+" "+str(cmd))
+            self.periphs[id] = cmd
+            self.check_transitions()
+
+    def on_ros_odom(self, msg):
+        if (msg.header.frame_id == "map" and msg.child_frame_id == "robot"):
+            self.x = msg.pose.pose.position.x
+            self.y = msg.pose.pose.position.y
+            qx = msg.pose.pose.orientation.x
+            qy = msg.pose.pose.orientation.y
+            qz = msg.pose.pose.orientation.z
+            qw = msg.pose.pose.orientation.w
+            self.theta = z_euler_from_quaternions(qx, qy, qz, qw)
+            self.vlin = msg.twist.twist.linear.x
+            self.vtheta = msg.twist.twist.angular.z
+            self.check_transitions()
+
+    def check_transitions(self):
+        try:
+            if self.state_machine.is_init:
+                if self.periphs["TI"] == 42:
+                    self.state_machine.start
+        except Exception as e:
+            pass
+    
+    #fonctions des transitions
+    def on_start(self):
+        pass
 
 
 def main(args=None):
