@@ -25,16 +25,18 @@ class StratStateMachine(StateMachine):
     #états
     init = State("Init", initial=True)
     outhome = State("OutHome")
+    chope_palet_un = State("Chope palet un")
 
     almost_end = State("Almost End")
     end = State("End")
 
     #transitions
     start = init.to(outhome)
-    turn_palet = outhome.to(end)
+    turn_palet = outhome.to(chope_palet_un)
+    a_chope = chope_palet_un.to(almost_end)
 
 
-    last_ten_seconds = start.to(almost_end) | outhome.to(almost_end)
+    last_ten_seconds = init.to(almost_end) | outhome.to(almost_end) | chope_palet_un.to(almost_end)
     stop = almost_end.to(end)
 
 class Strategy(Node):
@@ -113,7 +115,8 @@ class Strategy(Node):
         print("/// Checking transitions")
         self.send_all_diags()
         try:
-            if self.chrono != 0 and (time.time() - self.chrono) > self.end - 10:
+            #trucs liés au temps
+            if not(self.state_machine.is_almost_end) and self.chrono != 0 and (time.time() - self.chrono) > self.end - 10 and (time.time() - self.chrono) < self.end:
                 #go home
                 print("Strategy: il reste 10 secondes: retour à la maison")
                 self.state_machine.last_ten_seconds()
@@ -122,9 +125,11 @@ class Strategy(Node):
                 print("Strategy: Time is up, blocking node on standby")
                 self.state_machine.stop()
                 #code de trucs à faire quand c'est la fin ici
+                self.send_all_diags()
                 while (True):
                     time.sleep(1)
 
+            #transitions normales
             if self.state_machine.is_init:
                 if self.periphs.get("TI") == 42:
                     self.state_machine.start()
@@ -133,6 +138,11 @@ class Strategy(Node):
                 if self.is_at_goal(0.0001, 0.0001, 10):
                     self.state_machine.turn_palet() #TODO: add transition and states
                     self.on_turn_palet()
+            if self.state_machine.is_chope_palet_un:
+                if self.periphs.get("hv") == 1: #il y a un palet dans la main avant
+                    self.state_machine.a_chope()
+                    self.on_almost_end()
+            
     
         except Exception as e:
             print("Strategy: crap in transition")
@@ -192,7 +202,12 @@ class Strategy(Node):
 
     def on_turn_palet(self):
         print("Strategy: Arrivé destination: Tourner palet")
+        self.send_cmd_vel(0.0, -1.0) #je tente des trucs, faire tourner le robot vers la gauche?
+        self.send_periph_msg("ma", 0) #choper un palet au sol
 
+    def on_almost_end(self):
+        print("Strategy: returning to home")
+        self.send_nav_msg(1, 200, 1200, 0) # retourner au bercail
 
 def main(args=None):
     rclpy.init(args=args)
