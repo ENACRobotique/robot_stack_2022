@@ -145,12 +145,12 @@ class Navigator(Node):
 			self._isRotating = False
 			self.move()
 			return
-		elif not is_not_at_target and abs(self.diff_angle(self.target.rotation_rad, rotation)) > self.rotation_precision: #final alignment
-			self._isNavigating = False
-			self._isRotating = True
-			#Need rotation
-			self.rotate(relative_rotation_rad, self.target.rotation_rad)
-			return
+		#elif not is_not_at_target and abs(self.diff_angle(self.target.rotation_rad, rotation)) > self.rotation_precision: #final alignment
+		#	self._isNavigating = False
+		#	self._isRotating = True
+		#	#Need rotation
+		#	self.rotate(relative_rotation_rad, self.target.rotation_rad)
+		#	return
 		else:
 			self.stop()
 			return
