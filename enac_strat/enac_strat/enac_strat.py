@@ -1,5 +1,5 @@
 import math, time
-from enac_strat.enac_strat.conversions import z_euler_from_quaternions, quaternion_from_euler
+from enac_strat.conversions import z_euler_from_quaternions, quaternion_from_euler
 import rclpy
 from rclpy.node import Node
 from std_msgs.msg import String
@@ -21,14 +21,23 @@ from statemachine import StateMachine, State
 
 #see for documentation https://github.com/fgmacedo/python-statemachine
 
-class Strategy(Node, StateMachine):
-
+class StratStateMachine(StateMachine):
     #états
-    init = State('Init', initial=True) #état de préparation pré-tirette
-    outhome = State('Out_Home') #état de sortie de la zone de départ
-    
+    init = State("Init", initial=True)
+    outhome = State("OutHome")
+
+    almost_end = State("Almost End")
+    end = State("End")
+
     #transitions
     start = init.to(outhome)
+    turn_palet = outhome.to(end)
+
+
+    last_ten_seconds = start.to(almost_end) | outhome.to(almost_end)
+    stop = almost_end.to(end)
+
+class Strategy(Node):
 
     #valeurs stockées
     x = 140 #appuyé sur le rebord
@@ -49,15 +58,31 @@ class Strategy(Node, StateMachine):
         # default buffer size like teensy (TODO: voir si à garder pour stm32?)
         super().__init__("enac_strat")
 
+        self.state_machine = StratStateMachine()
+
         #paramétrage ROS
         self.ros_periph_pub = self.create_publisher(PeriphValue, '/peripherals', 10)
         self.ros_diag_pub = self.create_publisher(DiagnosticArray, '/diagnostics', 10)
-        self.ros_vel_pub = self.create_subscription(Twist, '/cmd_vel', 10)
-        self.nav_pub = self.create_publisher(SetNavigation, 'navigation')
+        self.ros_vel_pub = self.create_publisher(Twist, '/cmd_vel', 10)
+        self.nav_pub = self.create_publisher(SetNavigation, '/navigation', 10)
         
         self.ros_odom_sub = self.create_subscription(Odometry, '/odom', self.on_ros_odom, 10)
         self.ros_periph_sub = self.create_subscription(PeriphValue, '/peripherals', self.on_ros_periph, 10)
+        print(self)
+        self.send_all_diags()
     
+    def __str__(self):
+        return "Strategy: state: "+str(self.state_machine.current_state)+" x: "+str(self.x)+" y: "+str(self.y)+" theta: "+str(self.theta)+(" match unstarted "if self.chrono == 0 else " chrono: "+str(time.time() - self.chrono))
+    
+    def send_all_diags(self):
+        if self.chrono == 0:
+            self.send_diagnostic(DiagnosticStatus.OK, "Strategy: match", "Match has not started")
+        elif self.chrono != 0 and (time.time() - self.chrono) > self.end:
+            self.send_diagnostic(DiagnosticStatus.ERROR, "Strategy: match", "Match has ended, strategy is blocked")
+        else:
+            self.send_diagnostic(DiagnosticStatus.OK if ((time.time() - self.chrono) < self.end - 10) else DiagnosticStatus.WARN, "Strategy: match", f"{str(time.time() - self.chrono)[:7]} seconds have passed")
+        self.send_diagnostic(DiagnosticStatus.STALE, "Strategy: state", f"{str(self.state_machine.current_state)}")
+
     def on_ros_periph(self, msg):
         if (msg.header.frame_id == "stm32"):#to prevent looping from self messages
             id = msg.periph_name[:2]
@@ -85,33 +110,48 @@ class Strategy(Node, StateMachine):
                 math.sqrt((self.x - self.goalx)**2 + (self.y - self.goaly)**2) <= distmax_mm) #TODO: add condition sur theta si utile
 
     def check_transitions(self):
+        print("/// Checking transitions")
+        self.send_all_diags()
         try:
             if self.chrono != 0 and (time.time() - self.chrono) > self.end - 10:
                 #go home
                 print("Strategy: il reste 10 secondes: retour à la maison")
-                pass
-            if self.is_init:
+                self.state_machine.last_ten_seconds()
+                #code de trucs à faire quand c'est presque la fin ici
+            if self.chrono != 0 and (time.time() - self.chrono) > self.end:
+                print("Strategy: Time is up, blocking node on standby")
+                self.state_machine.stop()
+                #code de trucs à faire quand c'est la fin ici
+                while (True):
+                    time.sleep(1)
+
+            if self.state_machine.is_init:
                 if self.periphs.get("TI") == 42:
-                    self.start
-            if self.is_outhome:
+                    self.state_machine.start()
+                    self.on_start()
+            if self.state_machine.is_outhome:
                 if self.is_at_goal(0.0001, 0.0001, 10):
-                    self.turn_palet #TODO: add transition and states
+                    self.state_machine.turn_palet() #TODO: add transition and states
+                    self.on_turn_palet()
     
         except Exception as e:
             print("Strategy: crap in transition")
             print(e)
+        
+        finally:
+            print(self)
     
-    def send_nav_msg(self, nav_type: int, x: float, y: float, theta: float):
-        self.goalx = x
-        self.goaly = y
-        self.goaltheta = theta
+    def send_nav_msg(self, nav_type, x, y, theta):
+        self.goalx = float(x)
+        self.goaly = float(y)
+        self.goaltheta = float(theta)
         msg = SetNavigation()
         msg.header.stamp = self.get_clock().now().to_msg()
-        msg.navigation_type = nav_type
+        msg.navigation_type = int(nav_type)
         msg.pose.position.x = x
         msg.pose.position.y = y
         msg.pose.position.z = 0.0
-        [qx, qy, qz, qw] = quaternion_from_euler(0.0, 0.0, theta)
+        [qx, qy, qz, qw] = quaternion_from_euler(0.0, 0.0, float(theta))
         msg.pose.orientation.x = qx
         msg.pose.orientation.y = qy
         msg.pose.orientation.z = qz
@@ -122,23 +162,36 @@ class Strategy(Node, StateMachine):
         msg = PeriphValue()
         msg.header.stamp = self.get_clock().now().to_msg()
         msg.header.frame_id = "raspberry"
-        msg.periph_name = id
-        msg.value = cmd
+        msg.periph_name = str(id)
+        msg.value = int(cmd)
         #envoyer les infos sur le bon topic
         self.ros_periph_pub.publish(msg)
 
     def send_cmd_vel(self, vlin, vtheta):
         msg = Twist()
-        msg.linear.x = vlin
-        msg.angular.z = vtheta
+        msg.linear.x = float(vlin)
+        msg.angular.z = float(vtheta)
         self.ros_vel_pub.publish(msg)
 
+    def send_diagnostic(self, level, ref_name, message):
+        msg = DiagnosticArray()
+        reference = DiagnosticStatus()
+        reference.level = level
+        reference.name = ref_name
+        reference.message = message
+        reference.hardware_id = "raspberry"
+        reference.values = []
+        msg.status = [reference]
+        self.ros_diag_pub.publish(msg)
 
     #fonctions des transitions
     def on_start(self):
-        print("Tirette détectée: start")
+        print("Strategy: Tirette détectée: start")
         self.chrono = time.time()
-        self.send_nav_msg(1, 700, 1140, 0)
+        self.send_nav_msg(1.0, 700.0, 1140.0, 0.0)
+
+    def on_turn_palet(self):
+        print("Strategy: Arrivé destination: Tourner palet")
 
 
 def main(args=None):
