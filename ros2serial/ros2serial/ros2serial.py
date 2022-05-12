@@ -178,10 +178,10 @@ class Ros2Serial(Node):
         msg = Odometry()
         msg.header.stamp = self.get_clock().now().to_msg()
         msg.header.frame_id = "map"
-        msg.child_frame_id = "robot"
+        msg.child_frame_id = "odom"
         #PoseWithCovariance
-        msg.pose.pose.position.x = float(args[0])
-        msg.pose.pose.position.y = float(args[1])
+        msg.pose.pose.position.x = float(args[0])/1000
+        msg.pose.pose.position.y = float(args[1])/1000
         msg.pose.pose.position.z = 0.0
         [qx, qy, qz, qw] = quaternion_from_euler(0.0, 0.0, float(args[2]))
         msg.pose.pose.orientation.x = qx
