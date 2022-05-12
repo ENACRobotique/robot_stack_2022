@@ -65,6 +65,12 @@ class OdomData:
 	def __str__(self):
 		return f"x: {self.x} y:{self.y} rot(rd):{self.rotation_rad}"
 
+	def set_nope(self):
+		self.x = -1
+		self.y = -1
+
+	def is_nope(self):
+		return self.x <0 and self.y <0
 
 	def updataOdomData(self, x, y , rotation):
 		self.previous_x = self.x
@@ -87,8 +93,8 @@ class Navigator(Node):
 		self._isRotating = False 
 
 		self._max_speed = maxSpeed
-		self.current_position = OdomData(0.1400, 1.1400, 6.28)
-		self.target = OdomData(0.1400, 1.1400, 6.28)
+		self.current_position = OdomData(0.1400, 1.1400, 0)
+		self.target = OdomData(-1, -1, -1)
 
 		#self.odom_topic = self.create_subscription(TransformStamped, "/odom", self.updatePosition, 10) #odom fused by robot_localization or fed directly when debug
 		#self.wheel_topic = self.create_subscription(Odometry, "/encoder", self.updateSpeed, 10) #used to get speed from encoder
@@ -143,6 +149,8 @@ class Navigator(Node):
 
 
 		print(f"Update Position pos:({self.current_position}) speed:{speed} tgt:({self.target})")
+		if self.target.is_nope():
+			return
 
 		if  abs(relative_rotation_rad) > self.rotation_precision and is_not_at_target: #first rotation
 			print(">> First rotation")
@@ -167,6 +175,7 @@ class Navigator(Node):
 			return
 		else:
 			self.stop()
+			self.target.set_nope()
 			return
 
 		#	if speed >= 0.01 :
@@ -232,6 +241,8 @@ class Navigator(Node):
 		#https://blog.finxter.com/calculating-the-angle-clockwise-between-2-points/
 		v1_theta = atan2(current.y, current.x)
 		v2_theta = atan2(target.y, target.x)
+		theta = atan2(target.y - current.y, target.x - current.x)
+		return theta%pi
 		r = (v2_theta - v1_theta)
 		if r < 0:
 			r % pi
