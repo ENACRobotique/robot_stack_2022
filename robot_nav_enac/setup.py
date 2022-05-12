@@ -21,7 +21,7 @@ setup(
     entry_points={
         'console_scripts': [
             'nav = robot_nav_enac.nav_master:main',
-            'basic_nav = robot_nav_enac.basiv_nav_node:main'
+            'basic_nav = robot_nav_enac.basic_nav_node:main'
         ],
     },
 )

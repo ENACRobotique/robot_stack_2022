@@ -2,6 +2,10 @@ import numpy as np
 
 from math import atan2, cos, sin, pi
 
+from interfaces_enac.msg import _set_navigation
+
+SetNavigation = _set_navigation.SetNavigation
+
 import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import Twist, Pose, TransformStamped
@@ -58,6 +62,10 @@ class OdomData:
 		self.previous_rotation_rad = rotation
 
 
+	def __str__(self):
+		return f"x: {self.x} y:{self.y} rot(rd):{self.rotation_rad}"
+
+
 	def updataOdomData(self, x, y , rotation):
 		self.previous_x = self.x
 		self.previous_y = self.y
@@ -79,13 +87,13 @@ class Navigator(Node):
 		self._isRotating = False 
 
 		self._max_speed = maxSpeed
-		self.current_position = OdomData(0.0, 0.0, 6.28)
-		self.target = OdomData(0.0, 0.0, 6.28)
+		self.current_position = OdomData(0.1400, 1.1400, 6.28)
+		self.target = OdomData(0.1400, 1.1400, 6.28)
 
 		#self.odom_topic = self.create_subscription(TransformStamped, "/odom", self.updatePosition, 10) #odom fused by robot_localization or fed directly when debug
 		#self.wheel_topic = self.create_subscription(Odometry, "/encoder", self.updateSpeed, 10) #used to get speed from encoder
 		self.odom_topic = self.create_subscription(Odometry, "/odom", self.updatePosition, 10)
-		self.goal_pose_topic = self.create_subscription(Pose, "/goal_pose", self.setTarget, 10)
+		self.goal_pose_topic = self.create_subscription(SetNavigation, "/navigation", self.setTarget, 10)
 		self.velocity_publisher = self.velocity_publisher = self.create_publisher(Twist, '/cmd_vel', 10)
 		
 		self.rotation_precision = 0.08 #~4.5 deg
@@ -99,12 +107,12 @@ class Navigator(Node):
 	
 	def setTarget(self, msg):
 		#fetch goal_pose message and update target pose
-		x = msg.position.x
-		y = msg.position.y
-		rotation = z_euler_from_quaternions(msg.orientation.x,
-											msg.orientation.y,
-											msg.orientation.z,
-											msg.orientation.w)
+		x = msg.pose.position.x
+		y = msg.pose.position.y
+		rotation = z_euler_from_quaternions(msg.pose.orientation.x,
+											msg.pose.orientation.y,
+											msg.pose.orientation.z,
+											msg.pose.orientation.w)
 		self.target.updataOdomData(x, y, rotation)
 
 
@@ -133,7 +141,11 @@ class Navigator(Node):
 		rotation_to_target = self.angle_to_target(self.target, self.current_position) #calculate rotation between target position and current position
 		relative_rotation_rad = self.diff_angle(rotation_to_target, self.current_position.rotation_rad)
 
+
+		print(f"Update Position pos:({self.current_position}) speed:{speed} tgt:({self.target})")
+
 		if  abs(relative_rotation_rad) > self.rotation_precision and is_not_at_target: #first rotation
+			print(">> First rotation")
 			self._isNavigating = False
 			self._isRotating = True
 			#Need rotation
@@ -141,11 +153,13 @@ class Navigator(Node):
 			return
 
 		elif abs(relative_rotation_rad) <= self.rotation_precision and is_not_at_target : #aligned to path
+			print(">> Aligned to path")
 			self._isNavigating = True
 			self._isRotating = False
 			self.move()
 			return
 		elif not is_not_at_target and abs(self.diff_angle(self.target.rotation_rad, rotation)) > self.rotation_precision: #final alignment
+			print(">> Final alignment")
 			self._isNavigating = False
 			self._isRotating = True
 			#Need rotation
@@ -162,12 +176,13 @@ class Navigator(Node):
 		#self._isRotating = False
 		
 	def stop(self):
+		print("Stop")
 		msg = Twist()
 		#publish empty message to velocity to stop robot
 		self.velocity_publisher.publish(msg)
 	
 	def rotate(self, relative_rotation_rad, target):
-		
+		print("Rotate: "+str(relative_rotation_rad)+" tgt: "+str(target))
 
 		if (relative_rotation_rad <= 0):
 			rot_speed = -1
@@ -191,6 +206,8 @@ class Navigator(Node):
 
 		#TODO : speed curve depending on distance
 		speed = 0.5 #m/s
+
+		print("Move: vlin: "+str(speed))
 
 		if distance < 0.1 : 
 			#To Test

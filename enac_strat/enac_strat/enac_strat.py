@@ -42,8 +42,8 @@ class StratStateMachine(StateMachine):
 class Strategy(Node):
 
     #valeurs stockées
-    x = 140 #appuyé sur le rebord
-    y = 1140 # l'encodeur noir est sur le bord intérieur de la bande jaune
+    x = 0.140 #appuyé sur le rebord
+    y = 1.140 # l'encodeur noir est sur le bord intérieur de la bande jaune
     theta = 0
     vlin = 0
     vtheta = 0
@@ -67,11 +67,75 @@ class Strategy(Node):
         self.ros_diag_pub = self.create_publisher(DiagnosticArray, '/diagnostics', 10)
         self.ros_vel_pub = self.create_publisher(Twist, '/cmd_vel', 10)
         self.nav_pub = self.create_publisher(SetNavigation, '/navigation', 10)
+        self.publisher_map = self.create_publisher(
+            TransformStamped, 'carte_coins', 10)
         
         self.ros_odom_sub = self.create_subscription(Odometry, '/odom', self.on_ros_odom, 10)
         self.ros_periph_sub = self.create_subscription(PeriphValue, '/peripherals', self.on_ros_periph, 10)
         print(self)
         self.send_all_diags()
+        self.send_tf_map_corners()
+
+    def send_tf_map_corners(self):
+        msg_out_b = TransformStamped()
+        msg_out_b.header.frame_id = "map"
+        msg_out_b.child_frame_id = "map_0_2000"
+        msg_out_b.transform.translation.x = 0.0
+        msg_out_b.transform.translation.y = 2.0
+        msg_out_b.transform.translation.z = 0.0
+        [qxb, qyb, qzb, qwb] = quaternion_from_euler(
+            0, 0, 0)
+
+        msg_out_b.transform.rotation.x = qxb
+        msg_out_b.transform.rotation.y = qyb
+        msg_out_b.transform.rotation.z = qzb
+        msg_out_b.transform.rotation.w = qwb
+        self.publisher_map.publish(msg_out_b)
+
+        msg_out_c = TransformStamped()
+        msg_out_c.header.frame_id = "map"
+        msg_out_c.child_frame_id = "map_3000_0"
+        msg_out_c.transform.translation.x = 3.0
+        msg_out_c.transform.translation.y = 0.0
+        msg_out_c.transform.translation.z = 0.0
+        [qxc, qyc, qzc, qwc] = quaternion_from_euler(
+            0, 0, 0)
+
+        msg_out_c.transform.rotation.x = qxc
+        msg_out_c.transform.rotation.y = qyc
+        msg_out_c.transform.rotation.z = qzc
+        msg_out_c.transform.rotation.w = qwc
+        self.publisher_map.publish(msg_out_c)
+
+        msg_out = TransformStamped()
+        msg_out.header.frame_id = "map_3000_0"
+        msg_out.child_frame_id = "map_3000_2000"
+        msg_out.transform.translation.x = 0.0
+        msg_out.transform.translation.y = 2.0
+        msg_out.transform.translation.z = 0.0
+        [qx, qy, qz, qw] = quaternion_from_euler(
+            0, 0, 0)
+
+        msg_out.transform.rotation.x = qx
+        msg_out.transform.rotation.y = qy
+        msg_out.transform.rotation.z = qz
+        msg_out.transform.rotation.w = qw
+        self.publisher_map.publish(msg_out)
+
+        msg_out_d = TransformStamped()
+        msg_out_d.header.frame_id = "map_0_2000"
+        msg_out_d.child_frame_id = "map_300_2000"
+        msg_out_d.transform.translation.x = 3.0
+        msg_out_d.transform.translation.y = 0.0
+        msg_out_d.transform.translation.z = 0.0
+        [qxd, qyd, qzd, qwd] = quaternion_from_euler(
+            0, 0, 0)
+
+        msg_out_d.transform.rotation.x = qxd
+        msg_out_d.transform.rotation.y = qyd
+        msg_out_d.transform.rotation.z = qzd
+        msg_out_d.transform.rotation.w = qwd
+        self.publisher_map.publish(msg_out_d)
     
     def __str__(self):
         return "Strategy: state: "+str(self.state_machine.current_state)+" x: "+str(self.x)+" y: "+str(self.y)+" theta: "+str(self.theta)+(" match unstarted "if self.chrono == 0 else " chrono: "+str(time.time() - self.chrono))
@@ -87,6 +151,7 @@ class Strategy(Node):
 
     def on_ros_periph(self, msg):
         if (msg.header.frame_id == "stm32"):#to prevent looping from self messages
+            print("Periph from stm32")
             id = msg.periph_name[:2]
             cmd = int(msg.value)
             print("on_ros_periph "+str(id)+" "+str(cmd))
@@ -94,7 +159,8 @@ class Strategy(Node):
             self.check_transitions()
 
     def on_ros_odom(self, msg):
-        if (msg.header.frame_id == "map" and msg.child_frame_id == "robot"):
+        if (msg.header.frame_id == "map" and msg.child_frame_id == "odom"):
+            print("Odometry map->odom")
             self.x = msg.pose.pose.position.x
             self.y = msg.pose.pose.position.y
             qx = msg.pose.pose.orientation.x
@@ -198,7 +264,7 @@ class Strategy(Node):
     def on_start(self):
         print("Strategy: Tirette détectée: start")
         self.chrono = time.time()
-        self.send_nav_msg(1.0, 700.0, 1140.0, 0.0)
+        self.send_nav_msg(1.0, 0.700, 1.140, 0.0)
 
     def on_turn_palet(self):
         print("Strategy: Arrivé destination: Tourner palet")
@@ -207,7 +273,7 @@ class Strategy(Node):
 
     def on_almost_end(self):
         print("Strategy: returning to home")
-        self.send_nav_msg(1, 200, 1200, 0) # retourner au bercail
+        self.send_nav_msg(1, 0.200, 1.200, 0) # retourner au bercail
 
 def main(args=None):
     rclpy.init(args=args)
