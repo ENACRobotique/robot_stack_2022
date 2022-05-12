@@ -1,6 +1,7 @@
 #generated using graph_compil v0.1
 from statemachine import State, Transition, StateMachine
 
+#---partie ajoutée manuellement ci-dessous
 class TestNode:
     def __init__(self):
         pass
@@ -26,6 +27,8 @@ class TestNode:
 
 bruh = TestNode()
 
+#---
+
 Init = State("Init", bruh.on_enter, bruh.on_leave)
 Outhome = State("Outhome", bruh.on_enter_, bruh.on_leave_)
 End = State("End")
@@ -33,6 +36,8 @@ InitOuthomeToEnd = Transition("InitOuthomeToEnd", End, bruh.on_transition, bruh.
 Init.add_transition(InitOuthomeToEnd)
 Outhome.add_transition(InitOuthomeToEnd)
 test = StateMachine(Init)
+
+#--- partie ajoutée manuellement ci-dessous
 
 bruh.test = test
 
