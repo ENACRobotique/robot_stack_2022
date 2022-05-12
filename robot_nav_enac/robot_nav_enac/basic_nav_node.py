@@ -142,15 +142,15 @@ class Navigator(Node):
 
 		speed = msg.twist.twist.linear.x
 
+		if self.target.is_nope():
+			return
+
 		is_not_at_target = abs(x - self.target.x) >= self.position_precision or abs(y - self.target.y) >= self.position_precision #check only position not rotation
 		
 		rotation_to_target = self.angle_to_target(self.target, self.current_position) #calculate rotation between target position and current position
 		relative_rotation_rad = self.diff_angle(rotation_to_target, self.current_position.rotation_rad)
 
-
 		print(f"Update Position pos:({self.current_position}) speed:{speed} tgt:({self.target})")
-		if self.target.is_nope():
-			return
 
 		if  abs(relative_rotation_rad) > self.rotation_precision and is_not_at_target: #first rotation
 			print(">> First rotation")
@@ -195,9 +195,9 @@ class Navigator(Node):
 		print("Rotate: "+str(relative_rotation_rad)+" tgt: "+str(target))
 
 		if (relative_rotation_rad <= 0):
-			rot_speed = -0.05
+			rot_speed = -0.01
 		else:
-			rot_speed = 0.05
+			rot_speed = 0.01
 		if abs(relative_rotation_rad) <= self.rotation_precision:
 			rot_speed = 0
 		msg = Twist()
@@ -215,7 +215,7 @@ class Navigator(Node):
 		distance = ((self.current_position.x - self.target.x)**2 + (self.current_position.y - self.target.y)**2 )**0.5
 
 		#TODO : speed curve depending on distance
-		speed = 0.5 #m/s
+		speed = 0.2 #m/s
 
 		print("Move: vlin: "+str(speed))
 

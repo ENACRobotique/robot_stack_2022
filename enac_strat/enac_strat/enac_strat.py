@@ -26,6 +26,9 @@ class StratStateMachine(StateMachine):
     init = State("Init", initial=True)
     outhome = State("OutHome")
     chope_palet_un = State("Chope palet un")
+    chope_palet_deux = State("Chope palet deux")
+    chope_palet_trois = State("Chope palet trois")
+    go_galerie = State("go galerie")
 
     almost_end = State("Almost End")
     end = State("End")
@@ -33,10 +36,14 @@ class StratStateMachine(StateMachine):
     #transitions
     start = init.to(outhome)
     turn_palet = outhome.to(chope_palet_un)
-    a_chope = chope_palet_un.to(almost_end)
+    a_chope = chope_palet_un.to(chope_palet_deux)
+    a_chope_chope = chope_palet_deux.to(chope_palet_trois)
+    a_chope_chope_chope = chope_palet_trois.to(go_galerie)
+
+    
 
 
-    last_ten_seconds = init.to(almost_end) | outhome.to(almost_end) | chope_palet_un.to(almost_end)
+    last_ten_seconds = init.to(almost_end) | outhome.to(almost_end) | chope_palet_un.to(almost_end) | chope_palet_deux.to(almost_end) | chope_palet_trois.to(almost_end)
     stop = almost_end.to(end)
 
 class Strategy(Node):
@@ -53,8 +60,11 @@ class Strategy(Node):
     goaly = 0
     goaltheta = 0
 
+    score = 4
     chrono = 0
     end = 100
+
+    released_everything = False
 
     def __init__(self):
         # default buffer size like teensy (TODO: voir si à garder pour stm32?)
@@ -73,6 +83,7 @@ class Strategy(Node):
         self.ros_odom_sub = self.create_subscription(Odometry, '/odom', self.on_ros_odom, 10)
         self.ros_periph_sub = self.create_subscription(PeriphValue, '/peripherals', self.on_ros_periph, 10)
         print(self)
+        self.send_periph_msg("d", self.score)
         self.send_all_diags()
 
     def send_tf_map_corners(self):
@@ -167,16 +178,13 @@ class Strategy(Node):
 
     def on_ros_periph(self, msg):
         if (msg.header.frame_id == "stm32"):#to prevent looping from self messages
-            print("Periph from stm32")
             id = msg.periph_name[:2]
             cmd = int(msg.value)
-            print("on_ros_periph "+str(id)+" "+str(cmd))
             self.periphs[id] = cmd
             self.check_transitions()
 
     def on_ros_odom(self, msg):
         if (msg.header.frame_id == "map" and msg.child_frame_id == "odom"):
-            print("Odometry map->odom")
             self.x = msg.pose.pose.position.x
             self.y = msg.pose.pose.position.y
             qx = msg.pose.pose.orientation.x
@@ -188,26 +196,36 @@ class Strategy(Node):
             self.vtheta = msg.twist.twist.angular.z
             self.check_transitions()
 
-    def is_at_goal(self, vlin_tol, vtheta_tol, distmax_mm):
+    def is_at_goal(self, vlin_tol, vtheta_tol, distmax_m):
         return (abs(self.vlin) <= vlin_tol and
                 abs(self.vtheta) <= vtheta_tol and
-                math.sqrt((self.x - self.goalx)**2 + (self.y - self.goaly)**2) <= distmax_mm) #TODO: add condition sur theta si utile
+                math.sqrt((self.x - self.goalx)**2 + (self.y - self.goaly)**2) <= distmax_m) #TODO: add condition sur theta si utile
 
     def check_transitions(self):
-        print("/// Checking transitions")
         self.send_all_diags()
         try:
             #trucs liés au temps
             if not(self.state_machine.is_almost_end) and self.chrono != 0 and (time.time() - self.chrono) > self.end - 10 and (time.time() - self.chrono) < self.end:
                 #go home
+
+                print(self)
                 print("Strategy: il reste 10 secondes: retour à la maison")
                 self.state_machine.last_ten_seconds()
+                self.on_almost_end()
                 #code de trucs à faire quand c'est presque la fin ici
+
+            if not(self.released_everything) and self.chrono != 0 and (time.time() - self.chrono) > self.end - 3 and (time.time() - self.chrono) < self.end:
+                self.released_everything = True
+                self.tout_lacher_avant_fin()
+            
             if self.chrono != 0 and (time.time() - self.chrono) > self.end:
+                print(self)
                 print("Strategy: Time is up, blocking node on standby")
                 self.state_machine.stop()
+                
                 #code de trucs à faire quand c'est la fin ici
                 self.send_all_diags()
+                self.on_end()
                 while (True):
                     time.sleep(1)
 
@@ -216,22 +234,22 @@ class Strategy(Node):
                 if self.periphs.get("TI") == 42:
                     self.state_machine.start()
                     self.on_start()
+                    print(self)
             if self.state_machine.is_outhome:
-                if self.is_at_goal(0.0001, 0.0001, 10):
+                if self.is_at_goal(0.0001, 0.0001, 0.2):
                     self.state_machine.turn_palet() #TODO: add transition and states
                     self.on_turn_palet()
+                    print(self)
             if self.state_machine.is_chope_palet_un:
-                if self.periphs.get("hv") == 1: #il y a un palet dans la main avant
+                if self.periphs.get("mv") == 3: #il y a un palet dans la main avant
                     self.state_machine.a_chope()
-                    self.on_almost_end()
+                    self.on_a_chope()
+                    print(self)
             
     
         except Exception as e:
             print("Strategy: crap in transition")
             print(e)
-        
-        finally:
-            print(self)
     
     def send_nav_msg(self, nav_type, x, y, theta):
         self.goalx = float(x)
@@ -280,17 +298,44 @@ class Strategy(Node):
     def on_start(self):
         print("Strategy: Tirette détectée: start")
         self.chrono = time.time()
+        #if (self.periphs.get("co", 0) == 0):
+        print("start yellow")
         self.send_nav_msg(1, 0.700, 1.140, 0.0)
+        #else:
+        #    print("start violet")
+        #    self.send_nav_msg(1, 3.0-0.700, 1.140, math.radians(180))
 
     def on_turn_palet(self):
         print("Strategy: Arrivé destination: Tourner palet")
-        self.send_cmd_vel(0.0, -1.0) #je tente des trucs, faire tourner le robot vers la gauche?
+        #self.send_cmd_vel(-0.001, 0.0029) #je tente des trucs, faire tourner le robot vers la gauche?
+        self.send_nav_msg(1, 0.7, 1.140, math.radians(15))
+        time.sleep(0.2)
         self.send_periph_msg("ma", 0) #choper un palet au sol
+        self.send_periph_msg("mc", 0) # et mettre dans la réserve
+
+    def on_a_chope(self):
+        #self.send_cmd_vel(0.0001, 0.0025) #tourner un peu à gauche
+        self.send_nav_msg(1, self.x, self.y, math.radians(45))
+        print("Strategy: choper second")
+        time.sleep(1)
+        self.send_periph_msg("mf", 0)
+        self.send_periph_msg("ma", 0)
+        self.send_periph_msg("mc", 0)
 
     def on_almost_end(self):
         print("Strategy: returning to home")
-        self.send_nav_msg(1, 0.200, 1.200, 0) # retourner au bercail
+        self.score += 20
+        self.send_periph_msg("d", self.score)
+        #if (self.periphs.get("co", 0) == 0):
+        self.send_nav_msg(1, 0.200, 1.200, math.radians(90)) # retourner au bercail
+        #else:
+        #self.send_nav_msg(1, 3.0-0.2, 1.140, math.radians(90))
     
+    def tout_lacher_avant_fin(self):
+        self.score += 2
+        self.send_periph_msg("mg", 0)
+        self.send_periph_msg("mh", 0)
+
     def on_end(self):
         print("End: stop everything")
         self.send_nav_msg(1, -1, -1, -1) #nav shut up pls
