@@ -74,7 +74,6 @@ class Strategy(Node):
         self.ros_periph_sub = self.create_subscription(PeriphValue, '/peripherals', self.on_ros_periph, 10)
         print(self)
         self.send_all_diags()
-        self.send_tf_map_corners()
 
     def send_tf_map_corners(self):
         msg_out_b = TransformStamped()
@@ -148,6 +147,8 @@ class Strategy(Node):
         else:
             self.send_diagnostic(DiagnosticStatus.OK if ((time.time() - self.chrono) < self.end - 10) else DiagnosticStatus.WARN, "Strategy: match", f"{str(time.time() - self.chrono)[:7]} seconds have passed")
         self.send_diagnostic(DiagnosticStatus.STALE, "Strategy: state", f"{str(self.state_machine.current_state)}")
+
+        self.send_tf_map_corners()
 
     def on_ros_periph(self, msg):
         if (msg.header.frame_id == "stm32"):#to prevent looping from self messages
@@ -274,6 +275,11 @@ class Strategy(Node):
     def on_almost_end(self):
         print("Strategy: returning to home")
         self.send_nav_msg(1, 0.200, 1.200, 0) # retourner au bercail
+    
+    def on_end(self):
+        print("End: stop everything")
+        self.send_nav_msg(1, -1, -1, -1) #nav shut up pls
+        self.send_cmd_vel(0, 0) # stop
 
 def main(args=None):
     rclpy.init(args=args)
