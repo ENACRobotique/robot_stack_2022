@@ -76,6 +76,21 @@ class Strategy(Node):
         self.send_all_diags()
 
     def send_tf_map_corners(self):
+        msg_out_r = TransformStamped()
+        msg_out_r.header.frame_id = "map"
+        msg_out_r.child_frame_id = "odom"
+        msg_out_r.transform.translation.x = self.x
+        msg_out_r.transform.translation.y = self.y
+        msg_out_r.transform.translation.z = 0.0
+        [qxr, qyr, qzr, qwr] = quaternion_from_euler(
+            0, 0, self.theta)
+
+        msg_out_r.transform.rotation.x = qxr
+        msg_out_r.transform.rotation.y = qyr
+        msg_out_r.transform.rotation.z = qzr
+        msg_out_r.transform.rotation.w = qwr
+        self.publisher_map.publish(msg_out_r)
+
         msg_out_b = TransformStamped()
         msg_out_b.header.frame_id = "map"
         msg_out_b.child_frame_id = "map_0_2000"
@@ -265,7 +280,7 @@ class Strategy(Node):
     def on_start(self):
         print("Strategy: Tirette détectée: start")
         self.chrono = time.time()
-        self.send_nav_msg(1.0, 0.700, 1.140, 0.0)
+        self.send_nav_msg(1, 0.700, 1.140, 0.0)
 
     def on_turn_palet(self):
         print("Strategy: Arrivé destination: Tourner palet")

@@ -195,9 +195,9 @@ class Navigator(Node):
 		print("Rotate: "+str(relative_rotation_rad)+" tgt: "+str(target))
 
 		if (relative_rotation_rad <= 0):
-			rot_speed = -1
+			rot_speed = -0.05
 		else:
-			rot_speed = 1
+			rot_speed = 0.05
 		if abs(relative_rotation_rad) <= self.rotation_precision:
 			rot_speed = 0
 		msg = Twist()
