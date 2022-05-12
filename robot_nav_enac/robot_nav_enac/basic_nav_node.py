@@ -70,7 +70,7 @@ class OdomData:
 		self.y = -1
 
 	def is_nope(self):
-		return self.x <0 and self.y <0
+		return self.x <0 or self.y <0 or self.x>3 or self.y > 2
 
 	def updataOdomData(self, x, y , rotation):
 		self.previous_x = self.x
@@ -90,7 +90,7 @@ class Navigator(Node):
 		super().__init__('navigator')
 
 		self._isNavigating = False
-		self._isRotating = False 
+		self._isRotating = False
 
 		self._max_speed = maxSpeed
 		self.current_position = OdomData(0.1400, 1.1400, 0)
@@ -166,10 +166,11 @@ class Navigator(Node):
 			self._isRotating = False
 			self.move()
 			return
-		elif not is_not_at_target and abs(self.diff_angle(self.target.rotation_rad, rotation)) > self.rotation_precision: #final alignment
+		elif not (is_not_at_target) and abs(self.diff_angle(self.target.rotation_rad, rotation)) > self.rotation_precision: #final alignment
 			print(">> Final alignment")
 			self._isNavigating = False
 			self._isRotating = True
+			relative_rotation_rad = self.diff_angle(self.target.rotation_rad, rotation)
 			#Need rotation
 			self.rotate(relative_rotation_rad, self.target.rotation_rad)
 			return
@@ -241,10 +242,9 @@ class Navigator(Node):
 		#https://blog.finxter.com/calculating-the-angle-clockwise-between-2-points/
 		v1_theta = atan2(current.y, current.x)
 		v2_theta = atan2(target.y, target.x)
-		theta = atan2(target.y - current.y, target.x - current.x)
-		print("Angle to target: "+str(theta))
-		return theta
-		r = (v2_theta - v1_theta)
+		r = atan2(target.y - current.y, target.x - current.x)
+		print("Angle to target: "+str(r))
+		#r = (v2_theta - v1_theta)
 		if r < 0:
 			r % pi
 		return r
