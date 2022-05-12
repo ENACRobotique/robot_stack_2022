@@ -242,6 +242,7 @@ class Navigator(Node):
 		v1_theta = atan2(current.y, current.x)
 		v2_theta = atan2(target.y, target.x)
 		theta = atan2(target.y - current.y, target.x - current.x)
+		print("Angle to target: "+str(theta))
 		return theta%pi
 		r = (v2_theta - v1_theta)
 		if r < 0:
