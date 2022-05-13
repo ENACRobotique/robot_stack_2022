@@ -6,7 +6,7 @@ class Acceleration():
         self.time_deceleration = time_deceleration  # time to reach 0 from max speed
         accel_dist = 0.5 * self.time_acceleration * max_speed
         self.decel_dist = 0.5 * self.time_deceleration * max_speed
-        self.accel_decel_dist = accel_dist + decel_dist
+        self.accel_decel_dist = accel_dist + self.decel_dist
 
         self.cur_time = 0
 
