@@ -7,6 +7,7 @@ from sensor_msgs.msg import LaserScan
 from lidar_location.Triangle import Triangle
 from geometry_msgs.msg import TransformStamped, Transform
 import math
+import timeit
 
 import numpy as np
 
@@ -38,6 +39,9 @@ class lidarlocation(Node):
         self.publish_position = self.create_publisher(
             TransformStamped, 'robot_position', 10)
         self.timer = self.create_timer(1, self.test)
+        self.positions = [] # Defines a list of positions to be evened out
+        self.pos_counter = 0 #Incremented at every new position to return the median value
+        self.start = timeit.default_timer()
 
     def test(self):
         msg_out = TransformStamped()
@@ -121,6 +125,7 @@ class lidarlocation(Node):
         self.publish_position.publish(msg_out)
 
     def listener_callback(self, msg):
+        self.start = timeit.default_timer()
         # self.get_logger().info(msg.angle_max)
         msg_out = self.generate_filtered_message(msg, self.filter_out(msg))
         # msg_out = self.generate_filtered_message(
@@ -186,15 +191,18 @@ class lidarlocation(Node):
                 j += 1
             i += 1
 
-        print("######")
-        print([(center.pos_x, center.pos_y) for center in valid_centers])
+        #print("######")
+        #print([(center.pos_x, center.pos_y) for center in valid_centers])
 
         for tri in tri_list:
             position = self.determiner_position(tri)
-            print("++++++++++++++++++++++++++++++")
+            #print("++++++++++++++++++++++++++++++")
             if position[0] > 0 and position[1] > 0:
-                print(position)
+                #print(position)
                 self.send_position(position)
+                calc = timeit.default_timer() - self.start
+                #print(calc)
+                print(position[1])
         
         # Trier la liste par angle modulo pi
         list_pts = []
@@ -202,154 +210,157 @@ class lidarlocation(Node):
 
         self.publisher_.publish(msg_obj)
 
+    def mean_position(self):
+        length_l = len(self.positions)
+        mean_x = 0
+        mean_y = 0
+        for i in range(0, length_l):
+            mean_x += self.positions[i][0]
+            mean_y += self.positions[i][1]
+        
+        return [mean_x/length_l, mean_y/length_l]
+
+
+
 
     def determiner_position(self, tri):
+        x = 0
+        y = 0
+        x2 = 0
+        y2 = 0
+
+        # Tri des points par angle
+        # print(tri.pt_list)
+        tri.pt_list = sorted(tri.pt_list, key=Point.get_angle)
+        # print(tri.pt_list)
+
+        k = 0
+        i = 0
+        j = 0
         
-        #potentiellement suppr
-        positionsx= array([0,0,0])
-        positionsy= array([0,0,0])
-        t=0   
-        for t in range 2:
-            x = 0
-            y = 0
-            x2 = 0
-            y2 = 0
-
-            # Tri des points par angle
-            # print(tri.pt_list)
-            tri.pt_list = sorted(tri.pt_list, key=Point.get_angle)
-            # print(tri.pt_list)
-
-            k = 0
-            i = 0
+        # détermination des bons indices grace aux petits cotés
+        if(calculate_distance_xy(
+                tri.pt_list[0].pos_x, tri.pt_list[0].pos_y, tri.pt_list[1].pos_x, tri.pt_list[1].pos_y) > 1.6 and calculate_distance_xy(
+                tri.pt_list[0].pos_x, tri.pt_list[0].pos_y, tri.pt_list[1].pos_x, tri.pt_list[1].pos_y) < 1.9):
+            #print("A")
             j = 0
-            
-            # détermination des bons indices grace aux petits cotés
-            if(calculate_distance_xy(
-                    tri.pt_list[0].pos_x, tri.pt_list[0].pos_y, tri.pt_list[1].pos_x, tri.pt_list[1].pos_y) > 1.6 and calculate_distance_xy(
-                    tri.pt_list[0].pos_x, tri.pt_list[0].pos_y, tri.pt_list[1].pos_x, tri.pt_list[1].pos_y) < 1.9):
-                print("A")
-                j = 0
-                i = 1
-                k = 2
-            elif(calculate_distance_xy(
-                    tri.pt_list[1].pos_x, tri.pt_list[1].pos_y, tri.pt_list[2].pos_x, tri.pt_list[2].pos_y) > 1.6 and calculate_distance_xy(
-                    tri.pt_list[1].pos_x, tri.pt_list[1].pos_y, tri.pt_list[2].pos_x, tri.pt_list[2].pos_y) < 1.9):
-                print("B")
-                j = 1
-                i = 2
-                k = 0
+            i = 1
+            k = 2
+        elif(calculate_distance_xy(
+                tri.pt_list[1].pos_x, tri.pt_list[1].pos_y, tri.pt_list[2].pos_x, tri.pt_list[2].pos_y) > 1.6 and calculate_distance_xy(
+                tri.pt_list[1].pos_x, tri.pt_list[1].pos_y, tri.pt_list[2].pos_x, tri.pt_list[2].pos_y) < 1.9):
+            #print("B")
+            j = 1
+            i = 2
+            k = 0
 
-            elif(calculate_distance_xy(
-                    tri.pt_list[2].pos_x, tri.pt_list[2].pos_y, tri.pt_list[0].pos_x, tri.pt_list[0].pos_y) > 1.6 and calculate_distance_xy(
-                    tri.pt_list[2].pos_x, tri.pt_list[2].pos_y, tri.pt_list[0].pos_x, tri.pt_list[0].pos_y) < 1.9):
-                print("C")
-                j = 2
-                i = 0
-                k = 1
-            else:
-                print("D")
-                print(calculate_distance_xy(
-                    tri.pt_list[2].pos_x, tri.pt_list[2].pos_y, tri.pt_list[0].pos_x, tri.pt_list[0].pos_y))
-                print(calculate_distance_xy(
-                    tri.pt_list[1].pos_x, tri.pt_list[1].pos_y, tri.pt_list[2].pos_x, tri.pt_list[2].pos_y))
-                print(calculate_distance_xy(
-                    tri.pt_list[0].pos_x, tri.pt_list[0].pos_y, tri.pt_list[1].pos_x, tri.pt_list[1].pos_y))
-                j = 0
-                i = 1
-                k = 2   
+        elif(calculate_distance_xy(
+                tri.pt_list[2].pos_x, tri.pt_list[2].pos_y, tri.pt_list[0].pos_x, tri.pt_list[0].pos_y) > 1.6 and calculate_distance_xy(
+                tri.pt_list[2].pos_x, tri.pt_list[2].pos_y, tri.pt_list[0].pos_x, tri.pt_list[0].pos_y) < 1.9):
+            #print("C")
+            j = 2
+            i = 0
+            k = 1
+        else:
+            #print("D")
+            #print(calculate_distance_xy(
+            #    tri.pt_list[2].pos_x, tri.pt_list[2].pos_y, tri.pt_list[0].pos_x, tri.pt_list[0].pos_y))
+            #print(calculate_distance_xy(
+            #    tri.pt_list[1].pos_x, tri.pt_list[1].pos_y, tri.pt_list[2].pos_x, tri.pt_list[2].pos_y))
+            #print(calculate_distance_xy(
+            #    tri.pt_list[0].pos_x, tri.pt_list[0].pos_y, tri.pt_list[1].pos_x, tri.pt_list[1].pos_y))
+            j = 0
+            i = 1
+            k = 2   
 
-            
-            #print(tri.pt_list[i].distance, tri.pt_list[j].distance)
+        
+        #print(tri.pt_list[i].distance, tri.pt_list[j].distance)
 
-            teta = math.pi/2 - get_beta(tri.pt_list[j], tri.pt_list[i])
-            phi = math.pi/2 - \
-                get_gamma(tri.pt_list[i], tri.pt_list[j],
-                        get_beta(tri.pt_list[i], tri.pt_list[j]))
-            x = math.cos(teta)*tri.pt_list[j].distance - 0.1
-            x2 = math.cos(phi)*tri.pt_list[i].distance - 0.1
-            y = math.sin(teta)*tri.pt_list[j].distance + 0.05
-            y2 = 1.95 - math.sin(phi)*tri.pt_list[i].distance
+        teta = math.pi/2 - get_beta(tri.pt_list[j], tri.pt_list[i])
+        phi = math.pi/2 - \
+            get_gamma(tri.pt_list[i], tri.pt_list[j],
+                    get_beta(tri.pt_list[i], tri.pt_list[j]))
+        x = math.cos(teta)*tri.pt_list[j].distance - 0.1
+        x2 = math.cos(phi)*tri.pt_list[i].distance - 0.1
+        y = math.sin(teta)*tri.pt_list[j].distance + 0.05
+        y2 = 1.95 - math.sin(phi)*tri.pt_list[i].distance
 
-            # voir ou qu'il pense qu'elles sont les balises
-            msg_bal_1 = TransformStamped()
-            msg_bal_1.header.frame_id = "laser"
-            msg_bal_1.child_frame_id = "balise1"
-            msg_bal_1.transform.translation.x = tri.pt_list[i].distance * math.cos(
-                tri.pt_list[i].angle)
-            msg_bal_1.transform.translation.y = tri.pt_list[i].distance * math.sin(
-                tri.pt_list[i].angle)
-            msg_bal_1.transform.translation.z = 0.0
-            [qx1, qy1, qz1, qw1] = quaternion_from_euler(
-                0, 0, 0)
+        # voir ou qu'il pense qu'elles sont les balises
+        msg_bal_1 = TransformStamped()
+        msg_bal_1.header.frame_id = "laser"
+        msg_bal_1.child_frame_id = "balise1"
+        msg_bal_1.transform.translation.x = tri.pt_list[i].distance * math.cos(
+            tri.pt_list[i].angle)
+        msg_bal_1.transform.translation.y = tri.pt_list[i].distance * math.sin(
+            tri.pt_list[i].angle)
+        msg_bal_1.transform.translation.z = 0.0
+        [qx1, qy1, qz1, qw1] = quaternion_from_euler(
+            0, 0, 0)
 
-            msg_bal_1.transform.rotation.x = qx1
-            msg_bal_1.transform.rotation.y = qy1
-            msg_bal_1.transform.rotation.z = qz1
-            msg_bal_1.transform.rotation.w = qw1
-            self.publisher_map.publish(msg_bal_1)
+        msg_bal_1.transform.rotation.x = qx1
+        msg_bal_1.transform.rotation.y = qy1
+        msg_bal_1.transform.rotation.z = qz1
+        msg_bal_1.transform.rotation.w = qw1
+        self.publisher_map.publish(msg_bal_1)
 
-            msg_bal_2 = TransformStamped()
-            msg_bal_2.header.frame_id = "laser"
-            msg_bal_2.child_frame_id = "balise2"
-            msg_bal_2.transform.translation.x = tri.pt_list[j].distance * math.cos(
-                tri.pt_list[j].angle)
-            msg_bal_2.transform.translation.y = tri.pt_list[j].distance * math.sin(
-                tri.pt_list[j].angle)
-            msg_bal_2.transform.translation.z = 0.0
-            [qx2, qy2, qz2, qw2] = quaternion_from_euler(
-                0, 0, 0)
+        msg_bal_2 = TransformStamped()
+        msg_bal_2.header.frame_id = "laser"
+        msg_bal_2.child_frame_id = "balise2"
+        msg_bal_2.transform.translation.x = tri.pt_list[j].distance * math.cos(
+            tri.pt_list[j].angle)
+        msg_bal_2.transform.translation.y = tri.pt_list[j].distance * math.sin(
+            tri.pt_list[j].angle)
+        msg_bal_2.transform.translation.z = 0.0
+        [qx2, qy2, qz2, qw2] = quaternion_from_euler(
+            0, 0, 0)
 
-            msg_bal_2.transform.rotation.x = qx2
-            msg_bal_2.transform.rotation.y = qy2
-            msg_bal_2.transform.rotation.z = qz2
-            msg_bal_2.transform.rotation.w = qw2
-            self.publisher_map.publish(msg_bal_2)
+        msg_bal_2.transform.rotation.x = qx2
+        msg_bal_2.transform.rotation.y = qy2
+        msg_bal_2.transform.rotation.z = qz2
+        msg_bal_2.transform.rotation.w = qw2
+        self.publisher_map.publish(msg_bal_2)
 
-            msg_bal_3 = TransformStamped()
-            msg_bal_3.header.frame_id = "laser"
-            msg_bal_3.child_frame_id = "balise3"
-            msg_bal_3.transform.translation.x = tri.pt_list[k].distance * math.cos(
-                tri.pt_list[k].angle)
-            msg_bal_3.transform.translation.y = tri.pt_list[k].distance * math.sin(
-                tri.pt_list[k].angle)
-            msg_bal_3.transform.translation.z = 0.0
-            [qx3, qy3, qz3, qw3] = quaternion_from_euler(
-                0, 0, 0)
+        msg_bal_3 = TransformStamped()
+        msg_bal_3.header.frame_id = "laser"
+        msg_bal_3.child_frame_id = "balise3"
+        msg_bal_3.transform.translation.x = tri.pt_list[k].distance * math.cos(
+            tri.pt_list[k].angle)
+        msg_bal_3.transform.translation.y = tri.pt_list[k].distance * math.sin(
+            tri.pt_list[k].angle)
+        msg_bal_3.transform.translation.z = 0.0
+        [qx3, qy3, qz3, qw3] = quaternion_from_euler(
+            0, 0, 0)
 
-            msg_bal_3.transform.rotation.x = qx3
-            msg_bal_3.transform.rotation.y = qy3
-            msg_bal_3.transform.rotation.z = qz3
-            msg_bal_3.transform.rotation.w = qw3
-            self.publisher_map.publish(msg_bal_3)
+        msg_bal_3.transform.rotation.x = qx3
+        msg_bal_3.transform.rotation.y = qy3
+        msg_bal_3.transform.rotation.z = qz3
+        msg_bal_3.transform.rotation.w = qw3
+        self.publisher_map.publish(msg_bal_3)
 
-            resx = (x + x2)/2
-            resy = (y + y2)/2
+        resx = (x + x2)/2
+        resy = (y + y2)/2
 
-            #orientation angle
-            orientation=0
-            if( (y<1) and (1-y)/tri.pt_list[k].distance<1 and (1-y)/tri.pt_list[k].distance>-1):
-                alpha= math.asin((1-y)/tri.pt_list[k].distance)
-                orientation=2*math.pi-(tri.pt_list[k].angle-alpha)   
-                    
-            elif((y>1) and (1-y)/tri.pt_list[k].distance<1 and (1-y)/tri.pt_list[k].distance>-1):
-                alpha= math.asin((y-1)/tri.pt_list[k].distance)
-                orientation=2*math.pi-(tri.pt_list[k].angle+alpha)
-    #potentiellement suppr
-        positionsx[t]=x
-        positionsy[t]=y   
-    moyenne_positionx=0
-    moyenne_positionx=0
-    for y in range 2:
-        moyenne_positionx+=positionx[t]
-        moyenne_positiony+=positiony[t]
+        #orientation angle
+        orientation=0
+        if( (y<1) and (1-y)/tri.pt_list[k].distance<1 and (1-y)/tri.pt_list[k].distance>-1):
+            alpha= math.asin((1-y)/tri.pt_list[k].distance)
+            orientation=2*math.pi-(tri.pt_list[k].angle-alpha)   
+                
+        elif((y>1) and (1-y)/tri.pt_list[k].distance<1 and (1-y)/tri.pt_list[k].distance>-1):
+            alpha= math.asin((y-1)/tri.pt_list[k].distance)
+            orientation=2*math.pi-(tri.pt_list[k].angle+alpha)
 
-    moyenne_positionx=moyenne_positionx/3
-    moyenne_positiony=moyenne_positiony/3
+        self.pos_counter += 1
+        self.pos_counter = self.pos_counter % 3 # The modulo is the total number of positions to be evened out
 
+        if self.pos_counter >= len(self.positions):
+            self.positions.append([x,y])
+        else:
+            self.positions[self.pos_counter] = [x, y] # adds the latest position to the list ofp ositions
 
+        #[x, y] = self.mean_position() # Determines the median of all positions
 
-    return [x, y, x2,y2,orientation]
+        return [x, y, x2,y2,orientation]
 
 
 def get_distance_pt(pt1, pt2):
