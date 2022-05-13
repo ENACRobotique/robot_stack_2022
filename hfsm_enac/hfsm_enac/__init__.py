@@ -10,7 +10,14 @@ from hfsm_enac.hfsm_enac.fsmSupervisor import fsmSupervisor
 from hfsm_enac.hfsm_enac.listTasks import wait_departure_signal
 
 class fsmNode(rclpy.Node):
-    pass
+    def __init__(self) -> None:
+        super().__init__('fsmNode')
+        #subscribe to peripherals
+        #publish goal_pose
+        #publish to peripherals
+    def move_actuator(id:str, position:int):
+        pass #publish to peripherals
+
     #fsmSupervisor(wait_departure_signal)
 def main():
     rclpy.init()

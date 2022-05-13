@@ -29,6 +29,10 @@ find_package(std_msgs REQUIRED)
 rosidl_generate_interfaces(interfaces_enac
   "msg/ObjectMarked.msg"
   "msg/FiducialsPoses.msg"
+  "msg/PeriphValue.msg"
+  "msg/Pid.msg"
+  "msg/Obstacles.msg"
+  "msg/SetNavigation.msg"
   DEPENDENCIES builtin_interfaces geometry_msgs std_msgs
  )
 

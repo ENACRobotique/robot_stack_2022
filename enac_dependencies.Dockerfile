@@ -82,14 +82,12 @@ RUN sudo apt install -y libcanberra-gtk-module libcanberra-gtk3-module
 
 RUN apt install -y ros-galactic-rosbridge-suite
 
-#install gui elements - add ~200MB
+#install robot_localization EKF - add ~200MB
 
-RUN apt install -y ros-galactic-rviz2 ros-galactic-rviz-default-plugins
-
-RUN apt install -y ros-galactic-rqt ros-galactic-rqt-common-plugins
+RUN apt install -y ros-galactic-robot_localization
 
 
 RUN echo "source /opt/ros/galactic/setup.bash" >> ~/.bashrc
-RUN echo "source /driver_ws/install/local_setup.bash" >> ~/.bashrc
+#RUN echo "source /driver_ws/install/local_setup.bash" >> ~/.bashrc
 
 
