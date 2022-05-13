@@ -1,4 +1,4 @@
-from Points import Points
+from robot_nav_enac.Points import Points
 import math
 
 class Obstacle:

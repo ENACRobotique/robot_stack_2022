@@ -144,9 +144,9 @@ class StraightPath():
 	def get_rotate_speed(self, relative_rotation_rad):
 
 		if (relative_rotation_rad <= 0):
-			rot_speed = -0.5
+			rot_speed = -0.015
 		else:
-			rot_speed = 0.5
+			rot_speed = 0.015
 		if abs(relative_rotation_rad) <= self.rotation_precision:
 			rot_speed = 0
 		

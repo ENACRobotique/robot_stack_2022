@@ -1,11 +1,8 @@
-from __future__ import print_function
-from operator import truediv 
-import matplotlib.pyplot as plt
-
-from Obstacle import Obstacle, Rectangle, Rond
-from Points import Points
+from robot_nav_enac.Obstacle import Obstacle, Rectangle, Rond
+from robot_nav_enac.Points import Points
 import math
 import time
+
 class AStarGraph(object):
     #Define a class board like grid with two barriers
  
@@ -119,37 +116,3 @@ def AStarSearch(start, end, graph):
             openVertices.add(neighbour) #Discovered a new vertex
  
     raise RuntimeError("A* failed to find a solution")
-
-
- 
-if __name__=="__main__":
-    tps1 = time.time()
-    liste = [Rond(Points(100,50),30)]
-    liste.append(Rond(Points(100,50),30))
-    liste.append(Rond(Points(150,75),30))
-    liste.append(Rectangle(Points(50,50),Points(80,80)))
-    
-    
-    graph = AStarGraph(liste)
-
-    rapport_x = (1288/(3000))*10
-    rapport_y = (880/(2000))*10
-
-
-    result, cost = AStarSearch(Points(250,150), Points(0,0), graph)
-    #print ("route", result)
-    tps2=time.time()
-    #print(tps2 - tps1)
-    #print ("cost", cost)
-    
-    #print(graph.barriers)
-    plt.plot([v.x for v in result], [v.y for v in result])
-    #for barrier in graph.barriers:
-    #    plt.plot([v.x for v in barrier], [v.y for v in barrier])
-
-    #print(result[0][1])
-
-    plt.xlim(0,300)
-    plt.ylim(0,200)
-    plt.show()
-    
