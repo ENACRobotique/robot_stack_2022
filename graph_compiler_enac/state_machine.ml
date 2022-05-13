@@ -5,8 +5,9 @@ let lib =
 
 class Transition:
     def nothing(self):
-        pass
+        print(f\"{self.name}: nothing\")
     def accept_by_default(self):
+        print(f\"{self.name}: accept_by_default\")
         return True
     def __init__(self, name, destination, on_transition = None, guard = None):
         self.name = name
@@ -23,30 +24,34 @@ class Transition:
         return f\"Transition({self.name})\"
 
 class State:
-    def nothing(self):
-        pass
+    def on_enter_default(self):
+        print(f\"{self.name}: on_enter_default\")
+    def on_leave_default(self):
+        print(f\"{self.name}: on_leave_default\")
     def __init__(self, name, on_enter = None, on_leave = None, transitions = []):
         self.name = name
         if on_enter is None:
-            self.on_enter = self.nothing
+            self.on_enter = self.on_enter_default
         else:
             self.on_enter = on_enter
         if on_enter is None:
-            self.on_leave = self.nothing
+            self.on_leave = self.on_leave_default
         else:
             self.on_leave = on_leave
-        self.transitions = transitions
+        self.transitions = transitions.copy()
     def add_transition(self, transition):
         self.transitions.append(transition)
     def check_transitions(self):
         for transition in self.transitions:
             if transition.guard():
-                self.on_leave()
                 transition.on_transition()
                 return transition.destination
         return None
     def __str__(self):
-        return f\"State({self.name})\"
+        str_trs = \"\"
+        for t in self.transitions:
+            str_trs += str(t)+\" \"
+        return f\"State({self.name}, [{str_trs}])\"
 
 class StateMachine:
     def __init__(self, init_state = None):
@@ -57,6 +62,11 @@ class StateMachine:
         if self.state is not None:
             new_state = self.state.check_transitions()
             if new_state is not None:
+                if new_state != self.state:
+                    self.state.on_leave()
+                    new_state.on_enter()
                 self.state = new_state
-                self.state.on_enter()
+    
+    def __str__(self):
+        return f\"StateMachine({str(self.state)})\"
 "

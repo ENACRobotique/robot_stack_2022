@@ -46,18 +46,24 @@ let generate_stm_py = fun stm ->
     StateMachine(init, name, st_ls) ->
       let list_states = List.filter (fun x -> match x with State(_, _) -> true | _ -> false) st_ls in
       let list_trs = List.filter (fun x -> match x with State(_, _) -> false | _ -> true) st_ls in
-      let rec infer_missing = fun tr_name ls->
-          match ls with
-            [] -> true
-          | a::b -> begin match a with
-                      State(name, _) -> if tr_name = name then false else infer_missing tr_name b
-                    | _ -> infer_missing tr_name b end in
-      let inferred_states = List.map (fun x -> State(x, "")) (List.filter (fun x -> infer_missing x list_states) (List.map (fun x -> match x with Transition(_, dest, _) -> dest|_->"nope") list_trs)) in
+
+      let infer_states = fun tr->
+        match tr with
+          Transition(orig_ls, dest , _) -> 
+            let state_names = (List.map (fun x -> match x with State(a, _) -> a | _ -> failwith "Error: Transition in st_ls") list_states) in
+
+            let unknown_states = List.filter
+              (fun x -> not (List.mem x state_names)) orig_ls in
+              List.map (fun x -> State(x, "")) (if List.mem dest state_names then unknown_states else dest::unknown_states) 
+        | _ -> failwith "Error: state in tr_list" in
+      
+      let inferred_states = List.map infer_states list_trs in
+
       let rec remove_duplicates = fun ls acc ->
         match ls with
           [] -> acc
         | a::b -> if List.mem a acc then remove_duplicates b acc else remove_duplicates b (a::acc) in
-      let py_states = List.map generate_state_transition_py (List.concat [list_states; remove_duplicates inferred_states []]) in
+      let py_states = List.map generate_state_transition_py (remove_duplicates (List.concat [list_states; List.concat inferred_states]) []) in
       let py_trs = List.map generate_state_transition_py list_trs in
       let all_printed = String.concat "\n" (List.concat [py_states; py_trs]) in
       let py_stm = Printf.sprintf "%s = StateMachine(%s)"

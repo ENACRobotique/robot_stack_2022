@@ -41,6 +41,8 @@ test = StateMachine(Init)
 
 bruh.test = test
 
-print(bruh.test.state)
+print(bruh.test)
 bruh.test.check_transitions()
-print(bruh.test.state)
+print(bruh.test)
+bruh.test.check_transitions()
+print(bruh.test)
