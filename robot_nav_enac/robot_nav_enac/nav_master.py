@@ -11,7 +11,7 @@ from interfaces_enac.msg import _obstacles
 from robot_nav_enac.Stop import Stop
 from robot_nav_enac.StraightPath import StraightPath
 from robot_nav_enac.PurePursuit import PurePursuit
-from robot_nav_enac.robot_nav_enac.NavigationType import OdomData
+from robot_nav_enac.NavigationType import OdomData
 
 SetNavigation = _set_navigation.SetNavigation
 Obstacles = _obstacles.Obstacles
@@ -24,6 +24,11 @@ Navtypes :
     3 : WallFollower (without planification, no basic obstacle stop yet)
     4 : WallStop (without planification, no basic obstacle stop yet)
 """
+
+def z_euler_from_quaternions(qx, qy, qz, qw):
+    t3 = +2.0 * (qw * qz + qx * qy)
+    t4 = +1.0 - 2.0 * (qy * qy + qz * qz)
+    return np.arctan2(t3, t4)
 
 
 class Navigator(Node):
@@ -38,13 +43,13 @@ class Navigator(Node):
 
         #instantiate nav types available
         self.stop = Stop()
-        self.straight_path = StraightPath()
+        self.straight_path = StraightPath(self.get_logger().info)
         self.pure_pursuit = PurePursuit()
         #self.wall_follower = WallFollower()
         #self.wall_stop = WallStop()
 
-        self.nav_type = self.stop #default nav_type by safety
-        self.nav_type_int = 0 #used to detect if nav_type has changed
+        self.navigation_type = self.stop #default navigation_type by safety
+        self.nav_type_int = 0 #used to detect if navigation_type has changed
 
 
         # subscribe to nav
@@ -57,7 +62,7 @@ class Navigator(Node):
         obstacle_subscriber = self.create_subscription(
             Obstacles, 'obstacles', self.on_obstacle_callback, 10)
         #publish to velocity
-        self.velocity_publisher = self.create_publisher(Twist, 'cmd_vel')
+        self.velocity_publisher = self.create_publisher(Twist, 'cmd_vel', 10)
 
     def on_obstacle_callback(self, msg):
         #TODO : maintain a list of dynamic obstacles and send it to PurePursuit astar planification on callback
@@ -65,31 +70,31 @@ class Navigator(Node):
 
     def on_nav_callback(self, msg):
         #switch nav type if changed
-        if self.nav_type_int != msg.nav_type:
-            self.nav_type = msg.nav_type
-            if self.nav_type == 0:
-                self.nav_type = self.stop()
-            elif self.nav_type == 1:
-                self.nav_type = self.straight_path
-                #self.nav_type.set_target = cur_position or reset button??
-            #elif self.nav_type == 2:
-            #    self.nav_type = self.pure_pursuit
-            #elif self.nav_type == 3:
-            #    self.nav_type = self.wall_follower
-            #elif self.nav_type == 4:
-            #    self.nav_type = self.wall_stop
+        if self.nav_type_int != msg.navigation_type:
+            self.navigation_type = msg.navigation_type
+            if self.navigation_type == 0:
+                self.navigation_type = self.stop
+            elif self.navigation_type == 1:
+                self.navigation_type = self.straight_path
+                #self.navigation_type.set_target = cur_position or reset button??
+            #elif self.navigation_type == 2:
+            #    self.navigation_type = self.pure_pursuit
+            #elif self.navigation_type == 3:
+            #    self.navigation_type = self.wall_follower
+            #elif self.navigation_type == 4:
+            #    self.navigation_type = self.wall_stop
 
         #extracting goal_pose from msg
-        x = msg.position.x
-        y = msg.position.y
-        rotation = z_euler_from_quaternions(msg.orientation.x,
-        									msg.orientation.y,
-        									msg.orientation.z,
-        									msg.orientation.w)
-        self.target.updataOdomData(x, y, rotation)
+        x = msg.pose.position.x
+        y = msg.pose.position.y
+        rotation = z_euler_from_quaternions(msg.pose.orientation.x,
+        									msg.pose.orientation.y,
+        									msg.pose.orientation.z,
+        									msg.pose.orientation.w)
 
-        #set target to the nav_type selected
-        self.nav_type.set_target(self.target, self.fixed_obstacle + self.dynamic_obstacle)
+        #set target to the navigation_type selected
+        self.target_position.updataOdomData(x,y, rotation)
+        self.navigation_type.set_target(self.target_position)
 
 
     def on_odom_callback(self, msg):
@@ -114,12 +119,12 @@ class Navigator(Node):
         self.cur_position.updataOdomData(x, y, rotation)
         self.cur_speed.updataOdomData(msg.twist.twist.linear.x, 0, msg.twist.twist.angular.z)
 
-        self.nav_type.update_odom(self.publish_nav, self.cur_position, self.cur_speed) #TODO voir quel type de données mettre (OdomData ??)
-
-    def publish_nav(self, linear_speed, angular_speed):
+        self.navigation_type.update_odom(self.publish_nav, self.cur_position, self.cur_speed) #TODO voir quel type de données mettre (OdomData ??)
+        
+    def publish_nav(self, linear_speed: float, angular_speed: float):
         msg = Twist()
-        msg.linear.x = linear_speed
-        msg.angular.z = angular_speed
+        msg.linear.x = float(linear_speed)
+        msg.angular.z = float(angular_speed)
         self.velocity_publisher.publish(msg)
 
 	

@@ -1,3 +1,5 @@
+from typing import Callable
+
 class OdomData:
 
 	def __init__(self, x, y, rotation):
@@ -23,10 +25,13 @@ class NavigationType():
     def __init__(self, fixed_obstacles = None):
         pass
 
-    def set_target(self, target_pose:OdomData, dynamic_obstacles = None):
+    def set_target(self, target_pose:OdomData):
         pass
 
-    def update_odom(self, callback_speed, position:OdomData, speed:OdomData):
+    def update_dyn_obstacles(self, dynamic_obstacles = None):
+        pass
+    
+    def update_odom(self, callback_speed:Callable[[float, float], None], position:OdomData, speed:OdomData):
         """_summary_
 
         Args:
