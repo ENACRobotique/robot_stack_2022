@@ -22,6 +22,7 @@ setup(
         'console_scripts': [
             'nav = robot_nav_enac.nav_master:main',
             'accel_test = robot_nav_enac.AccelCalibration:main',
+            'basic_nav = robot_nav_enac.basic_nav_node:main'
         ],
     },
 )

@@ -11,13 +11,12 @@ import time,threading
 #Permet de recuperer la liste des Obstacle fournit par l'IHM
 trait = 0
 cercle_bleu = 0
-global obstacle_carte
     
 ##----- Créations des Fonctions -----##
 def foo():
     print(time.ctime())
     tps1 = time.time()
-    threading.Timer(1,foo).start()
+    #threading.Timer(10.0,foo).start()
     if started:
         w,x,s,l = dessin.coords('area')
         #print(w+47,x+47)
@@ -37,21 +36,21 @@ def foo():
     
 
     liste_obstacle_IHM = Recuperation_IHM(liste_ca,liste_cercle)
-    print("\n")
-    print("liste_obstacle_IHM",liste_obstacle_IHM)
-    print("Taille obs IHM",len(liste_obstacle_IHM))
-    print("\n")
+    #print("\n")
+    #print("liste_obstacle_IHM",liste_obstacle_IHM)
+    #print("Taille obs IHM",len(liste_obstacle_IHM))
+    #print("\n")
 
     obstacle_carte = Map_init(liste_obstacle)
-    print("\n")
-    print("Obstacle carte",obstacle_carte)
-    print("Taille obs carte",len(obstacle_carte))
-    print("\n")
+    #print("\n")
+    #print("Obstacle carte",obstacle_carte)
+    #print("Taille obs carte",len(obstacle_carte))
+    #print("\n")
 
     #obstacle_carte = [Rectangle(Points(50,20),Points(80,70)),Rectangle(Points(100,20),Points(120,70))]
    
-    #liste_obstacle = liste_obstacle_IHM + obstacle_carte
     liste_obstacle = liste_obstacle_IHM + obstacle_carte
+    #liste_obstacle = obstacle_carte
     print("Taille liste_obstacle",len(liste_obstacle))
     #liste_obstacle = obstacle_carte
     #liste_obstacle = liste_obstacle_IHM
@@ -72,13 +71,13 @@ def foo():
     #Depart = Points(50,50)
     #Arrive = Points(300,200)
 
-    Depart = Points(5,5)
-    Arrive = Points(260,5)
+    Depart = Points(100,5)
+    Arrive = Points(250,5)
 
     #Depart = Points(20,50)
     #Arrive = Points(200,50)
 
-    result = Chemin_Astar(Arrive,Depart,liste_obstacle)
+    result = Chemin_Astar(Arrive,Depart,liste_obstacle.copy())
 
      ######### AFFICHAGE#######
     
@@ -238,6 +237,7 @@ def choisirformes(event):
         animate(1)
     else:
         formeee.set(0)
+    foo()
 
 #http://pascal.ortiz.free.fr/contents/tkinter/tkinter/le_canevas
 #http://tkinter.fdex.eu/doc/caw.html#Canvas.tag_bind
@@ -401,17 +401,18 @@ def Map_init(liste_obs):
     c = Coin()
     #liste_obs.append(c)
 
-    r1 = Rectangle(Points(45,1),Points(117,8.5))
-    r2 = Rectangle(Points(127.5,1),Points(142.5,10.2))
-    #barre = Rond(Points(150, 5), 5)
+    #r1 = Rectangle(Points(45,1),Points(117,8.5))
+    #r2 = Rectangle(Points(127.5,1),Points(142.5,10.2))
+    barre = Rond(Points(150, 5.0), 4)
+    #barre = Rectangle(Points(139.885,2.0),Points(160.115,30.0))
     moitie = 1500
-    r2_bis = Rectangle(Points((moitie+75)/10,1),Points((moitie+225)/10,10.2))
-    r1_bis = Rectangle(Points((moitie+330)/10,1),Points((moitie+1050)/10,8.5))
-    liste_obs.append(r1)
-    liste_obs.append(r2)
-    liste_obs.append(r1_bis)
-    liste_obs.append(r2_bis)
-    #liste_obs.append(barre)
+    #r2_bis = Rectangle(Points((moitie+75)/10,1),Points((moitie+225)/10,10.2))
+    #r1_bis = Rectangle(Points((moitie+330)/10,1),Points((moitie+1050)/10,8.5))
+    #liste_obs.append(r1)
+    #liste_obs.append(r2)
+    #liste_obs.append(r1_bis)
+    #liste_obs.append(r2_bis)
+    liste_obs.append(barre)
 
     return liste_obs # return liste_obs apres debugage
 
