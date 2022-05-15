@@ -13,7 +13,8 @@ class Amalgame:
         self.list_points = list_points
         self.relative_center = self._calculate_relative_center()
         self.absolute_position = []
-        self.size = self.get_size()
+        self.size = self.get_size_amalgame()
+        #print("TAILLE", self.size)
 
     def _calculate_relative_center(self):
         new_p = Point()
@@ -29,5 +30,9 @@ class Amalgame:
 
         return new_p
 
+    #deprecated
     def get_size(self):
         return 2 * self.relative_center.distance * math.tan(((len(self.list_points) - 1) * angle_increment) / 2)
+    
+    def get_size_amalgame(self):
+        return math.sqrt(self.list_points[0].distance**2 + self.list_points[len(self.list_points)-1].distance**2 - 2*self.list_points[0].distance*self.list_points[len(self.list_points)-1].distance*math.cos(abs(self.list_points[0].angle-self.list_points[len(self.list_points)-1].angle)))
