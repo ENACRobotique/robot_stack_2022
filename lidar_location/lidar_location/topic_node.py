@@ -4,6 +4,7 @@ from lidar_location.Point import Point
 import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import LaserScan
+from sensor_msgs.msg import Bool
 from lidar_location.Triangle import Triangle
 from geometry_msgs.msg import TransformStamped, Transform
 import math
@@ -38,11 +39,15 @@ class lidarlocation(Node):
             TransformStamped, 'carte_coins', 10)
         self.publish_position = self.create_publisher(
             TransformStamped, 'robot_position', 10)
+        ## CRITIACL CODE AHEAD : DO NOT TOUCH
+        self.publisher_proxomity_warning = self.create_publisher(Bool, 'stop', 10)
+        ## END OF CRITICAL CODE
         self.timer = self.create_timer(1, self.test)
         self.positions = [[0,0],[0,0],[0,0],[0,0],[0,0]] # Defines a list of positions to be evened out
         self.pos_counter = 0 #Incremented at every new position to return the median value
         self.last_good = 0 # Used in determiner_position for abborhent values
         self.start = timeit.default_timer()
+        self.proximity_distance = 0.20 #CRITICAL: Trigger distance of the proximity sensor
 
     def test(self):
         msg_out = TransformStamped()
@@ -127,6 +132,19 @@ class lidarlocation(Node):
 
     def listener_callback(self, msg):
         self.start = timeit.default_timer()
+        
+        ## CRITICAL CODE AHEAD : DO NOT TOUCH ##
+        # PROXIMITY WARNING SYSTEM
+        # Detects any object closer than self.proximity_distance and triggers a STOP message
+        for distance in msg.ranges:
+            if distance < self.proximity_distance:
+                # SENDS A PROXIMITY STOP
+                msg_prox = Bool()
+                msg_prox.bool = True
+                self.publisher_proxomity_warning.publish(msg_prox)
+        ## END OF CRITICAL CODE ##
+        
+        
         # self.get_logger().info(msg.angle_max)
         msg_out = self.generate_filtered_message(msg, self.filter_out(msg))
         # msg_out = self.generate_filtered_message(
@@ -221,9 +239,6 @@ class lidarlocation(Node):
         
         return [mean_x/length_l, mean_y/length_l]
 
-
-
-
     def determiner_position(self, tri):
         x = 0
         y = 0
@@ -231,9 +246,7 @@ class lidarlocation(Node):
         y2 = 0
 
         # Tri des points par angle
-        # print(tri.pt_list)
         tri.pt_list = sorted(tri.pt_list, key=Point.get_angle)
-        # print(tri.pt_list)
 
         k = 0
         i = 0
@@ -243,14 +256,12 @@ class lidarlocation(Node):
         if(calculate_distance_xy(
                 tri.pt_list[0].pos_x, tri.pt_list[0].pos_y, tri.pt_list[1].pos_x, tri.pt_list[1].pos_y) > 1.6 and calculate_distance_xy(
                 tri.pt_list[0].pos_x, tri.pt_list[0].pos_y, tri.pt_list[1].pos_x, tri.pt_list[1].pos_y) < 1.9):
-            #print("A")
             j = 0
             i = 1
             k = 2
         elif(calculate_distance_xy(
                 tri.pt_list[1].pos_x, tri.pt_list[1].pos_y, tri.pt_list[2].pos_x, tri.pt_list[2].pos_y) > 1.6 and calculate_distance_xy(
                 tri.pt_list[1].pos_x, tri.pt_list[1].pos_y, tri.pt_list[2].pos_x, tri.pt_list[2].pos_y) < 1.9):
-            #print("B")
             j = 1
             i = 2
             k = 0
@@ -258,7 +269,6 @@ class lidarlocation(Node):
         elif(calculate_distance_xy(
                 tri.pt_list[2].pos_x, tri.pt_list[2].pos_y, tri.pt_list[0].pos_x, tri.pt_list[0].pos_y) > 1.6 and calculate_distance_xy(
                 tri.pt_list[2].pos_x, tri.pt_list[2].pos_y, tri.pt_list[0].pos_x, tri.pt_list[0].pos_y) < 1.9):
-            #print("C")
             j = 2
             i = 0
             k = 1
@@ -388,6 +398,7 @@ class lidarlocation(Node):
         
 
         return [x, y, x2,y2,orientation]
+        
 
 
 def get_distance_pt(pt1, pt2):
