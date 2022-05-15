@@ -14,7 +14,6 @@ class Amalgame:
         self.relative_center = self._calculate_relative_center()
         self.absolute_position = []
         self.size = self.get_size_amalgame()
-        #print("TAILLE", self.size)
 
     def _calculate_relative_center(self):
         new_p = Point()

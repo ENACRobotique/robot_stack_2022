@@ -19,11 +19,6 @@ class Amalgame_list:
         self.list_points = self.message_to_points()
         self.points_length = len(self.list_points)
         self.list_obj = self.detect_Amalgames()
-        """
-        self.list_obj = []
-        for pt in self.list_points:
-            self.list_obj.append(Amalgame([pt]))
-        """
 
     def message_to_points(self):
         list_points = []
@@ -41,27 +36,21 @@ class Amalgame_list:
         position = start_position
         list_obj = []
         points_length = len(self.list_points)
-        #print("Pt depart: ", start_position)
 
         # Goes through all the list of points starting from the first break
         while position < points_length + start_position:
             list_pt_ama = []
-            #print("BFEAK ! at position ", position)
             c = True
             while c:
                 if self.is_break(position):
-                    #print("Not a break")
                     c = False
                 if position > points_length + start_position:
-                    # print("overshoot")
                     c = False
                 list_pt_ama.append(
                     self.list_points[position % points_length])
                 position += 1
             new_ama = Amalgame(list_pt_ama)
-            #print("New amalgame", new_ama.size)
             if new_ama.relative_center.distance > Amalgames_min_dist and new_ama.size < Amalgame_max_size and len(list_pt_ama) < Amalgame_max_nb_pts and new_ama.size > Amalgame_min_size :
-                #print("Amalgame is fair")
                 list_obj.append(new_ama)
         return list_obj
 
