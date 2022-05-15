@@ -1,7 +1,7 @@
 //init Init
 digraph EnacStrat {
     Init [comment="on_init"]
-    //séquence: dépôt de la réplique et récupération de la statuette
+    //sequence: depot de la replique et recuperation de la statuette
     Init -> AtStatuette
         [label="go_recup_statuette/is_tirette_activee"]
     AtStatuette -> HasRecupStatuette
@@ -15,8 +15,8 @@ digraph EnacStrat {
     AtVitrine -> HasDroppedStatuette
         [label="drop_statuette/is_at_vitrine"]
     
-    //séquence: récupération des palets et dépôt sur la galerie
-    //récupération des 3 palets
+    //sequence: recuperation des palets et depot sur la galerie
+    //recuperation des 3 palets
     HasDroppedStatuette -> DevantPaletRouge
         [label="go_palet_rouge/is_prio_galerie"]
     DevantPaletRouge -> HasRecupPaletRougeAndStored
@@ -31,7 +31,7 @@ digraph EnacStrat {
         [label="go_palet_bleu/has_stored_vert"]
     DevantPaletBleu -> HasRecupPaletBleu
         [label="recup_bleu/is_at_palet_bleu"]
-    //dépôt des palets sur la galerie
+    //depot des palets sur la galerie
     HasRecupPaletBleu -> DevantGalerieRougeRetourne
         [label="go_galerie_rouge/has_recup_bleu"]
     DevantGalerieRougeRetourne -> HasDroppedRougeGalerie
@@ -53,7 +53,7 @@ digraph EnacStrat {
         [label="go_bercail/has_deja_fait_carres"]
     
 
-    //séquence: carrés de fouille
+    //sequence: carres de fouille
     HasDroppedStatuette -> DevantCarres
         [label="go_carres/is_prio_carres"]
     DevantCarres -> ColleAuMur
@@ -76,7 +76,7 @@ digraph EnacStrat {
     FinCarres -> DevantPaletRouge
         [label="go_palet_rouge_depuis_mur/pas_deja_fait_galerie"]
 
-    //retour au bercail en cas
+    //retour au bercail en cas de pb de temps
     {Init AtStatuette HasRecupStatuette HasTurnedAroundReplique HasDroppedReplique AtVitrine HasDroppedStatuette
         DevantPaletRouge HasRecupPaletRougeAndStored RougeInBackHand DevantPaletVert HasRecupPaletVertAndStored DevantPaletBleu HasRecupPaletBleu
         DevantGalerieRougeRetourne HasDroppedRougeGalerie DevantGalerieVertRetourne HasDroppedVertGalerie DevantGalerieBleuRetourne HasDroppedBleuGalerie FinGalerie

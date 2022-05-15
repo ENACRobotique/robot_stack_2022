@@ -29,7 +29,8 @@ let generate_state_transition_py = fun st ->
         Printf.sprintf "%s = State(\"%s\", %s)" id id enter
       | _ -> failwith (Printf.sprintf "Too much in state %s" (st_str st)) end
   | Transition(id_ls, id_dest, guard_and_on_transition) ->
-      let name = String.concat "To" [(String.concat "" id_ls); id_dest] in
+      let tent_name = String.concat "To" [(String.concat "" id_ls); id_dest] in
+      let name = if String.length tent_name > 40 then String.concat "" ["tr"; string_of_int (Hashtbl.hash (tent_name)); "To"; id_dest] else tent_name in
       let decl = begin match String.split_on_char '/' guard_and_on_transition with
         on_transition::[guard] ->
           Printf.sprintf "%s = Transition(\"%s\", %s, %s, %s)" name name id_dest on_transition guard
