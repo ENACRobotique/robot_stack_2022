@@ -16,36 +16,9 @@ PeriphValue = _periph_value.PeriphValue
 Pid = _pid.Pid
 SetNavigation = _set_navigation.SetNavigation
 
-#uses python-statemachine
-from statemachine import StateMachine, State
+from statemachine import State, Transition, StateMachine
 
-#see for documentation https://github.com/fgmacedo/python-statemachine
-
-class StratStateMachine(StateMachine):
-    #états
-    init = State("Init", initial=True)
-    outhome = State("OutHome")
-    chope_palet_un = State("Chope palet un")
-    chope_palet_deux = State("Chope palet deux")
-    chope_palet_trois = State("Chope palet trois")
-    go_galerie = State("go galerie")
-
-    almost_end = State("Almost End")
-    end = State("End")
-
-    #transitions
-    start = init.to(outhome)
-    turn_palet = outhome.to(chope_palet_un)
-    a_chope = chope_palet_un.to(chope_palet_deux)
-    a_chope_chope = chope_palet_deux.to(chope_palet_trois)
-    a_chope_chope_chope = chope_palet_trois.to(go_galerie)
-
-    
-
-
-    last_ten_seconds = init.to(almost_end) | outhome.to(almost_end) | chope_palet_un.to(almost_end) | chope_palet_deux.to(almost_end) | chope_palet_trois.to(almost_end)
-    stop = almost_end.to(end)
-
+#### fin partie générée automatiquement
 class Strategy(Node):
 
     #valeurs stockées
@@ -70,7 +43,137 @@ class Strategy(Node):
         # default buffer size like teensy (TODO: voir si à garder pour stm32?)
         super().__init__("enac_strat")
 
-        self.state_machine = StratStateMachine()
+        #state machine
+
+        ### début partie générée automatiquement
+
+        #generated using graph_compil v0.1
+        HasRentreAuBercail = State("HasRentreAuBercail")
+        FinCarres = State("FinCarres")
+        QuitterMur = State("QuitterMur")
+        ProchainCarre = State("ProchainCarre")
+        PousserSiBesoin = State("PousserSiBesoin")
+        LireCarre = State("LireCarre")
+        ColleAuMur = State("ColleAuMur")
+        IsRentringAuBercail = State("IsRentringAuBercail")
+        DevantCarres = State("DevantCarres")
+        FinGalerie = State("FinGalerie")
+        HasDroppedBleuGalerie = State("HasDroppedBleuGalerie")
+        DevantGalerieBleuRetourne = State("DevantGalerieBleuRetourne")
+        HasDroppedVertGalerie = State("HasDroppedVertGalerie")
+        DevantGalerieVertRetourne = State("DevantGalerieVertRetourne")
+        HasDroppedRougeGalerie = State("HasDroppedRougeGalerie")
+        DevantGalerieRougeRetourne = State("DevantGalerieRougeRetourne")
+        HasRecupPaletBleu = State("HasRecupPaletBleu")
+        DevantPaletBleu = State("DevantPaletBleu")
+        HasRecupPaletVertAndStored = State("HasRecupPaletVertAndStored")
+        DevantPaletVert = State("DevantPaletVert")
+        RougeInBackHand = State("RougeInBackHand")
+        HasRecupPaletRougeAndStored = State("HasRecupPaletRougeAndStored")
+        DevantPaletRouge = State("DevantPaletRouge")
+        HasDroppedStatuette = State("HasDroppedStatuette")
+        AtVitrine = State("AtVitrine")
+        HasDroppedReplique = State("HasDroppedReplique")
+        HasTurnedAroundReplique = State("HasTurnedAroundReplique")
+        HasRecupStatuette = State("HasRecupStatuette")
+        AtStatuette = State("AtStatuette")
+        Init = State("Init", self.on_init)
+        InitToAtStatuette = Transition("InitToAtStatuette", AtStatuette, self.go_recup_statuette, self.is_tirette_activee)
+        Init.add_transition(InitToAtStatuette)
+        AtStatuetteToHasRecupStatuette = Transition("AtStatuetteToHasRecupStatuette", HasRecupStatuette, self.recup_statuette, self.is_at_statuette)
+        AtStatuette.add_transition(AtStatuetteToHasRecupStatuette)
+        tr581141130ToHasTurnedAroundReplique = Transition("tr581141130ToHasTurnedAroundReplique", HasTurnedAroundReplique, self.turn_around_replique, self.has_gotten_statuette)
+        HasRecupStatuette.add_transition(tr581141130ToHasTurnedAroundReplique)
+        tr86346170ToHasDroppedReplique = Transition("tr86346170ToHasDroppedReplique", HasDroppedReplique, self.drop_replique, self.has_turned_around_replique)
+        HasTurnedAroundReplique.add_transition(tr86346170ToHasDroppedReplique)
+        HasDroppedRepliqueToAtVitrine = Transition("HasDroppedRepliqueToAtVitrine", AtVitrine, self.go_vitrine, self.has_dropped_replique)
+        HasDroppedReplique.add_transition(HasDroppedRepliqueToAtVitrine)
+        AtVitrineToHasDroppedStatuette = Transition("AtVitrineToHasDroppedStatuette", HasDroppedStatuette, self.drop_statuette, self.is_at_vitrine)
+        AtVitrine.add_transition(AtVitrineToHasDroppedStatuette)
+        HasDroppedStatuetteToDevantPaletRouge = Transition("HasDroppedStatuetteToDevantPaletRouge", DevantPaletRouge, self.go_palet_rouge, self.is_prio_galerie)
+        HasDroppedStatuette.add_transition(HasDroppedStatuetteToDevantPaletRouge)
+        tr443085219ToHasRecupPaletRougeAndStored = Transition("tr443085219ToHasRecupPaletRougeAndStored", HasRecupPaletRougeAndStored, recup_rouge_stocker, is_at_palet_rouge)
+        DevantPaletRouge.add_transition(tr443085219ToHasRecupPaletRougeAndStored)
+        tr224422110ToRougeInBackHand = Transition("tr224422110ToRougeInBackHand", RougeInBackHand, put_back_rouge, has_stored_rouge)
+        HasRecupPaletRougeAndStored.add_transition(tr224422110ToRougeInBackHand)
+        RougeInBackHandToDevantPaletVert = Transition("RougeInBackHandToDevantPaletVert", DevantPaletVert, go_palet_vert, has_backhand_rouge)
+        RougeInBackHand.add_transition(RougeInBackHandToDevantPaletVert)
+        tr487924451ToHasRecupPaletVertAndStored = Transition("tr487924451ToHasRecupPaletVertAndStored", HasRecupPaletVertAndStored, recup_vert_stocker, is_at_palet_vert)
+        DevantPaletVert.add_transition(tr487924451ToHasRecupPaletVertAndStored)
+        tr226431985ToDevantPaletBleu = Transition("tr226431985ToDevantPaletBleu", DevantPaletBleu, go_palet_bleu, has_stored_vert)
+        HasRecupPaletVertAndStored.add_transition(tr226431985ToDevantPaletBleu)
+        DevantPaletBleuToHasRecupPaletBleu = Transition("DevantPaletBleuToHasRecupPaletBleu", HasRecupPaletBleu, recup_bleu, is_at_palet_bleu)
+        DevantPaletBleu.add_transition(DevantPaletBleuToHasRecupPaletBleu)
+        tr298394497ToDevantGalerieRougeRetourne = Transition("tr298394497ToDevantGalerieRougeRetourne", DevantGalerieRougeRetourne, go_galerie_rouge, has_recup_bleu)
+        HasRecupPaletBleu.add_transition(tr298394497ToDevantGalerieRougeRetourne)
+        tr156138794ToHasDroppedRougeGalerie = Transition("tr156138794ToHasDroppedRougeGalerie", HasDroppedRougeGalerie, depot_rouge_arriere, is_at_galerie_rouge_retourne)
+        DevantGalerieRougeRetourne.add_transition(tr156138794ToHasDroppedRougeGalerie)
+        tr1003384989ToDevantGalerieVertRetourne = Transition("tr1003384989ToDevantGalerieVertRetourne", DevantGalerieVertRetourne, go_galerie_vert, has_dropped_rouge)
+        HasDroppedRougeGalerie.add_transition(tr1003384989ToDevantGalerieVertRetourne)
+        tr168523427ToHasDroppedVertGalerie = Transition("tr168523427ToHasDroppedVertGalerie", HasDroppedVertGalerie, destore_drop_vert_arriere, is_at_galerie_vert_retourne)
+        DevantGalerieVertRetourne.add_transition(tr168523427ToHasDroppedVertGalerie)
+        tr210589313ToDevantGalerieBleuRetourne = Transition("tr210589313ToDevantGalerieBleuRetourne", DevantGalerieBleuRetourne, store_bleu_from_front_hand_and_go_galerie_bleu, has_dropped_vert)
+        HasDroppedVertGalerie.add_transition(tr210589313ToDevantGalerieBleuRetourne)
+        tr432180998ToHasDroppedBleuGalerie = Transition("tr432180998ToHasDroppedBleuGalerie", HasDroppedBleuGalerie, destore_drop_bleu_arriere, is_at_galerie_bleu)
+        DevantGalerieBleuRetourne.add_transition(tr432180998ToHasDroppedBleuGalerie)
+        HasDroppedBleuGalerieToFinGalerie = Transition("HasDroppedBleuGalerieToFinGalerie", FinGalerie, do_nothing, has_dropped_bleu)
+        HasDroppedBleuGalerie.add_transition(HasDroppedBleuGalerieToFinGalerie)
+        FinGalerieToDevantCarres = Transition("FinGalerieToDevantCarres", DevantCarres, go_carres, pas_deja_fait_carres)
+        FinGalerie.add_transition(FinGalerieToDevantCarres)
+        FinGalerieToIsRentringAuBercail = Transition("FinGalerieToIsRentringAuBercail", IsRentringAuBercail, go_bercail, has_deja_fait_carres)
+        FinGalerie.add_transition(FinGalerieToIsRentringAuBercail)
+        HasDroppedStatuetteToDevantCarres = Transition("HasDroppedStatuetteToDevantCarres", DevantCarres, go_carres, is_prio_carres)
+        HasDroppedStatuette.add_transition(HasDroppedStatuetteToDevantCarres)
+        DevantCarresToColleAuMur = Transition("DevantCarresToColleAuMur", ColleAuMur, se_coller_au_mur_deployer_poelon, is_devant_carres)
+        DevantCarres.add_transition(DevantCarresToColleAuMur)
+        ColleAuMurToLireCarre = Transition("ColleAuMurToLireCarre", LireCarre, lire_carre_si_besoin, is_au_mur)
+        ColleAuMur.add_transition(ColleAuMurToLireCarre)
+        LireCarreToPousserSiBesoin = Transition("LireCarreToPousserSiBesoin", PousserSiBesoin, pousser_si_besoin, has_lu_carre_si_besoin)
+        LireCarre.add_transition(LireCarreToPousserSiBesoin)
+        PousserSiBesoinToProchainCarre = Transition("PousserSiBesoinToProchainCarre", ProchainCarre, go_prochain_carre, has_checked_carre)
+        PousserSiBesoin.add_transition(PousserSiBesoinToProchainCarre)
+        ProchainCarreToLireCarre = Transition("ProchainCarreToLireCarre", LireCarre, lire_carre_si_besoin, is_at_prochain)
+        ProchainCarre.add_transition(ProchainCarreToLireCarre)
+        PousserSiBesoinToQuitterMur = Transition("PousserSiBesoinToQuitterMur", QuitterMur, quitter_mur_rentrer_poelon, tous_carres_lus)
+        PousserSiBesoin.add_transition(PousserSiBesoinToQuitterMur)
+        QuitterMurToFinCarres = Transition("QuitterMurToFinCarres", FinCarres, do_nothing, has_quitte_mur)
+        QuitterMur.add_transition(QuitterMurToFinCarres)
+        FinCarresToIsRentringAuBercail = Transition("FinCarresToIsRentringAuBercail", IsRentringAuBercail, go_bercail, has_deja_fait_galerie)
+        FinCarres.add_transition(FinCarresToIsRentringAuBercail)
+        FinCarresToDevantPaletRouge = Transition("FinCarresToDevantPaletRouge", DevantPaletRouge, go_palet_rouge_depuis_mur, pas_deja_fait_galerie)
+        FinCarres.add_transition(FinCarresToDevantPaletRouge)
+        tr992703258ToIsRentringAuBercail = Transition("tr992703258ToIsRentringAuBercail", IsRentringAuBercail, go_bercail, quinze_dernieres_secondes)
+        Init.add_transition(tr992703258ToIsRentringAuBercail)
+        AtStatuette.add_transition(tr992703258ToIsRentringAuBercail)
+        HasRecupStatuette.add_transition(tr992703258ToIsRentringAuBercail)
+        HasTurnedAroundReplique.add_transition(tr992703258ToIsRentringAuBercail)
+        HasDroppedReplique.add_transition(tr992703258ToIsRentringAuBercail)
+        AtVitrine.add_transition(tr992703258ToIsRentringAuBercail)
+        HasDroppedStatuette.add_transition(tr992703258ToIsRentringAuBercail)
+        DevantPaletRouge.add_transition(tr992703258ToIsRentringAuBercail)
+        HasRecupPaletRougeAndStored.add_transition(tr992703258ToIsRentringAuBercail)
+        RougeInBackHand.add_transition(tr992703258ToIsRentringAuBercail)
+        DevantPaletVert.add_transition(tr992703258ToIsRentringAuBercail)
+        HasRecupPaletVertAndStored.add_transition(tr992703258ToIsRentringAuBercail)
+        DevantPaletBleu.add_transition(tr992703258ToIsRentringAuBercail)
+        HasRecupPaletBleu.add_transition(tr992703258ToIsRentringAuBercail)
+        DevantGalerieRougeRetourne.add_transition(tr992703258ToIsRentringAuBercail)
+        HasDroppedRougeGalerie.add_transition(tr992703258ToIsRentringAuBercail)
+        DevantGalerieVertRetourne.add_transition(tr992703258ToIsRentringAuBercail)
+        HasDroppedVertGalerie.add_transition(tr992703258ToIsRentringAuBercail)
+        DevantGalerieBleuRetourne.add_transition(tr992703258ToIsRentringAuBercail)
+        HasDroppedBleuGalerie.add_transition(tr992703258ToIsRentringAuBercail)
+        FinGalerie.add_transition(tr992703258ToIsRentringAuBercail)
+        DevantCarres.add_transition(tr992703258ToIsRentringAuBercail)
+        FinCarres.add_transition(tr992703258ToIsRentringAuBercail)
+        PousserSiBesoinToQuitterMur = Transition("PousserSiBesoinToQuitterMur", QuitterMur, quitter_mur_rentrer_poelon, quinze_dernieres_secondes)
+        PousserSiBesoin.add_transition(PousserSiBesoinToQuitterMur)
+        IsRentringAuBercailToHasRentreAuBercail = Transition("IsRentringAuBercailToHasRentreAuBercail", HasRentreAuBercail, things_todo_at_bercail, is_at_bercail)
+        IsRentringAuBercail.add_transition(IsRentringAuBercailToHasRentreAuBercail)
+        self.EnacStrat = StateMachine(Init)
+
+        ### fin partie générée automatiquement
+
 
         #paramétrage ROS
         self.ros_periph_pub = self.create_publisher(PeriphValue, '/peripherals', 10)
@@ -204,49 +307,7 @@ class Strategy(Node):
     def check_transitions(self):
         self.send_all_diags()
         try:
-            #trucs liés au temps
-            if not(self.state_machine.is_almost_end) and self.chrono != 0 and (time.time() - self.chrono) > self.end - 10 and (time.time() - self.chrono) < self.end:
-                #go home
-
-                print(self)
-                print("Strategy: il reste 10 secondes: retour à la maison")
-                self.state_machine.last_ten_seconds()
-                self.on_almost_end()
-                #code de trucs à faire quand c'est presque la fin ici
-
-            if not(self.released_everything) and self.chrono != 0 and (time.time() - self.chrono) > self.end - 3 and (time.time() - self.chrono) < self.end:
-                self.released_everything = True
-                self.tout_lacher_avant_fin()
-            
-            if self.chrono != 0 and (time.time() - self.chrono) > self.end:
-                print(self)
-                print("Strategy: Time is up, blocking node on standby")
-                self.state_machine.stop()
-                
-                #code de trucs à faire quand c'est la fin ici
-                self.send_all_diags()
-                self.on_end()
-                while (True):
-                    time.sleep(1)
-
-            #transitions normales
-            if self.state_machine.is_init:
-                if self.periphs.get("TI") == 42:
-                    self.state_machine.start()
-                    self.on_start()
-                    print(self)
-            if self.state_machine.is_outhome:
-                if self.is_at_goal(0.0001, 0.0001, 0.2):
-                    self.state_machine.turn_palet() #TODO: add transition and states
-                    self.on_turn_palet()
-                    print(self)
-            if self.state_machine.is_chope_palet_un:
-                if self.periphs.get("mv") == 3: #il y a un palet dans la main avant
-                    self.state_machine.a_chope()
-                    self.on_a_chope()
-                    print(self)
-            
-    
+            self.EnacStrat.check_transitions()
         except Exception as e:
             print("Strategy: crap in transition")
             print(e)
@@ -294,7 +355,48 @@ class Strategy(Node):
         msg.status = [reference]
         self.ros_diag_pub.publish(msg)
 
-    #fonctions des transitions
+    #callbacks des états
+
+    def on_init(self):
+        pass
+
+    #callbacks et gardes des transitions
+    def go_recup_statuette(self):
+        pass
+    def is_tirette_active(self):
+        pass
+
+    def recup_statuette(self):
+        pass
+    def is_at_statuette(self):
+        pass
+
+    def turn_around_replique(self):
+        pass
+    def has_gotten_statuette(self):
+        pass
+
+    def drop_replique(self):
+        pass
+    def has_turned_around_replique(self):
+        pass
+
+    def go_vitrine(self):
+        pass
+    def has_dropped_replique(self):
+        pass
+
+    def drop_statuette(self):
+        pass
+    def is_at_vitrine(self):
+        pass
+
+    def go_palet_rouge(self):
+        pass
+    def is_prio_galerie(self):
+        pass
+    
+    #vieux code tout pourri
     def on_start(self):
         print("Strategy: Tirette détectée: start")
         self.chrono = time.time()
