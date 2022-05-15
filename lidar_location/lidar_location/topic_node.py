@@ -4,7 +4,7 @@ from lidar_location.Point import Point
 import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import LaserScan
-from sensor_msgs.msg import Bool
+from std_msgs.msg import Bool
 from lidar_location.Triangle import Triangle
 from geometry_msgs.msg import TransformStamped, Transform
 import math
@@ -145,13 +145,10 @@ class lidarlocation(Node):
         ## END OF CRITICAL CODE ##
         
         
-        # self.get_logger().info(msg.angle_max)
         msg_out = self.generate_filtered_message(msg, self.filter_out(msg))
         # msg_out = self.generate_filtered_message(
         #    msg, self.filter_out(self.generate_fake(msg)))
         # msg_out = msg
-        # self.get_logger().info(msg_out.angle_max)
-        # triangulation = Amalgame_list(msg_out)
         triangulation = Triangulation(msg_out)
 
         # DEPLACER LE CODE
@@ -210,9 +207,6 @@ class lidarlocation(Node):
                 j += 1
             i += 1
 
-        #print("######")
-        #print([(center.pos_x, center.pos_y) for center in valid_centers])
-
         for tri in tri_list:
             position = self.determiner_position(tri)
             #print("++++++++++++++++++++++++++++++")
@@ -221,7 +215,7 @@ class lidarlocation(Node):
                 self.send_position(position)
                 calc = timeit.default_timer() - self.start
                 #print(calc)
-                print(position[1])
+                #print(position[1])
         
         # Trier la liste par angle modulo pi
         list_pts = []
@@ -273,20 +267,10 @@ class lidarlocation(Node):
             i = 0
             k = 1
         else:
-            #print("D")
-            #print(calculate_distance_xy(
-            #    tri.pt_list[2].pos_x, tri.pt_list[2].pos_y, tri.pt_list[0].pos_x, tri.pt_list[0].pos_y))
-            #print(calculate_distance_xy(
-            #    tri.pt_list[1].pos_x, tri.pt_list[1].pos_y, tri.pt_list[2].pos_x, tri.pt_list[2].pos_y))
-            #print(calculate_distance_xy(
-            #    tri.pt_list[0].pos_x, tri.pt_list[0].pos_y, tri.pt_list[1].pos_x, tri.pt_list[1].pos_y))
             j = 0
             i = 1
             k = 2   
-
-        
-        #print(tri.pt_list[i].distance, tri.pt_list[j].distance)
-
+            
         teta = math.pi/2 - get_beta(tri.pt_list[j], tri.pt_list[i])
         phi = math.pi/2 - \
             get_gamma(tri.pt_list[i], tri.pt_list[j],
@@ -386,16 +370,9 @@ class lidarlocation(Node):
         #If its the first value calculated OF we're inside the maximum distance between points
         if self.positions[self.pos_counter-1][0] == 0 or dist_in_time <= self.last_good * max_distance_between_runs:
             self.last_good = 0 #Reset the counter
-            #print("is good", dist_in_time)
         else: #Otherwise return the last good position
-            #print("is not good", dist_in_time)
             x = self.positions[(self.pos_counter-self.last_good) % size_of_memory][0]
             y = self.positions[(self.pos_counter-self.last_good) % size_of_memory][1]
-            
-
-        #[x, y] = self.mean_position() # Determines the median of all positions
-        
-        
 
         return [x, y, x2,y2,orientation]
         
@@ -406,10 +383,6 @@ def get_distance_pt(pt1, pt2):
 
 
 def get_beta(pt1, pt2):
-    #print(pt1.distance)
-    #print(pt2.distance)
-    #print(abs((get_distance_pt(pt1, pt2)**2 + pt2.distance**2 -
-    #      pt1.distance**2) / (2 * get_distance_pt(pt1, pt2) * pt2.distance)))
     return math.acos(abs((get_distance_pt(pt1, pt2)**2 + pt2.distance**2 - pt1.distance**2) / (2 * get_distance_pt(pt1, pt2) * pt2.distance)))
 
 
