@@ -39,8 +39,9 @@ class lidarlocation(Node):
         self.publish_position = self.create_publisher(
             TransformStamped, 'robot_position', 10)
         self.timer = self.create_timer(1, self.test)
-        self.positions = [] # Defines a list of positions to be evened out
+        self.positions = [[0,0],[0,0],[0,0],[0,0],[0,0]] # Defines a list of positions to be evened out
         self.pos_counter = 0 #Incremented at every new position to return the median value
+        self.last_good = 0 # Used in determiner_position for abborhent values
         self.start = timeit.default_timer()
 
     def test(self):
@@ -349,16 +350,42 @@ class lidarlocation(Node):
         elif((y>1) and (1-y)/tri.pt_list[k].distance<1 and (1-y)/tri.pt_list[k].distance>-1):
             alpha= math.asin((y-1)/tri.pt_list[k].distance)
             orientation=2*math.pi-(tri.pt_list[k].angle+alpha)
+        
+        # This part managed the algorithms necessary to even out positions and improve stability
+        # This is stanted in Diez/Eve ISESA21 Technical projet Part : Amélioration de la précision
+        size_of_memory = 5
+        
+        # This "constant" defines the maximum distance at which the robot will be at the end of a run. 
+        # Rn this number is 14cm plus a margin of 6cm        
+        max_distance_between_runs = 0.20
 
         self.pos_counter += 1
-        self.pos_counter = self.pos_counter % 3 # The modulo is the total number of positions to be evened out
+        self.pos_counter = self.pos_counter % size_of_memory # The modulo is the total number of positions to hold in memory
 
         if self.pos_counter >= len(self.positions):
             self.positions.append([x,y])
         else:
             self.positions[self.pos_counter] = [x, y] # adds the latest position to the list ofp ositions
+            
+        # This part implements the position drop for abborhent values
+        self.last_good += 1
+        x_in_time = abs(self.positions[(self.pos_counter-1) % size_of_memory][0] - self.positions[self.pos_counter][0]) #distance between x's in time
+        y_in_time = abs(self.positions[(self.pos_counter-1) % size_of_memory][1] - self.positions[self.pos_counter][1]) #distance between y's in time
+        
+        dist_in_time = math.sqrt(x_in_time**2 + y_in_time**2)
+        #If its the first value calculated OF we're inside the maximum distance between points
+        if self.positions[self.pos_counter-1][0] == 0 or dist_in_time <= self.last_good * max_distance_between_runs:
+            self.last_good = 0 #Reset the counter
+            #print("is good", dist_in_time)
+        else: #Otherwise return the last good position
+            #print("is not good", dist_in_time)
+            x = self.positions[(self.pos_counter-self.last_good) % size_of_memory][0]
+            y = self.positions[(self.pos_counter-self.last_good) % size_of_memory][1]
+            
 
         #[x, y] = self.mean_position() # Determines the median of all positions
+        
+        
 
         return [x, y, x2,y2,orientation]
 
