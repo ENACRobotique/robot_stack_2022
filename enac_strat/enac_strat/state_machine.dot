@@ -1,0 +1,93 @@
+//init Init
+digraph EnacStrat {
+    Init [comment="on_init"]
+    //séquence: dépôt de la réplique et récupération de la statuette
+    Init -> AtStatuette
+        [label="go_recup_statuette/is_tirette_activee"]
+    AtStatuette -> HasRecupStatuette
+        [label="recup_statuette/is_at_statuette"]
+    HasRecupStatuette -> HasTurnedAroundReplique
+        [label="turn_around_replique/has_gotten_statuette"]
+    HasTurnedAroundReplique -> HasDroppedReplique
+        [label="drop_replique/has_turned_around_replique"]
+    HasDroppedReplique -> AtVitrine
+        [label="go_vitrine/has_dropped_replique"]
+    AtVitrine -> HasDroppedStatuette
+        [label="drop_statuette/is_at_vitrine"]
+    
+    //séquence: récupération des palets et dépôt sur la galerie
+    //récupération des 3 palets
+    HasDroppedStatuette -> DevantPaletRouge
+        [label="go_palet_rouge/is_prio_galerie"]
+    DevantPaletRouge -> HasRecupPaletRougeAndStored
+        [label="recup_rouge_stocker/is_at_palet_rouge"]
+    HasRecupPaletRougeAndStored -> RougeInBackHand
+        [label="put_back_rouge/has_stored_rouge"]
+    RougeInBackHand -> DevantPaletVert
+        [label="go_palet_vert/has_backhand_rouge"]
+    DevantPaletVert -> HasRecupPaletVertAndStored
+        [label="recup_vert_stocker/is_at_palet_vert"]
+    HasRecupPaletVertAndStored -> DevantPaletBleu
+        [label="go_palet_bleu/has_stored_vert"]
+    DevantPaletBleu -> HasRecupPaletBleu
+        [label="recup_bleu/is_at_palet_bleu"]
+    //dépôt des palets sur la galerie
+    HasRecupPaletBleu -> DevantGalerieRougeRetourne
+        [label="go_galerie_rouge/has_recup_bleu"]
+    DevantGalerieRougeRetourne -> HasDroppedRougeGalerie
+        [label="depot_rouge_arriere/is_at_galerie_rouge_retourne"]
+    HasDroppedRougeGalerie -> DevantGalerieVertRetourne
+        [label="go_galerie_vert/has_dropped_rouge"]
+    DevantGalerieVertRetourne -> HasDroppedVertGalerie
+        [label="destore_drop_vert_arriere/is_at_galerie_vert_retourne"]
+    HasDroppedVertGalerie -> DevantGalerieBleuRetourne
+        [label="store_bleu_from_front_hand_and_go_galerie_bleu/has_dropped_vert"]
+    DevantGalerieBleuRetourne -> HasDroppedBleuGalerie
+        [label="destore_drop_bleu_arriere/is_at_galerie_bleu"]
+    HasDroppedBleuGalerie -> FinGalerie
+        [label="do_nothing/has_dropped_bleu"]
+
+    FinGalerie -> DevantCarres
+        [label="go_carres/pas_deja_fait_carres"]
+    FinGalerie -> IsRentringAuBercail
+        [label="go_bercail/has_deja_fait_carres"]
+    
+
+    //séquence: carrés de fouille
+    HasDroppedStatuette -> DevantCarres
+        [label="go_carres/is_prio_carres"]
+    DevantCarres -> ColleAuMur
+        [label="se_coller_au_mur_deployer_poelon/is_devant_carres"]
+    ColleAuMur -> LireCarre
+        [label="lire_carre_si_besoin/is_au_mur"]
+    LireCarre -> PousserSiBesoin
+        [label="pousser_si_besoin/has_lu_carre_si_besoin"]
+    PousserSiBesoin -> ProchainCarre
+        [label="go_prochain_carre/has_checked_carre"]
+    ProchainCarre -> LireCarre
+        [label="lire_carre_si_besoin/is_at_prochain"]
+    PousserSiBesoin -> QuitterMur
+        [label="quitter_mur_rentrer_poelon/tous_carres_lus"]
+    QuitterMur -> FinCarres
+        [label="do_nothing/has_quitte_mur"]
+    
+    FinCarres -> IsRentringAuBercail
+        [label="go_bercail/has_deja_fait_galerie"]
+    FinCarres -> DevantPaletRouge
+        [label="go_palet_rouge_depuis_mur/pas_deja_fait_galerie"]
+
+    //retour au bercail en cas
+    {Init AtStatuette HasRecupStatuette HasTurnedAroundReplique HasDroppedReplique AtVitrine HasDroppedStatuette
+        DevantPaletRouge HasRecupPaletRougeAndStored RougeInBackHand DevantPaletVert HasRecupPaletVertAndStored DevantPaletBleu HasRecupPaletBleu
+        DevantGalerieRougeRetourne HasDroppedRougeGalerie DevantGalerieVertRetourne HasDroppedVertGalerie DevantGalerieBleuRetourne HasDroppedBleuGalerie FinGalerie
+        DevantCarres FinCarres
+    } -> IsRentringAuBercail
+        [label="go_bercail/quinze_dernieres_secondes"]
+    
+    PousserSiBesoin -> QuitterMur
+        [label="quitter_mur_rentrer_poelon/quinze_dernieres_secondes"]
+    
+    
+
+    IsRentringAuBercail -> HasRentreAuBercail [label="things_todo_at_bercail/is_at_bercail"]
+}
