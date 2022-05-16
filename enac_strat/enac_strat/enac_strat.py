@@ -37,6 +37,9 @@ class Strategy(Node):
     chrono = 0
     end = 100
 
+    done_galerie = False
+    done_carres = False
+
     released_everything = False
 
     def __init__(self):
@@ -276,7 +279,7 @@ class Strategy(Node):
         elif self.chrono != 0 and (time.time() - self.chrono) > self.end:
             self.send_diagnostic(DiagnosticStatus.ERROR, "Strategy: match", "Match has ended, strategy is blocked")
         else:
-            self.send_diagnostic(DiagnosticStatus.OK if ((time.time() - self.chrono) < self.end - 10) else DiagnosticStatus.WARN, "Strategy: match", f"{str(time.time() - self.chrono)[:7]} seconds have passed")
+            self.send_diagnostic(DiagnosticStatus.OK if ((time.time() - self.chrono) < self.end - 15) else DiagnosticStatus.WARN, "Strategy: match", f"{str(time.time() - self.chrono)[:7]} seconds have passed")
         self.send_diagnostic(DiagnosticStatus.STALE, "Strategy: state", f"{str(self.EnacStrat.state)}")
 
         self.send_tf_map_corners()
@@ -285,6 +288,7 @@ class Strategy(Node):
         if (msg.header.frame_id == "stm32"):#to prevent looping from self messages
             id = msg.periph_name[:2]
             cmd = int(msg.value)
+            print(f"ros_periph [{id}] {cmd}")
             self.periphs[id] = cmd
             self.check_transitions()
 
@@ -299,6 +303,7 @@ class Strategy(Node):
             self.theta = z_euler_from_quaternions(qx, qy, qz, qw)
             self.vlin = msg.twist.twist.linear.x
             self.vtheta = msg.twist.twist.angular.z
+            print(f"ros_odom x:{self.x} y:{self.y} theta:{self.theta}")
             self.check_transitions()
 
     def is_at_goal(self, vlin_tol, vtheta_tol, distmax_m):
@@ -362,193 +367,212 @@ class Strategy(Node):
         msg.status = [reference]
         self.ros_diag_pub.publish(msg)
 
-    #callbacks des états
     def on_init(self):
         pass
 
-    #callbacks des transitions
     def go_recup_statuette(self):
         print("Strategy: tirette activée")
+        self.chrono = time.time()
         self.send_nav_msg(1, 0.45, 0.45, math.radians(45))
+
     def is_tirette_activee(self):
         return (self.periphs.get("TI", None) == 42)
 
     def recup_statuette(self):
-        #todo macro bas-niveau
+        #TODO: code bas-niveau
         pass
+
     def is_at_statuette(self):
         return self.is_at_goal(0.001, 0.001, 0.01)
 
     def turn_around_replique(self):
         self.send_nav_msg(1, 0.45, 0.45, math.radians(135))
+
     def has_gotten_statuette(self):
         return (self.periphs.get("mr", None) == -1) #FIXME: coder l'état de neutre avec statuette en bas niveau et le renseigner ici
 
     def drop_replique(self):
-        #todo macro bas-niveau
+        #TODO: code bas-niveau
         pass
+
     def has_turned_around_replique(self):
         return self.is_at_goal(0.001, 0.001, 0.01)
 
     def go_vitrine(self):
         self.send_nav_msg(1, 0.24, 1.8, math.radians(90))
+
     def has_dropped_replique(self):
         return (self.periphs.get("mv", None) == 1) #la state_machine avant est revenue en position neutre sans charge
 
     def drop_statuette(self):
         pass
+
     def is_at_vitrine(self):
         return True
 
     def go_palet_rouge(self):
         pass
+
     def is_prio_galerie(self):
         return True
 
     def recup_rouge_stocker(self):
         pass
+
     def is_at_palet_rouge(self):
         return True
 
     def put_back_rouge(self):
         pass
+
     def has_stored_rouge(self):
         return True
 
     def go_palet_vert(self):
         pass
+
     def has_backhand_rouge(self):
         return True
 
     def recup_vert_stocker(self):
         pass
+
     def is_at_palet_vert(self):
         return True
 
     def go_palet_bleu(self):
         pass
+
     def has_stored_vert(self):
         return True
 
     def recup_bleu(self):
         pass
+
     def is_at_palet_bleu(self):
         return True
 
     def go_galerie_rouge(self):
         pass
+
     def has_recup_bleu(self):
         return True
 
     def depot_rouge_arriere(self):
         pass
+
     def is_at_galerie_rouge_retourne(self):
         return True
 
     def go_galerie_vert(self):
         pass
+
     def has_dropped_rouge(self):
         return True
 
     def destore_drop_vert_arriere(self):
         pass
+
     def is_at_galerie_vert_retourne(self):
         return True
 
     def store_bleu_from_front_hand_and_go_galerie_bleu(self):
         pass
+
     def has_dropped_vert(self):
         return True
 
     def destore_drop_bleu_arriere(self):
         pass
+
     def is_at_galerie_bleu(self):
         return True
 
     def do_nothing(self):
         pass
+
     def has_dropped_bleu(self):
         return True
 
     def go_carres(self):
         pass
+
     def pas_deja_fait_carres(self):
-        return True
+        return not self.done_carres
 
     def go_bercail(self):
-        pass
-    def has_deja_fait_carres(self):
-        return True
+        self.send_nav_msg(1, 0.14, 1.14, 0)
 
-    def go_carres(self):
-        pass
+    def has_deja_fait_carres(self):
+        return self.done_carres
+
     def is_prio_carres(self):
         return True
 
     def se_coller_au_mur_deployer_poelon(self):
         pass
+
     def is_devant_carres(self):
         return True
 
     def lire_carre_si_besoin(self):
         pass
+
     def is_au_mur(self):
         return True
 
     def pousser_si_besoin(self):
         pass
+
     def has_lu_carre_si_besoin(self):
         return True
 
     def go_prochain_carre(self):
         pass
+
     def has_checked_carre(self):
         return True
 
-    def lire_carre_si_besoin(self):
-        pass
     def is_at_prochain(self):
         return True
 
     def quitter_mur_rentrer_poelon(self):
         pass
+
     def tous_carres_lus(self):
         return True
 
-    def do_nothing(self):
-        pass
     def has_quitte_mur(self):
         return True
 
-    def go_bercail(self):
-        self.send_nav_msg(1, 0.14, 1.14, 0)
     def has_deja_fait_galerie(self):
-        return True
+        return self.done_galerie
+
 
     def go_palet_rouge_depuis_mur(self):
         pass
+
     def pas_deja_fait_galerie(self):
-        return True
+        return not self.done_galerie
 
     def quinze_dernieres_secondes(self):
-        return False
-
-    def quitter_mur_rentrer_poelon(self):
-        pass
+        return (self.chrono - time.time() <= 15.0)
 
     def things_todo_at_bercail(self):
         #shutter la configuration
-        self.send_nav_msg(1, -1, -1, -1)
+        self.send_nav_msg(1, -1.0, -1.0, 0.0)
         #être sûr d'arrêter le robot
-        self.send_cmd_vel(0, 0)
+        self.send_cmd_vel(0.0, 0.0)
         #déposer tous les palets
         if self.periphs.get("hv", 0) == 1:
             self.send_periph_msg("mg", 0)
         if self.periphs.get("hr", 0):
             self.send_periph_msg("mh", 0)
+
     def is_at_bercail(self):
         return (self.is_at_pos(0.001, 0.001, 0.01, 0.14, 1.14, 0))
-    
+
+
     #vieux code tout pourri
     def on_start(self):
         print("Strategy: Tirette détectée: start")

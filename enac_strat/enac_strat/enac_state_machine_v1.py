@@ -129,175 +129,189 @@ def on_init(self):
 
 def go_recup_statuette(self):
     pass
+
 def is_tirette_activee(self):
     return True
 
 def recup_statuette(self):
     pass
+
 def is_at_statuette(self):
     return True
 
 def turn_around_replique(self):
     pass
+
 def has_gotten_statuette(self):
     return True
 
 def drop_replique(self):
     pass
+
 def has_turned_around_replique(self):
     return True
 
 def go_vitrine(self):
     pass
+
 def has_dropped_replique(self):
     return True
 
 def drop_statuette(self):
     pass
+
 def is_at_vitrine(self):
     return True
 
 def go_palet_rouge(self):
     pass
+
 def is_prio_galerie(self):
     return True
 
 def recup_rouge_stocker(self):
     pass
+
 def is_at_palet_rouge(self):
     return True
 
 def put_back_rouge(self):
     pass
+
 def has_stored_rouge(self):
     return True
 
 def go_palet_vert(self):
     pass
+
 def has_backhand_rouge(self):
     return True
 
 def recup_vert_stocker(self):
     pass
+
 def is_at_palet_vert(self):
     return True
 
 def go_palet_bleu(self):
     pass
+
 def has_stored_vert(self):
     return True
 
 def recup_bleu(self):
     pass
+
 def is_at_palet_bleu(self):
     return True
 
 def go_galerie_rouge(self):
     pass
+
 def has_recup_bleu(self):
     return True
 
 def depot_rouge_arriere(self):
     pass
+
 def is_at_galerie_rouge_retourne(self):
     return True
 
 def go_galerie_vert(self):
     pass
+
 def has_dropped_rouge(self):
     return True
 
 def destore_drop_vert_arriere(self):
     pass
+
 def is_at_galerie_vert_retourne(self):
     return True
 
 def store_bleu_from_front_hand_and_go_galerie_bleu(self):
     pass
+
 def has_dropped_vert(self):
     return True
 
 def destore_drop_bleu_arriere(self):
     pass
+
 def is_at_galerie_bleu(self):
     return True
 
 def do_nothing(self):
     pass
+
 def has_dropped_bleu(self):
     return True
 
 def go_carres(self):
     pass
+
 def pas_deja_fait_carres(self):
     return True
 
 def go_bercail(self):
     pass
+
 def has_deja_fait_carres(self):
     return True
 
-def go_carres(self):
-    pass
 def is_prio_carres(self):
     return True
 
 def se_coller_au_mur_deployer_poelon(self):
     pass
+
 def is_devant_carres(self):
     return True
 
 def lire_carre_si_besoin(self):
     pass
+
 def is_au_mur(self):
     return True
 
 def pousser_si_besoin(self):
     pass
+
 def has_lu_carre_si_besoin(self):
     return True
 
 def go_prochain_carre(self):
     pass
+
 def has_checked_carre(self):
     return True
 
-def lire_carre_si_besoin(self):
-    pass
 def is_at_prochain(self):
     return True
 
 def quitter_mur_rentrer_poelon(self):
     pass
+
 def tous_carres_lus(self):
     return True
 
-def do_nothing(self):
-    pass
 def has_quitte_mur(self):
     return True
 
-def go_bercail(self):
-    pass
 def has_deja_fait_galerie(self):
     return True
 
 def go_palet_rouge_depuis_mur(self):
     pass
+
 def pas_deja_fait_galerie(self):
     return True
 
-def go_bercail(self):
-    pass
-def quinze_dernieres_secondes(self):
-    return True
-
-def quitter_mur_rentrer_poelon(self):
-    pass
 def quinze_dernieres_secondes(self):
     return True
 
 def things_todo_at_bercail(self):
     pass
+
 def is_at_bercail(self):
     return True
