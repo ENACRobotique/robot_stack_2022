@@ -31,7 +31,7 @@ class NavigationType():
     def update_dyn_obstacles(self, dynamic_obstacles = None):
         pass
     
-    def update_odom(self, callback_speed:Callable[[float, float], None], position:OdomData, speed:OdomData):
+    def update_odom(self, callback_speed:Callable[[float, float], None], position:OdomData, speed:OdomData, dt=0.0):
         """_summary_
 
         Args:
