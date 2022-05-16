@@ -1,0 +1,587 @@
+<?xml version="1.0" standalone="no"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="2758pt" height="2530pt" viewBox="0.00 0.00 2757.82 2530.40">
+<g id="graph0" class="graph" transform="translate(-251.71250109665198,2208.673499824284) scale(0.9291606742509155)" data-name="EnacStrat">
+
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-2526.4 2753.82,-2526.4 2753.82,4 -4,4" style=""/>
+<!-- Init -->
+<!-- on_init -->
+<g id="node1" class="node" pointer-events="visible" data-name="Init" data-comment="on_init">
+
+<ellipse fill="none" stroke="black" cx="27" cy="-2504.4" rx="27" ry="18" style=""/>
+<text text-anchor="middle" x="27" y="-2500.2" font-family="Times,serif" font-size="14.00" style="">Init</text>
+</g>
+<!-- AtStatuette -->
+<g id="node2" class="node" pointer-events="visible" data-name="AtStatuette">
+
+<ellipse fill="none" stroke="black" cx="242" cy="-2415.6" rx="54.47" ry="18" style=""/>
+<text text-anchor="middle" x="242" y="-2411.4" font-family="Times,serif" font-size="14.00" style="">AtStatuette</text>
+</g>
+<!-- Init&#45;&gt;AtStatuette -->
+<g id="edge1" class="edge" data-name="Init-&gt;AtStatuette">
+
+<path fill="none" stroke="black" d="M49.6,-2494.27C85.06,-2479.96 154.35,-2451.99 199.37,-2433.81" style=""/>
+<polygon fill="black" stroke="black" points="200.91,-2436.96 208.87,-2429.97 198.29,-2430.47 200.91,-2436.96" style=""/>
+<text text-anchor="middle" x="256.62" y="-2455.8" font-family="Times,serif" font-size="14.00" style="">go_recup_statuette/is_tirette_activee</text>
+</g>
+<!-- IsRentringAuBercail -->
+<g id="node23" class="node" pointer-events="visible" data-name="IsRentringAuBercail">
+
+<ellipse fill="none" stroke="black" cx="1066" cy="-106.8" rx="91.48" ry="18" style=""/>
+<text text-anchor="middle" x="1066" y="-102.6" font-family="Times,serif" font-size="14.00" style="">IsRentringAuBercail</text>
+</g>
+<!-- Init&#45;&gt;IsRentringAuBercail -->
+<g id="edge33" class="edge" data-name="Init-&gt;IsRentringAuBercail">
+
+<path fill="none" stroke="black" d="M22.03,-2486.6C17.33,-2469.24 11,-2441.27 11,-2416.6 11,-2416.6 11,-2416.6 11,-194.6 11,-66.3 167.51,-157.25 295,-142.8 533.75,-115.73 816.32,-109.41 964.18,-108.05" style=""/>
+<polygon fill="black" stroke="black" points="964.62,-111.55 974.59,-107.96 964.56,-104.55 964.62,-111.55" style=""/>
+<text text-anchor="middle" x="119.07" y="-1301.4" font-family="Times,serif" font-size="14.00" style="">go_bercail/quinze_dernieres_secondes</text>
+</g>
+<!-- HasRecupStatuette -->
+<g id="node3" class="node" pointer-events="visible" data-name="HasRecupStatuette">
+
+<ellipse fill="none" stroke="black" cx="486" cy="-2326.8" rx="84.53" ry="18" style=""/>
+<text text-anchor="middle" x="486" y="-2322.6" font-family="Times,serif" font-size="14.00" style="">HasRecupStatuette</text>
+</g>
+<!-- AtStatuette&#45;&gt;HasRecupStatuette -->
+<g id="edge2" class="edge" data-name="AtStatuette-&gt;HasRecupStatuette">
+
+<path fill="none" stroke="black" d="M277.74,-2401.89C319.14,-2387.16 387.67,-2362.78 434.74,-2346.04" style=""/>
+<polygon fill="black" stroke="black" points="436.19,-2349.23 444.44,-2342.58 433.85,-2342.64 436.19,-2349.23" style=""/>
+<text text-anchor="middle" x="470.36" y="-2367" font-family="Times,serif" font-size="14.00" style="">recup_statuette/is_at_statuette</text>
+</g>
+<!-- AtStatuette&#45;&gt;IsRentringAuBercail -->
+<g id="edge34" class="edge" data-name="AtStatuette-&gt;IsRentringAuBercail">
+
+<path fill="none" stroke="black" d="M242,-2397.31C242,-2379.79 242,-2351.91 242,-2327.8 242,-2327.8 242,-2327.8 242,-194.6 242,-122.74 744.07,-110.18 964.39,-108.12" style=""/>
+<polygon fill="black" stroke="black" points="964.7,-111.62 974.67,-108.03 964.64,-104.62 964.7,-111.62" style=""/>
+<text text-anchor="middle" x="350.07" y="-1257" font-family="Times,serif" font-size="14.00" style="">go_bercail/quinze_dernieres_secondes</text>
+</g>
+<!-- HasTurnedAroundReplique -->
+<g id="node4" class="node" pointer-events="visible" data-name="HasTurnedAroundReplique">
+
+<ellipse fill="none" stroke="black" cx="717" cy="-2238" rx="118.12" ry="18" style=""/>
+<text text-anchor="middle" x="717" y="-2233.8" font-family="Times,serif" font-size="14.00" style="">HasTurnedAroundReplique</text>
+</g>
+<!-- HasRecupStatuette&#45;&gt;HasTurnedAroundReplique -->
+<g id="edge3" class="edge" data-name="HasRecupStatuette-&gt;HasTurnedAroundReplique">
+
+<path fill="none" stroke="black" d="M525.71,-2310.88C564.25,-2296.4 622.93,-2274.35 665.14,-2258.49" style=""/>
+<polygon fill="black" stroke="black" points="666.55,-2261.69 674.68,-2254.9 664.09,-2255.14 666.55,-2261.69" style=""/>
+<text text-anchor="middle" x="742.75" y="-2278.2" font-family="Times,serif" font-size="14.00" style="">turn_around_replique/has_gotten_statuette</text>
+</g>
+<!-- HasRecupStatuette&#45;&gt;IsRentringAuBercail -->
+<g id="edge35" class="edge" data-name="HasRecupStatuette-&gt;IsRentringAuBercail">
+
+<path fill="none" stroke="black" d="M486,-2308.51C486,-2290.99 486,-2263.11 486,-2239 486,-2239 486,-2239 486,-194.6 486,-146.45 802.68,-122.06 968.04,-112.61" style=""/>
+<polygon fill="black" stroke="black" points="968.44,-116.1 978.23,-112.04 968.04,-109.11 968.44,-116.1" style=""/>
+<text text-anchor="middle" x="594.07" y="-1212.6" font-family="Times,serif" font-size="14.00" style="">go_bercail/quinze_dernieres_secondes</text>
+</g>
+<!-- HasDroppedReplique -->
+<g id="node5" class="node" pointer-events="visible" data-name="HasDroppedReplique">
+
+<ellipse fill="none" stroke="black" cx="900" cy="-2149.2" rx="94.92" ry="18" style=""/>
+<text text-anchor="middle" x="900" y="-2145" font-family="Times,serif" font-size="14.00" style="">HasDroppedReplique</text>
+</g>
+<!-- HasTurnedAroundReplique&#45;&gt;HasDroppedReplique -->
+<g id="edge4" class="edge" data-name="HasTurnedAroundReplique-&gt;HasDroppedReplique">
+
+<path fill="none" stroke="black" d="M751.42,-2220.67C781.39,-2206.46 824.95,-2185.8 857.17,-2170.52" style=""/>
+<polygon fill="black" stroke="black" points="858.82,-2173.61 866.35,-2166.16 855.82,-2167.28 858.82,-2173.61" style=""/>
+<text text-anchor="middle" x="946.3" y="-2189.4" font-family="Times,serif" font-size="14.00" style="">drop_replique/has_turned_around_replique</text>
+</g>
+<!-- HasTurnedAroundReplique&#45;&gt;IsRentringAuBercail -->
+<g id="edge36" class="edge" data-name="HasTurnedAroundReplique-&gt;IsRentringAuBercail">
+
+<path fill="none" stroke="black" d="M717,-2219.71C717,-2202.19 717,-2174.31 717,-2150.2 717,-2150.2 717,-2150.2 717,-1260.2 717,-1236.35 718.99,-1226.09 703,-1208.4 687.96,-1191.77 668.58,-1208.87 655.87,-1190.4 640.39,-1167.92 656,-1156.29 656,-1129 656,-1129 656,-1129 656,-194.6 656,-131.62 843.53,-114.12 964.93,-109.4" style=""/>
+<polygon fill="black" stroke="black" points="965.14,-112.89 975.01,-109.03 964.89,-105.9 965.14,-112.89" style=""/>
+<text text-anchor="middle" x="764.07" y="-1168.2" font-family="Times,serif" font-size="14.00" style="">go_bercail/quinze_dernieres_secondes</text>
+</g>
+<!-- AtVitrine -->
+<g id="node6" class="node" pointer-events="visible" data-name="AtVitrine">
+
+<ellipse fill="none" stroke="black" cx="976" cy="-2060.4" rx="48.09" ry="18" style=""/>
+<text text-anchor="middle" x="976" y="-2056.2" font-family="Times,serif" font-size="14.00" style="">AtVitrine</text>
+</g>
+<!-- HasDroppedReplique&#45;&gt;AtVitrine -->
+<g id="edge5" class="edge" data-name="HasDroppedReplique-&gt;AtVitrine">
+
+<path fill="none" stroke="black" d="M915.02,-2131.05C926.48,-2117.96 942.41,-2099.77 955.11,-2085.26" style=""/>
+<polygon fill="black" stroke="black" points="957.83,-2087.46 961.79,-2077.63 952.57,-2082.85 957.83,-2087.46" style=""/>
+<text text-anchor="middle" x="1037.92" y="-2100.6" font-family="Times,serif" font-size="14.00" style="">go_vitrine/has_dropped_replique</text>
+</g>
+<!-- HasDroppedReplique&#45;&gt;IsRentringAuBercail -->
+<g id="edge37" class="edge" data-name="HasDroppedReplique-&gt;IsRentringAuBercail">
+
+<path fill="none" stroke="black" d="M900,-2130.91C900,-2113.39 900,-2085.51 900,-2061.4 900,-2061.4 900,-2061.4 900,-1215.8 900,-1186.5 899.18,-1172.32 876,-1154.4 849.06,-1133.58 746.48,-1161.85 723.87,-1136.4 718.91,-1130.82 723.54,-1127.06 723.87,-1119.6 724.56,-1104 727,-1100.22 727,-1084.6 727,-1084.6 727,-1084.6 727,-194.6 727,-158.01 757.35,-157.17 791,-142.8 822.63,-129.3 904.65,-119.96 970.94,-114.35" style=""/>
+<polygon fill="black" stroke="black" points="971.34,-117.83 981.01,-113.52 970.76,-110.85 971.34,-117.83" style=""/>
+<text text-anchor="middle" x="832.07" y="-1123.8" font-family="Times,serif" font-size="14.00" style="">go_bercail/quinze_dernieres_secondes</text>
+</g>
+<!-- HasDroppedStatuette -->
+<g id="node7" class="node" pointer-events="visible" data-name="HasDroppedStatuette">
+
+<ellipse fill="none" stroke="black" cx="1089" cy="-1971.6" rx="93.77" ry="18" style=""/>
+<text text-anchor="middle" x="1089" y="-1967.4" font-family="Times,serif" font-size="14.00" style="">HasDroppedStatuette</text>
+</g>
+<!-- AtVitrine&#45;&gt;HasDroppedStatuette -->
+<g id="edge6" class="edge" data-name="AtVitrine-&gt;HasDroppedStatuette">
+
+<path fill="none" stroke="black" d="M996.2,-2043.88C1013.75,-2030.4 1039.41,-2010.69 1059.3,-1995.41" style=""/>
+<polygon fill="black" stroke="black" points="1061.64,-1998.03 1067.43,-1989.17 1057.37,-1992.48 1061.64,-1998.03" style=""/>
+<text text-anchor="middle" x="1119.59" y="-2011.8" font-family="Times,serif" font-size="14.00" style="">drop_statuette/is_at_vitrine</text>
+</g>
+<!-- AtVitrine&#45;&gt;IsRentringAuBercail -->
+<g id="edge38" class="edge" data-name="AtVitrine-&gt;IsRentringAuBercail">
+
+<path fill="none" stroke="black" d="M970.3,-2042.32C965.03,-2024.97 958,-1997.22 958,-1972.6 958,-1972.6 958,-1972.6 958,-1171.4 958,-1147.55 962.15,-1135.07 944,-1119.6 914.9,-1094.8 798.45,-1130.02 772.87,-1101.6 754.61,-1081.32 773,-1067.49 773,-1040.2 773,-1040.2 773,-1040.2 773,-194.6 773,-157.31 804.79,-157.64 839,-142.8 878.88,-125.5 925.96,-116.59 966.87,-112.06" style=""/>
+<polygon fill="black" stroke="black" points="967.27,-115.54 976.86,-111.03 966.55,-108.57 967.27,-115.54" style=""/>
+<text text-anchor="middle" x="881.07" y="-1079.4" font-family="Times,serif" font-size="14.00" style="">go_bercail/quinze_dernieres_secondes</text>
+</g>
+<!-- DevantPaletRouge -->
+<g id="node8" class="node" pointer-events="visible" data-name="DevantPaletRouge">
+
+<ellipse fill="none" stroke="black" cx="1176" cy="-1882.8" rx="83.39" ry="18" style=""/>
+<text text-anchor="middle" x="1176" y="-1878.6" font-family="Times,serif" font-size="14.00" style="">DevantPaletRouge</text>
+</g>
+<!-- HasDroppedStatuette&#45;&gt;DevantPaletRouge -->
+<g id="edge7" class="edge" data-name="HasDroppedStatuette-&gt;DevantPaletRouge">
+
+<path fill="none" stroke="black" d="M1105.77,-1953.86C1118.89,-1940.78 1137.31,-1922.4 1151.99,-1907.76" style=""/>
+<polygon fill="black" stroke="black" points="1154.67,-1910.03 1159.28,-1900.48 1149.73,-1905.07 1154.67,-1910.03" style=""/>
+<text text-anchor="middle" x="1228.47" y="-1923" font-family="Times,serif" font-size="14.00" style="">go_palet_rouge/is_prio_galerie</text>
+</g>
+<!-- DevantCarres -->
+<g id="node22" class="node" pointer-events="visible" data-name="DevantCarres">
+
+<ellipse fill="none" stroke="black" cx="1896" cy="-639.6" rx="64.25" ry="18" style=""/>
+<text text-anchor="middle" x="1896" y="-635.4" font-family="Times,serif" font-size="14.00" style="">DevantCarres</text>
+</g>
+<!-- HasDroppedStatuette&#45;&gt;DevantCarres -->
+<g id="edge23" class="edge" data-name="HasDroppedStatuette-&gt;DevantCarres">
+
+<path fill="none" stroke="black" d="M1182.49,-1970.32C1397.94,-1968.45 1911,-1956.36 1911,-1883.8 1911,-1883.8 1911,-1883.8 1911,-727.4 1911,-707.14 1906.98,-684.6 1903.1,-667.56" style=""/>
+<polygon fill="black" stroke="black" points="1906.48,-666.65 1900.75,-657.74 1899.68,-668.28 1906.48,-666.65" style=""/>
+<text text-anchor="middle" x="1979.8" y="-1301.4" font-family="Times,serif" font-size="14.00" style="">go_carres/is_prio_carres</text>
+</g>
+<!-- HasDroppedStatuette&#45;&gt;IsRentringAuBercail -->
+<g id="edge39" class="edge" data-name="HasDroppedStatuette-&gt;IsRentringAuBercail">
+
+<path fill="none" stroke="black" d="M1063.01,-1954C1042.38,-1938.58 1017,-1913.56 1017,-1883.8 1017,-1883.8 1017,-1883.8 1017,-1127 1017,-1097.7 1016.31,-1083.35 993,-1065.6 962.23,-1042.16 845.77,-1076.33 819.87,-1047.6 814.87,-1042.05 819.64,-1038.26 819.87,-1030.8 820.34,-1015.22 822,-1011.38 822,-995.8 822,-995.8 822,-995.8 822,-194.6 822,-160.7 847.7,-158.01 878,-142.8 906.51,-128.49 940.11,-119.99 970.96,-114.95" style=""/>
+<polygon fill="black" stroke="black" points="971.51,-118.41 980.87,-113.44 970.45,-111.49 971.51,-118.41" style=""/>
+<text text-anchor="middle" x="928.07" y="-1035" font-family="Times,serif" font-size="14.00" style="">go_bercail/quinze_dernieres_secondes</text>
+</g>
+<!-- HasRecupPaletRougeAndStored -->
+<g id="node9" class="node" pointer-events="visible" data-name="HasRecupPaletRougeAndStored">
+
+<ellipse fill="none" stroke="black" cx="1220" cy="-1794" rx="137.18" ry="18" style=""/>
+<text text-anchor="middle" x="1220" y="-1789.8" font-family="Times,serif" font-size="14.00" style="">HasRecupPaletRougeAndStored</text>
+</g>
+<!-- DevantPaletRouge&#45;&gt;HasRecupPaletRougeAndStored -->
+<g id="edge8" class="edge" data-name="DevantPaletRouge-&gt;HasRecupPaletRougeAndStored">
+
+<path fill="none" stroke="black" d="M1184.69,-1864.65C1190.96,-1852.29 1199.54,-1835.37 1206.67,-1821.3" style=""/>
+<polygon fill="black" stroke="black" points="1209.93,-1822.62 1211.33,-1812.11 1203.68,-1819.45 1209.93,-1822.62" style=""/>
+<text text-anchor="middle" x="1312.4" y="-1834.2" font-family="Times,serif" font-size="14.00" style="">recup_rouge_stocker/is_at_palet_rouge</text>
+</g>
+<!-- DevantPaletRouge&#45;&gt;IsRentringAuBercail -->
+<g id="edge40" class="edge" data-name="DevantPaletRouge-&gt;IsRentringAuBercail">
+
+<path fill="none" stroke="black" d="M1127.48,-1868.14C1093.82,-1855.36 1055,-1832.49 1055,-1795 1055,-1795 1055,-1795 1055,-1127 1055,-1083.73 1071.36,-1060.62 1040,-1030.8 1012.13,-1004.3 893.61,-1041.37 867.87,-1012.8 849.6,-992.53 868,-978.69 868,-951.4 868,-951.4 868,-951.4 868,-194.6 868,-145.69 919.3,-124.08 969.68,-114.65" style=""/>
+<polygon fill="black" stroke="black" points="970.47,-118.07 979.73,-112.93 969.28,-111.17 970.47,-118.07" style=""/>
+<text text-anchor="middle" x="976.07" y="-990.6" font-family="Times,serif" font-size="14.00" style="">go_bercail/quinze_dernieres_secondes</text>
+</g>
+<!-- RougeInBackHand -->
+<g id="node10" class="node" pointer-events="visible" data-name="RougeInBackHand">
+
+<ellipse fill="none" stroke="black" cx="1225" cy="-1705.2" rx="85.11" ry="18" style=""/>
+<text text-anchor="middle" x="1225" y="-1701" font-family="Times,serif" font-size="14.00" style="">RougeInBackHand</text>
+</g>
+<!-- HasRecupPaletRougeAndStored&#45;&gt;RougeInBackHand -->
+<g id="edge9" class="edge" data-name="HasRecupPaletRougeAndStored-&gt;RougeInBackHand">
+
+<path fill="none" stroke="black" d="M1220.99,-1775.85C1221.69,-1763.72 1222.64,-1747.22 1223.44,-1733.32" style=""/>
+<polygon fill="black" stroke="black" points="1226.93,-1733.5 1224.01,-1723.31 1219.94,-1733.1 1226.93,-1733.5" style=""/>
+<text text-anchor="middle" x="1319.42" y="-1745.4" font-family="Times,serif" font-size="14.00" style="">put_back_rouge/has_stored_rouge</text>
+</g>
+<!-- HasRecupPaletRougeAndStored&#45;&gt;IsRentringAuBercail -->
+<g id="edge41" class="edge" data-name="HasRecupPaletRougeAndStored-&gt;IsRentringAuBercail">
+
+<path fill="none" stroke="black" d="M1174.51,-1776.87C1145,-1763.17 1112,-1740.24 1112,-1706.2 1112,-1706.2 1112,-1706.2 1112,-1038.2 1112,-1008.9 1111.33,-994.52 1088,-976.8 1056.31,-952.74 937.14,-987.77 909.87,-958.8 880.54,-927.64 906,-905.39 906,-862.6 906,-862.6 906,-862.6 906,-194.6 906,-154.31 945.68,-132.62 985.52,-121" style=""/>
+<polygon fill="black" stroke="black" points="986.62,-124.33 995.36,-118.33 984.79,-117.57 986.62,-124.33" style=""/>
+<text text-anchor="middle" x="1018.07" y="-946.2" font-family="Times,serif" font-size="14.00" style="">go_bercail/quinze_dernieres_secondes</text>
+</g>
+<!-- DevantPaletVert -->
+<g id="node11" class="node" pointer-events="visible" data-name="DevantPaletVert">
+
+<ellipse fill="none" stroke="black" cx="1253" cy="-1616.4" rx="75.28" ry="18" style=""/>
+<text text-anchor="middle" x="1253" y="-1612.2" font-family="Times,serif" font-size="14.00" style="">DevantPaletVert</text>
+</g>
+<!-- RougeInBackHand&#45;&gt;DevantPaletVert -->
+<g id="edge10" class="edge" data-name="RougeInBackHand-&gt;DevantPaletVert">
+
+<path fill="none" stroke="black" d="M1230.53,-1687.05C1234.48,-1674.81 1239.87,-1658.09 1244.38,-1644.11" style=""/>
+<polygon fill="black" stroke="black" points="1247.74,-1645.1 1247.48,-1634.51 1241.08,-1642.96 1247.74,-1645.1" style=""/>
+<text text-anchor="middle" x="1341.52" y="-1656.6" font-family="Times,serif" font-size="14.00" style="">go_palet_vert/has_backhand_rouge</text>
+</g>
+<!-- RougeInBackHand&#45;&gt;IsRentringAuBercail -->
+<g id="edge42" class="edge" data-name="RougeInBackHand-&gt;IsRentringAuBercail">
+
+<path fill="none" stroke="black" d="M1197.92,-1687.85C1176.44,-1672.6 1150,-1647.67 1150,-1617.4 1150,-1617.4 1150,-1617.4 1150,-1038.2 1150,-994.53 1162.45,-971.23 1130,-942 1100.44,-915.37 978.55,-953.51 951.87,-924 933.57,-903.76 952,-889.89 952,-862.6 952,-862.6 952,-862.6 952,-194.6 952,-162.16 981.57,-140.25 1010.6,-126.56" style=""/>
+<polygon fill="black" stroke="black" points="1012.24,-129.66 1019.96,-122.4 1009.4,-123.26 1012.24,-129.66" style=""/>
+<text text-anchor="middle" x="1060.07" y="-901.8" font-family="Times,serif" font-size="14.00" style="">go_bercail/quinze_dernieres_secondes</text>
+</g>
+<!-- HasRecupPaletVertAndStored -->
+<g id="node12" class="node" pointer-events="visible" data-name="HasRecupPaletVertAndStored">
+
+<ellipse fill="none" stroke="black" cx="1353" cy="-1527.6" rx="129.07" ry="18" style=""/>
+<text text-anchor="middle" x="1353" y="-1523.4" font-family="Times,serif" font-size="14.00" style="">HasRecupPaletVertAndStored</text>
+</g>
+<!-- DevantPaletVert&#45;&gt;HasRecupPaletVertAndStored -->
+<g id="edge11" class="edge" data-name="DevantPaletVert-&gt;HasRecupPaletVertAndStored">
+
+<path fill="none" stroke="black" d="M1272.28,-1598.66C1287.4,-1585.54 1308.64,-1567.1 1325.54,-1552.44" style=""/>
+<polygon fill="black" stroke="black" points="1328.18,-1554.78 1333.44,-1545.58 1323.59,-1549.49 1328.18,-1554.78" style=""/>
+<text text-anchor="middle" x="1412.29" y="-1567.8" font-family="Times,serif" font-size="14.00" style="">recup_vert_stocker/is_at_palet_vert</text>
+</g>
+<!-- DevantPaletVert&#45;&gt;IsRentringAuBercail -->
+<g id="edge43" class="edge" data-name="DevantPaletVert-&gt;IsRentringAuBercail">
+
+<path fill="none" stroke="black" d="M1233.7,-1598.89C1217.17,-1582.8 1196,-1556.72 1196,-1528.6 1196,-1528.6 1196,-1528.6 1196,-949.4 1196,-920.1 1195.34,-905.71 1172,-888 1140.13,-863.81 1020.15,-899.27 992.87,-870 963.7,-838.71 990,-816.57 990,-773.8 990,-773.8 990,-773.8 990,-194.6 990,-167.84 1010.7,-145.37 1030.49,-130" style=""/>
+<polygon fill="black" stroke="black" points="1032.58,-132.81 1038.56,-124.06 1028.43,-127.17 1032.58,-132.81" style=""/>
+<text text-anchor="middle" x="1101.07" y="-857.4" font-family="Times,serif" font-size="14.00" style="">go_bercail/quinze_dernieres_secondes</text>
+</g>
+<!-- DevantPaletBleu -->
+<g id="node13" class="node" pointer-events="visible" data-name="DevantPaletBleu">
+
+<ellipse fill="none" stroke="black" cx="1353" cy="-1438.8" rx="76.44" ry="18" style=""/>
+<text text-anchor="middle" x="1353" y="-1434.6" font-family="Times,serif" font-size="14.00" style="">DevantPaletBleu</text>
+</g>
+<!-- HasRecupPaletVertAndStored&#45;&gt;DevantPaletBleu -->
+<g id="edge12" class="edge" data-name="HasRecupPaletVertAndStored-&gt;DevantPaletBleu">
+
+<path fill="none" stroke="black" d="M1353,-1509.45C1353,-1497.32 1353,-1480.82 1353,-1466.92" style=""/>
+<polygon fill="black" stroke="black" points="1356.5,-1466.91 1353,-1456.91 1349.5,-1466.91 1356.5,-1466.91" style=""/>
+<text text-anchor="middle" x="1438.92" y="-1479" font-family="Times,serif" font-size="14.00" style="">go_palet_bleu/has_stored_vert</text>
+</g>
+<!-- HasRecupPaletVertAndStored&#45;&gt;IsRentringAuBercail -->
+<g id="edge44" class="edge" data-name="HasRecupPaletVertAndStored-&gt;IsRentringAuBercail">
+
+<path fill="none" stroke="black" d="M1301.15,-1511.05C1269.08,-1497.88 1234,-1475.34 1234,-1439.8 1234,-1439.8 1234,-1439.8 1234,-949.4 1234,-905.64 1245.65,-882.34 1213,-853.2 1183.48,-826.86 1063.15,-863.85 1035.87,-835.2 989.77,-786.79 1028,-751.85 1028,-685 1028,-685 1028,-685 1028,-194.6 1028,-172.67 1038.3,-150.04 1048.18,-133.39" style=""/>
+<polygon fill="black" stroke="black" points="1051.22,-135.13 1053.56,-124.79 1045.29,-131.42 1051.22,-135.13" style=""/>
+<text text-anchor="middle" x="1144.07" y="-813" font-family="Times,serif" font-size="14.00" style="">go_bercail/quinze_dernieres_secondes</text>
+</g>
+<!-- HasRecupPaletBleu -->
+<g id="node14" class="node" pointer-events="visible" data-name="HasRecupPaletBleu">
+
+<ellipse fill="none" stroke="black" cx="1396" cy="-1350" rx="88.05" ry="18" style=""/>
+<text text-anchor="middle" x="1396" y="-1345.8" font-family="Times,serif" font-size="14.00" style="">HasRecupPaletBleu</text>
+</g>
+<!-- DevantPaletBleu&#45;&gt;HasRecupPaletBleu -->
+<g id="edge13" class="edge" data-name="DevantPaletBleu-&gt;HasRecupPaletBleu">
+
+<path fill="none" stroke="black" d="M1361.5,-1420.65C1367.62,-1408.29 1376,-1391.37 1382.97,-1377.3" style=""/>
+<polygon fill="black" stroke="black" points="1386.22,-1378.63 1387.52,-1368.11 1379.95,-1375.52 1386.22,-1378.63" style=""/>
+<text text-anchor="middle" x="1457.92" y="-1390.2" font-family="Times,serif" font-size="14.00" style="">recup_bleu/is_at_palet_bleu</text>
+</g>
+<!-- DevantPaletBleu&#45;&gt;IsRentringAuBercail -->
+<g id="edge45" class="edge" data-name="DevantPaletBleu-&gt;IsRentringAuBercail">
+
+<path fill="none" stroke="black" d="M1327.06,-1421.58C1306.08,-1406.25 1280,-1381.13 1280,-1351 1280,-1351 1280,-1351 1280,-860.6 1280,-831.3 1279.35,-816.89 1256,-799.2 1223.58,-774.64 1102.38,-810.2 1073.87,-781.2 1043.79,-750.61 1066,-727.9 1066,-685 1066,-685 1066,-685 1066,-194.6 1066,-174.82 1066,-152.51 1066,-135.46" style=""/>
+<polygon fill="black" stroke="black" points="1069.5,-135.09 1066,-125.09 1062.5,-135.09 1069.5,-135.09" style=""/>
+<text text-anchor="middle" x="1182.07" y="-768.6" font-family="Times,serif" font-size="14.00" style="">go_bercail/quinze_dernieres_secondes</text>
+</g>
+<!-- DevantGalerieRougeRetourne -->
+<g id="node15" class="node" pointer-events="visible" data-name="DevantGalerieRougeRetourne">
+
+<ellipse fill="none" stroke="black" cx="1474" cy="-1261.2" rx="127.9" ry="18" style=""/>
+<text text-anchor="middle" x="1474" y="-1257" font-family="Times,serif" font-size="14.00" style="">DevantGalerieRougeRetourne</text>
+</g>
+<!-- HasRecupPaletBleu&#45;&gt;DevantGalerieRougeRetourne -->
+<g id="edge14" class="edge" data-name="HasRecupPaletBleu-&gt;DevantGalerieRougeRetourne">
+
+<path fill="none" stroke="black" d="M1411.41,-1331.85C1422.95,-1319.01 1438.9,-1301.26 1451.81,-1286.89" style=""/>
+<polygon fill="black" stroke="black" points="1454.54,-1289.09 1458.62,-1279.31 1449.33,-1284.41 1454.54,-1289.09" style=""/>
+<text text-anchor="middle" x="1536.85" y="-1301.4" font-family="Times,serif" font-size="14.00" style="">go_galerie_rouge/has_recup_bleu</text>
+</g>
+<!-- HasRecupPaletBleu&#45;&gt;IsRentringAuBercail -->
+<g id="edge46" class="edge" data-name="HasRecupPaletBleu-&gt;IsRentringAuBercail">
+
+<path fill="none" stroke="black" d="M1367.84,-1332.91C1345.5,-1317.82 1318,-1293 1318,-1262.2 1318,-1262.2 1318,-1262.2 1318,-860.6 1318,-816.53 1327.35,-793.2 1294,-764.4 1263.22,-737.82 1139.96,-775.81 1111.87,-746.4 1065.7,-698.05 1104,-663.05 1104,-596.2 1104,-596.2 1104,-596.2 1104,-194.6 1104,-172.67 1093.7,-150.04 1083.82,-133.39" style=""/>
+<polygon fill="black" stroke="black" points="1086.71,-131.42 1078.44,-124.79 1080.78,-135.13 1086.71,-131.42" style=""/>
+<text text-anchor="middle" x="1220.07" y="-724.2" font-family="Times,serif" font-size="14.00" style="">go_bercail/quinze_dernieres_secondes</text>
+</g>
+<!-- HasDroppedRougeGalerie -->
+<g id="node16" class="node" pointer-events="visible" data-name="HasDroppedRougeGalerie">
+
+<ellipse fill="none" stroke="black" cx="1497" cy="-1172.4" rx="113.44" ry="18" style=""/>
+<text text-anchor="middle" x="1497" y="-1168.2" font-family="Times,serif" font-size="14.00" style="">HasDroppedRougeGalerie</text>
+</g>
+<!-- DevantGalerieRougeRetourne&#45;&gt;HasDroppedRougeGalerie -->
+<g id="edge15" class="edge" data-name="DevantGalerieRougeRetourne-&gt;HasDroppedRougeGalerie">
+
+<path fill="none" stroke="black" d="M1478.54,-1243.05C1481.76,-1230.92 1486.13,-1214.42 1489.81,-1200.52" style=""/>
+<polygon fill="black" stroke="black" points="1493.29,-1201.08 1492.47,-1190.51 1486.52,-1199.28 1493.29,-1201.08" style=""/>
+<text text-anchor="middle" x="1628.71" y="-1212.6" font-family="Times,serif" font-size="14.00" style="">depot_rouge_arriere/is_at_galerie_rouge_retourne</text>
+</g>
+<!-- DevantGalerieRougeRetourne&#45;&gt;IsRentringAuBercail -->
+<g id="edge47" class="edge" data-name="DevantGalerieRougeRetourne-&gt;IsRentringAuBercail">
+
+<path fill="none" stroke="black" d="M1422.93,-1244.67C1391.04,-1231.46 1356,-1208.88 1356,-1173.4 1356,-1173.4 1356,-1173.4 1356,-771.8 1356,-742.5 1355.34,-728.11 1332,-710.4 1299.95,-686.09 1180.35,-720.81 1151.87,-692.4 1121.44,-662.05 1142,-639.18 1142,-596.2 1142,-596.2 1142,-596.2 1142,-194.6 1142,-169.23 1134.46,-162.11 1118,-142.8 1113.92,-138.02 1109.04,-133.61 1103.92,-129.66" style=""/>
+<polygon fill="black" stroke="black" points="1105.93,-126.79 1095.76,-123.82 1101.86,-132.49 1105.93,-126.79" style=""/>
+<text text-anchor="middle" x="1260.07" y="-679.8" font-family="Times,serif" font-size="14.00" style="">go_bercail/quinze_dernieres_secondes</text>
+</g>
+<!-- DevantGalerieVertRetourne -->
+<g id="node17" class="node" pointer-events="visible" data-name="DevantGalerieVertRetourne">
+
+<ellipse fill="none" stroke="black" cx="1542" cy="-1083.6" rx="119.79" ry="18" style=""/>
+<text text-anchor="middle" x="1542" y="-1079.4" font-family="Times,serif" font-size="14.00" style="">DevantGalerieVertRetourne</text>
+</g>
+<!-- HasDroppedRougeGalerie&#45;&gt;DevantGalerieVertRetourne -->
+<g id="edge16" class="edge" data-name="HasDroppedRougeGalerie-&gt;DevantGalerieVertRetourne">
+
+<path fill="none" stroke="black" d="M1505.89,-1154.25C1512.3,-1141.89 1521.07,-1124.97 1528.36,-1110.9" style=""/>
+<polygon fill="black" stroke="black" points="1531.63,-1112.2 1533.13,-1101.71 1525.42,-1108.98 1531.63,-1112.2" style=""/>
+<text text-anchor="middle" x="1625.08" y="-1123.8" font-family="Times,serif" font-size="14.00" style="">go_galerie_vert/has_dropped_rouge</text>
+</g>
+<!-- HasDroppedRougeGalerie&#45;&gt;IsRentringAuBercail -->
+<g id="edge48" class="edge" data-name="HasDroppedRougeGalerie-&gt;IsRentringAuBercail">
+
+<path fill="none" stroke="black" d="M1455.4,-1155.58C1426.82,-1141.69 1394,-1118.39 1394,-1084.6 1394,-1084.6 1394,-1084.6 1394,-771.8 1394,-727.94 1404.92,-704.58 1372,-675.6 1341.14,-648.44 1215.49,-688.05 1187.87,-657.6 1169.53,-637.39 1188,-623.49 1188,-596.2 1188,-596.2 1188,-596.2 1188,-194.6 1188,-160.91 1156.74,-139.09 1125.86,-125.75" style=""/>
+<polygon fill="black" stroke="black" points="1126.91,-122.4 1116.33,-121.88 1124.28,-128.88 1126.91,-122.4" style=""/>
+<text text-anchor="middle" x="1296.07" y="-635.4" font-family="Times,serif" font-size="14.00" style="">go_bercail/quinze_dernieres_secondes</text>
+</g>
+<!-- HasDroppedVertGalerie -->
+<g id="node18" class="node" pointer-events="visible" data-name="HasDroppedVertGalerie">
+
+<ellipse fill="none" stroke="black" cx="1565" cy="-994.8" rx="105.34" ry="18" style=""/>
+<text text-anchor="middle" x="1565" y="-990.6" font-family="Times,serif" font-size="14.00" style="">HasDroppedVertGalerie</text>
+</g>
+<!-- DevantGalerieVertRetourne&#45;&gt;HasDroppedVertGalerie -->
+<g id="edge17" class="edge" data-name="DevantGalerieVertRetourne-&gt;HasDroppedVertGalerie">
+
+<path fill="none" stroke="black" d="M1546.54,-1065.45C1549.76,-1053.32 1554.13,-1036.82 1557.81,-1022.92" style=""/>
+<polygon fill="black" stroke="black" points="1561.29,-1023.48 1560.47,-1012.91 1554.52,-1021.68 1561.29,-1023.48" style=""/>
+<text text-anchor="middle" x="1707.6" y="-1035" font-family="Times,serif" font-size="14.00" style="">destore_drop_vert_arriere/is_at_galerie_vert_retourne</text>
+</g>
+<!-- DevantGalerieVertRetourne&#45;&gt;IsRentringAuBercail -->
+<g id="edge49" class="edge" data-name="DevantGalerieVertRetourne-&gt;IsRentringAuBercail">
+
+<path fill="none" stroke="black" d="M1495.99,-1066.84C1465.84,-1053.27 1432,-1030.34 1432,-995.8 1432,-995.8 1432,-995.8 1432,-683 1432,-653.7 1431.33,-639.32 1408,-621.6 1376.31,-597.54 1257.14,-632.57 1229.87,-603.6 1200.54,-572.44 1226,-550.19 1226,-507.4 1226,-507.4 1226,-507.4 1226,-194.6 1226,-169.23 1221.5,-159.04 1202,-142.8 1188.61,-131.65 1172.1,-124 1155.25,-118.76" style=""/>
+<polygon fill="black" stroke="black" points="1155.88,-115.3 1145.31,-115.94 1153.98,-122.04 1155.88,-115.3" style=""/>
+<text text-anchor="middle" x="1338.07" y="-591" font-family="Times,serif" font-size="14.00" style="">go_bercail/quinze_dernieres_secondes</text>
+</g>
+<!-- DevantGalerieBleuRetourne -->
+<g id="node19" class="node" pointer-events="visible" data-name="DevantGalerieBleuRetourne">
+
+<ellipse fill="none" stroke="black" cx="1619" cy="-906" rx="120.95" ry="18" style=""/>
+<text text-anchor="middle" x="1619" y="-901.8" font-family="Times,serif" font-size="14.00" style="">DevantGalerieBleuRetourne</text>
+</g>
+<!-- HasDroppedVertGalerie&#45;&gt;DevantGalerieBleuRetourne -->
+<g id="edge18" class="edge" data-name="HasDroppedVertGalerie-&gt;DevantGalerieBleuRetourne">
+
+<path fill="none" stroke="black" d="M1527.79,-977.85C1511.21,-968.41 1497.42,-955.65 1507.45,-942 1512.86,-934.63 1519.82,-928.77 1527.62,-924.12" style=""/>
+<polygon fill="black" stroke="black" points="1529.49,-927.09 1536.74,-919.36 1526.25,-920.88 1529.49,-927.09" style=""/>
+<text text-anchor="middle" x="1702.78" y="-946.2" font-family="Times,serif" font-size="14.00" style="">store_bleu_from_front_hand_and_go_galerie_bleu/has_dropped_vert</text>
+</g>
+<!-- HasDroppedVertGalerie&#45;&gt;IsRentringAuBercail -->
+<g id="edge50" class="edge" data-name="HasDroppedVertGalerie-&gt;IsRentringAuBercail">
+
+<path fill="none" stroke="black" d="M1528,-977.85C1501.32,-963.59 1470,-939.84 1470,-907 1470,-907 1470,-907 1470,-683 1470,-639.33 1482.45,-616.03 1450,-586.8 1420.44,-560.17 1298.55,-598.31 1271.87,-568.8 1253.57,-548.56 1272,-534.69 1272,-507.4 1272,-507.4 1272,-507.4 1272,-194.6 1272,-143.47 1217.43,-121.97 1164.46,-113.16" style=""/>
+<polygon fill="black" stroke="black" points="1164.67,-109.65 1154.26,-111.61 1163.62,-116.57 1164.67,-109.65" style=""/>
+<text text-anchor="middle" x="1380.07" y="-546.6" font-family="Times,serif" font-size="14.00" style="">go_bercail/quinze_dernieres_secondes</text>
+</g>
+<!-- HasDroppedBleuGalerie -->
+<g id="node20" class="node" pointer-events="visible" data-name="HasDroppedBleuGalerie">
+
+<ellipse fill="none" stroke="black" cx="1650" cy="-817.2" rx="106.5" ry="18" style=""/>
+<text text-anchor="middle" x="1650" y="-813" font-family="Times,serif" font-size="14.00" style="">HasDroppedBleuGalerie</text>
+</g>
+<!-- DevantGalerieBleuRetourne&#45;&gt;HasDroppedBleuGalerie -->
+<g id="edge19" class="edge" data-name="DevantGalerieBleuRetourne-&gt;HasDroppedBleuGalerie">
+
+<path fill="none" stroke="black" d="M1625.12,-887.85C1629.5,-875.61 1635.47,-858.89 1640.46,-844.91" style=""/>
+<polygon fill="black" stroke="black" points="1643.82,-845.91 1643.89,-835.31 1637.23,-843.55 1643.82,-845.91" style=""/>
+<text text-anchor="middle" x="1765.11" y="-857.4" font-family="Times,serif" font-size="14.00" style="">destore_drop_bleu_arriere/is_at_galerie_bleu</text>
+</g>
+<!-- DevantGalerieBleuRetourne&#45;&gt;IsRentringAuBercail -->
+<g id="edge51" class="edge" data-name="DevantGalerieBleuRetourne-&gt;IsRentringAuBercail">
+
+<path fill="none" stroke="black" d="M1577.11,-889.03C1548.59,-875.13 1516,-851.87 1516,-818.2 1516,-818.2 1516,-818.2 1516,-594.2 1516,-564.9 1515.31,-550.55 1492,-532.8 1461.23,-509.36 1344.77,-543.53 1318.87,-514.8 1313.87,-509.25 1318.54,-505.46 1318.87,-498 1319.56,-482.4 1322,-478.62 1322,-463 1322,-463 1322,-463 1322,-194.6 1322,-166.56 1309.74,-157.71 1286,-142.8 1264.93,-129.57 1209.49,-120.8 1159.53,-115.35" style=""/>
+<polygon fill="black" stroke="black" points="1159.61,-111.84 1149.3,-114.27 1158.88,-118.8 1159.61,-111.84" style=""/>
+<text text-anchor="middle" x="1427.07" y="-502.2" font-family="Times,serif" font-size="14.00" style="">go_bercail/quinze_dernieres_secondes</text>
+</g>
+<!-- FinGalerie -->
+<g id="node21" class="node" pointer-events="visible" data-name="FinGalerie">
+
+<ellipse fill="none" stroke="black" cx="1650" cy="-728.4" rx="52.17" ry="18" style=""/>
+<text text-anchor="middle" x="1650" y="-724.2" font-family="Times,serif" font-size="14.00" style="">FinGalerie</text>
+</g>
+<!-- HasDroppedBleuGalerie&#45;&gt;FinGalerie -->
+<g id="edge20" class="edge" data-name="HasDroppedBleuGalerie-&gt;FinGalerie">
+
+<path fill="none" stroke="black" d="M1650,-799.05C1650,-786.92 1650,-770.42 1650,-756.52" style=""/>
+<polygon fill="black" stroke="black" points="1653.5,-756.51 1650,-746.51 1646.5,-756.51 1653.5,-756.51" style=""/>
+<text text-anchor="middle" x="1735.16" y="-768.6" font-family="Times,serif" font-size="14.00" style="">do_nothing/has_dropped_bleu</text>
+</g>
+<!-- HasDroppedBleuGalerie&#45;&gt;IsRentringAuBercail -->
+<g id="edge52" class="edge" data-name="HasDroppedBleuGalerie-&gt;IsRentringAuBercail">
+
+<path fill="none" stroke="black" d="M1612.33,-800.21C1585.44,-785.99 1554,-762.32 1554,-729.4 1554,-729.4 1554,-729.4 1554,-594.2 1554,-550.93 1570.35,-527.83 1539,-498 1511.29,-471.64 1393.45,-508.42 1367.87,-480 1349.61,-459.72 1368,-445.89 1368,-418.6 1368,-418.6 1368,-418.6 1368,-194.6 1368,-167.54 1358.74,-157.47 1336,-142.8 1308.25,-124.89 1230.31,-116.1 1165.27,-111.81" style=""/>
+<polygon fill="black" stroke="black" points="1165.15,-108.3 1154.95,-111.17 1164.71,-115.29 1165.15,-108.3" style=""/>
+<text text-anchor="middle" x="1476.07" y="-457.8" font-family="Times,serif" font-size="14.00" style="">go_bercail/quinze_dernieres_secondes</text>
+</g>
+<!-- FinGalerie&#45;&gt;DevantCarres -->
+<g id="edge21" class="edge" data-name="FinGalerie-&gt;DevantCarres">
+
+<path fill="none" stroke="black" d="M1668.08,-711.44C1682.25,-699.78 1702.97,-684.5 1723.65,-675.6 1756.04,-661.65 1794.28,-653.16 1826.51,-648.05" style=""/>
+<polygon fill="black" stroke="black" points="1827.38,-651.46 1836.75,-646.51 1826.33,-644.54 1827.38,-651.46" style=""/>
+<text text-anchor="middle" x="1810.68" y="-679.8" font-family="Times,serif" font-size="14.00" style="">go_carres/pas_deja_fait_carres</text>
+</g>
+<!-- FinGalerie&#45;&gt;IsRentringAuBercail -->
+<g id="edge22" class="edge" data-name="FinGalerie-&gt;IsRentringAuBercail">
+
+<path fill="none" stroke="black" d="M1637.77,-710.72C1626.66,-693.91 1612,-666.76 1612,-640.6 1612,-640.6 1612,-640.6 1612,-505.4 1612,-476.1 1611.08,-462.05 1588,-444 1539.28,-405.88 1491.23,-472.1 1449.98,-426 1434.62,-408.84 1449,-397.23 1449,-374.2 1449,-374.2 1449,-374.2 1449,-194.6 1449,-136.53 1279.39,-117.31 1165.91,-110.94" style=""/>
+<polygon fill="black" stroke="black" points="1165.97,-107.44 1155.8,-110.4 1165.6,-114.43 1165.97,-107.44" style=""/>
+<text text-anchor="middle" x="1539.01" y="-413.4" font-family="Times,serif" font-size="14.00" style="">go_bercail/has_deja_fait_carres</text>
+</g>
+<!-- FinGalerie&#45;&gt;IsRentringAuBercail -->
+<g id="edge53" class="edge" data-name="FinGalerie-&gt;IsRentringAuBercail">
+
+<path fill="none" stroke="black" d="M1650,-710.11C1650,-692.59 1650,-664.71 1650,-640.6 1650,-640.6 1650,-640.6 1650,-194.6 1650,-146.06 1330.31,-121.83 1163.99,-112.51" style=""/>
+<polygon fill="black" stroke="black" points="1163.92,-109 1153.75,-111.95 1163.54,-115.99 1163.92,-109" style=""/>
+<text text-anchor="middle" x="1758.07" y="-413.4" font-family="Times,serif" font-size="14.00" style="">go_bercail/quinze_dernieres_secondes</text>
+</g>
+<!-- DevantCarres&#45;&gt;IsRentringAuBercail -->
+<g id="edge54" class="edge" data-name="DevantCarres-&gt;IsRentringAuBercail">
+
+<path fill="none" stroke="black" d="M1900.05,-621.48C1909.04,-578.76 1925.49,-466.81 1867,-409.2 1815.35,-358.32 1757.46,-441.1 1704.87,-391.2 1623.7,-314.19 1747.14,-217.67 1664,-142.8 1628.1,-110.48 1329.33,-106.64 1168.15,-106.96" style=""/>
+<polygon fill="black" stroke="black" points="1167.73,-103.46 1157.74,-106.99 1167.75,-110.46 1167.73,-103.46" style=""/>
+<text text-anchor="middle" x="1813.07" y="-369" font-family="Times,serif" font-size="14.00" style="">go_bercail/quinze_dernieres_secondes</text>
+</g>
+<!-- ColleAuMur -->
+<g id="node24" class="node" pointer-events="visible" data-name="ColleAuMur">
+
+<ellipse fill="none" stroke="black" cx="1987" cy="-550.8" rx="60.28" ry="18" style=""/>
+<text text-anchor="middle" x="1987" y="-546.6" font-family="Times,serif" font-size="14.00" style="">ColleAuMur</text>
+</g>
+<!-- DevantCarres&#45;&gt;ColleAuMur -->
+<g id="edge24" class="edge" data-name="DevantCarres-&gt;ColleAuMur">
+
+<path fill="none" stroke="black" d="M1913.55,-621.86C1927.36,-608.69 1946.78,-590.17 1962.18,-575.48" style=""/>
+<polygon fill="black" stroke="black" points="1965,-577.62 1969.82,-568.19 1960.16,-572.56 1965,-577.62" style=""/>
+<text text-anchor="middle" x="2099.67" y="-591" font-family="Times,serif" font-size="14.00" style="">se_coller_au_mur_deployer_poelon/is_devant_carres</text>
+</g>
+<!-- HasRentreAuBercail -->
+<g id="node30" class="node" pointer-events="visible" data-name="HasRentreAuBercail">
+
+<ellipse fill="none" stroke="black" cx="1066" cy="-18" rx="91.46" ry="18" style=""/>
+<text text-anchor="middle" x="1066" y="-13.8" font-family="Times,serif" font-size="14.00" style="">HasRentreAuBercail</text>
+</g>
+<!-- IsRentringAuBercail&#45;&gt;HasRentreAuBercail -->
+<g id="edge57" class="edge" data-name="IsRentringAuBercail-&gt;HasRentreAuBercail">
+
+<path fill="none" stroke="black" d="M1066,-88.65C1066,-76.52 1066,-60.02 1066,-46.12" style=""/>
+<polygon fill="black" stroke="black" points="1069.5,-46.11 1066,-36.11 1062.5,-46.11 1069.5,-46.11" style=""/>
+<text text-anchor="middle" x="1167.86" y="-58.2" font-family="Times,serif" font-size="14.00" style="">things_todo_at_bercail/is_at_bercail</text>
+</g>
+<!-- LireCarre -->
+<g id="node25" class="node" pointer-events="visible" data-name="LireCarre">
+
+<ellipse fill="none" stroke="black" cx="2006" cy="-462" rx="48.63" ry="18" style=""/>
+<text text-anchor="middle" x="2006" y="-457.8" font-family="Times,serif" font-size="14.00" style="">LireCarre</text>
+</g>
+<!-- ColleAuMur&#45;&gt;LireCarre -->
+<g id="edge25" class="edge" data-name="ColleAuMur-&gt;LireCarre">
+
+<path fill="none" stroke="black" d="M1990.75,-532.65C1993.41,-520.52 1997.02,-504.02 2000.06,-490.12" style=""/>
+<polygon fill="black" stroke="black" points="2003.53,-490.63 2002.25,-480.11 1996.7,-489.13 2003.53,-490.63" style=""/>
+<text text-anchor="middle" x="2086.25" y="-502.2" font-family="Times,serif" font-size="14.00" style="">lire_carre_si_besoin/is_au_mur</text>
+</g>
+<!-- PousserSiBesoin -->
+<g id="node26" class="node" pointer-events="visible" data-name="PousserSiBesoin">
+
+<ellipse fill="none" stroke="black" cx="2006" cy="-373.2" rx="75.92" ry="18" style=""/>
+<text text-anchor="middle" x="2006" y="-369" font-family="Times,serif" font-size="14.00" style="">PousserSiBesoin</text>
+</g>
+<!-- LireCarre&#45;&gt;PousserSiBesoin -->
+<g id="edge26" class="edge" data-name="LireCarre-&gt;PousserSiBesoin">
+
+<path fill="none" stroke="black" d="M2006,-443.85C2006,-431.72 2006,-415.22 2006,-401.32" style=""/>
+<polygon fill="black" stroke="black" points="2009.5,-401.31 2006,-391.31 2002.5,-401.31 2009.5,-401.31" style=""/>
+<text text-anchor="middle" x="2124.98" y="-413.4" font-family="Times,serif" font-size="14.00" style="">pousser_si_besoin/has_lu_carre_si_besoin</text>
+</g>
+<!-- ProchainCarre -->
+<g id="node27" class="node" pointer-events="visible" data-name="ProchainCarre">
+
+<ellipse fill="none" stroke="black" cx="2501" cy="-284.4" rx="66.62" ry="18" style=""/>
+<text text-anchor="middle" x="2501" y="-280.2" font-family="Times,serif" font-size="14.00" style="">ProchainCarre</text>
+</g>
+<!-- PousserSiBesoin&#45;&gt;ProchainCarre -->
+<g id="edge27" class="edge" data-name="PousserSiBesoin-&gt;ProchainCarre">
+
+<path fill="none" stroke="black" d="M2077.82,-367.31C2137.92,-362.36 2225.69,-353.1 2301,-337.2 2325.88,-331.95 2331.16,-327.11 2355.68,-320.4 2383.76,-312.71 2415.13,-305.04 2441.52,-298.85" style=""/>
+<polygon fill="black" stroke="black" points="2442.43,-302.23 2451.37,-296.55 2440.84,-295.42 2442.43,-302.23" style=""/>
+<text text-anchor="middle" x="2462.66" y="-324.6" font-family="Times,serif" font-size="14.00" style="">go_prochain_carre/has_checked_carre</text>
+</g>
+<!-- QuitterMur -->
+<g id="node28" class="node" pointer-events="visible" data-name="QuitterMur">
+
+<ellipse fill="none" stroke="black" cx="1931" cy="-284.4" rx="55.04" ry="18" style=""/>
+<text text-anchor="middle" x="1931" y="-280.2" font-family="Times,serif" font-size="14.00" style="">QuitterMur</text>
+</g>
+<!-- PousserSiBesoin&#45;&gt;QuitterMur -->
+<g id="edge29" class="edge" data-name="PousserSiBesoin-&gt;QuitterMur">
+
+<path fill="none" stroke="black" d="M1950.44,-360.87C1939.08,-358.79 1927.18,-356.78 1916,-355.2 1894.95,-352.22 1739.82,-352.92 1725.52,-337.2 1720.49,-331.68 1720.7,-326.11 1725.52,-320.4 1743.33,-299.29 1812.97,-290.91 1866.29,-287.59" style=""/>
+<polygon fill="black" stroke="black" points="1866.6,-291.07 1876.38,-287 1866.2,-284.09 1866.6,-291.07" style=""/>
+<text text-anchor="middle" x="1849.24" y="-324.6" font-family="Times,serif" font-size="14.00" style="">quitter_mur_rentrer_poelon/tous_carres_lus</text>
+</g>
+<!-- PousserSiBesoin&#45;&gt;QuitterMur -->
+<g id="edge56" class="edge" data-name="PousserSiBesoin-&gt;QuitterMur">
+
+<path fill="none" stroke="black" d="M1996.41,-355.01C1990.14,-344.49 1981.39,-331.05 1972,-320.4 1968.29,-316.19 1964.06,-312.03 1959.77,-308.13" style=""/>
+<polygon fill="black" stroke="black" points="1961.91,-305.35 1952.06,-301.43 1957.32,-310.63 1961.91,-305.35" style=""/>
+<text text-anchor="middle" x="2140.28" y="-324.6" font-family="Times,serif" font-size="14.00" style="">quitter_mur_rentrer_poelon/quinze_dernieres_secondes</text>
+</g>
+<!-- ProchainCarre&#45;&gt;LireCarre -->
+<g id="edge28" class="edge" data-name="ProchainCarre-&gt;LireCarre">
+
+<path fill="none" stroke="black" d="M2542.39,-298.71C2563.82,-307.85 2583.19,-321.21 2571,-337.2 2509.73,-417.58 2195.48,-448.1 2063.97,-457.47" style=""/>
+<polygon fill="black" stroke="black" points="2063.43,-454 2053.7,-458.18 2063.92,-460.98 2063.43,-454" style=""/>
+<text text-anchor="middle" x="2649.91" y="-369" font-family="Times,serif" font-size="14.00" style="">lire_carre_si_besoin/is_at_prochain</text>
+</g>
+<!-- FinCarres -->
+<g id="node29" class="node" pointer-events="visible" data-name="FinCarres">
+
+<ellipse fill="none" stroke="black" cx="1931" cy="-195.6" rx="49.24" ry="18" style=""/>
+<text text-anchor="middle" x="1931" y="-191.4" font-family="Times,serif" font-size="14.00" style="">FinCarres</text>
+</g>
+<!-- QuitterMur&#45;&gt;FinCarres -->
+<g id="edge30" class="edge" data-name="QuitterMur-&gt;FinCarres">
+
+<path fill="none" stroke="black" d="M1931,-266.25C1931,-254.12 1931,-237.62 1931,-223.72" style=""/>
+<polygon fill="black" stroke="black" points="1934.5,-223.71 1931,-213.71 1927.5,-223.71 1934.5,-223.71" style=""/>
+<text text-anchor="middle" x="2008.38" y="-235.8" font-family="Times,serif" font-size="14.00" style="">do_nothing/has_quitte_mur</text>
+</g>
+<!-- FinCarres&#45;&gt;DevantPaletRouge -->
+<g id="edge32" class="edge" data-name="FinCarres-&gt;DevantPaletRouge">
+
+<path fill="none" stroke="black" d="M1980.12,-197.29C2085.14,-200.1 2322,-214.13 2322,-283.4 2322,-1795 2322,-1795 2322,-1795 2322,-1847.7 1541.39,-1872.53 1268.68,-1879.6" style=""/>
+<polygon fill="black" stroke="black" points="1268.32,-1876.11 1258.42,-1879.87 1268.5,-1883.11 1268.32,-1876.11" style=""/>
+<text text-anchor="middle" x="2463.9" y="-1035" font-family="Times,serif" font-size="14.00" style="">go_palet_rouge_depuis_mur/pas_deja_fait_galerie</text>
+</g>
+<!-- FinCarres&#45;&gt;IsRentringAuBercail -->
+<g id="edge31" class="edge" data-name="FinCarres-&gt;IsRentringAuBercail">
+
+<path fill="none" stroke="black" d="M1882.54,-192.49C1839.95,-189.21 1777.01,-180.85 1726.31,-159.6 1714.53,-154.66 1715.04,-147.06 1703,-142.8 1653.9,-125.45 1333.17,-114.7 1166.4,-110.22" style=""/>
+<polygon fill="black" stroke="black" points="1166.22,-106.71 1156.13,-109.95 1166.04,-113.71 1166.22,-106.71" style=""/>
+<text text-anchor="middle" x="1818.35" y="-147" font-family="Times,serif" font-size="14.00" style="">go_bercail/has_deja_fait_galerie</text>
+</g>
+<!-- FinCarres&#45;&gt;IsRentringAuBercail -->
+<g id="edge55" class="edge" data-name="FinCarres-&gt;IsRentringAuBercail">
+
+<path fill="none" stroke="black" d="M1928.53,-177.38C1925.85,-165.56 1920.33,-150.64 1909,-142.8 1878.99,-122.03 1384.6,-112.39 1167.21,-109.13" style=""/>
+<polygon fill="black" stroke="black" points="1167.12,-105.63 1157.07,-108.98 1167.02,-112.63 1167.12,-105.63" style=""/>
+<text text-anchor="middle" x="2031.07" y="-147" font-family="Times,serif" font-size="14.00" style="">go_bercail/quinze_dernieres_secondes</text>
+</g>
+</g>
+</svg>
