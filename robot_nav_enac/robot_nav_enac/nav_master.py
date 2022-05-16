@@ -35,6 +35,9 @@ class Navigator(Node):
     def __init__(self):
         super().__init__('navigator')
 
+        self.last_time_stamp = -1.0
+        self.dt
+        
         self.target_position = OdomData(0, 0, 0) #TODO : set it to initial position from state machine on beggining
         self.cur_position = OdomData(0, 0, 0)
         self.cur_speed = OdomData(0,0,0)
@@ -119,7 +122,9 @@ class Navigator(Node):
         self.cur_position.updataOdomData(x, y, rotation)
         self.cur_speed.updataOdomData(msg.twist.twist.linear.x, 0, msg.twist.twist.angular.z)
 
-        self.navigation_type.update_odom(self.publish_nav, self.cur_position, self.cur_speed) #TODO voir quel type de données mettre (OdomData ??)
+        if self.last_time_stamp == -1.0:
+
+        self.navigation_type.update_odom(self.publish_nav, self.cur_position, self.cur_speed, dt) #TODO voir quel type de données mettre (OdomData ??)
         
     def publish_nav(self, linear_speed: float, angular_speed: float):
         msg = Twist()
