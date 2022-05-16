@@ -16,7 +16,7 @@ PeriphValue = _periph_value.PeriphValue
 Pid = _pid.Pid
 SetNavigation = _set_navigation.SetNavigation
 
-from statemachine import State, Transition, StateMachine
+from enac_strat.statemachine import State, Transition, StateMachine
 
 #### fin partie générée automatiquement
 class Strategy(Node):
@@ -277,7 +277,7 @@ class Strategy(Node):
             self.send_diagnostic(DiagnosticStatus.ERROR, "Strategy: match", "Match has ended, strategy is blocked")
         else:
             self.send_diagnostic(DiagnosticStatus.OK if ((time.time() - self.chrono) < self.end - 10) else DiagnosticStatus.WARN, "Strategy: match", f"{str(time.time() - self.chrono)[:7]} seconds have passed")
-        self.send_diagnostic(DiagnosticStatus.STALE, "Strategy: state", f"{str(self.state_machine.current_state)}")
+        self.send_diagnostic(DiagnosticStatus.STALE, "Strategy: state", f"{str(self.EnacStrat.state)}")
 
         self.send_tf_map_corners()
 
