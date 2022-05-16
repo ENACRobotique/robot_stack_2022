@@ -4,7 +4,7 @@ import math
 import numpy as np
 import numpy as numpy
 import matplotlib.pyplot as plt
-from Points import Points
+from robot_nav_enac.Points import Points
 
 
 # Vitesse de Target :
