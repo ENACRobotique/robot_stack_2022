@@ -1,6 +1,4 @@
-from statemachine import StateMachine, State
-import math
-import time
+import math, time
 from enac_strat.conversions import z_euler_from_quaternions, quaternion_from_euler
 import rclpy
 from rclpy.node import Node
@@ -23,9 +21,9 @@ from statemachine import State, Transition, StateMachine
 #### fin partie générée automatiquement
 class Strategy(Node):
 
-    # valeurs stockées
-    x = 0.140  # appuyé sur le rebord
-    y = 1.140  # l'encodeur noir est sur le bord intérieur de la bande jaune
+    #valeurs stockées
+    x = 0.140 #appuyé sur le rebord
+    y = 1.140 # l'encodeur noir est sur le bord intérieur de la bande jaune
     theta = 0
     vlin = 0
     vtheta = 0
@@ -176,11 +174,9 @@ class Strategy(Node):
 
         ### fin partie générée automatiquement
 
-        # paramétrage ROS
-        self.ros_periph_pub = self.create_publisher(
-            PeriphValue, '/peripherals', 10)
-        self.ros_diag_pub = self.create_publisher(
-            DiagnosticArray, '/diagnostics', 10)
+        #paramétrage ROS
+        self.ros_periph_pub = self.create_publisher(PeriphValue, '/peripherals', 10)
+        self.ros_diag_pub = self.create_publisher(DiagnosticArray, '/diagnostics', 10)
         self.ros_vel_pub = self.create_publisher(Twist, '/cmd_vel', 10)
         self.nav_pub = self.create_publisher(SetNavigation, '/navigation', 10)
         self.publisher_map = self.create_publisher(
@@ -270,22 +266,18 @@ class Strategy(Node):
         msg_out_d.transform.rotation.z = qzd
         msg_out_d.transform.rotation.w = qwd
         self.publisher_map.publish(msg_out_d)
-
+    
     def __str__(self):
         return "Strategy: state: "+str(self.EnacStrat.state)+" x: "+str(self.x)+" y: "+str(self.y)+" theta: "+str(self.theta)+(" match unstarted "if self.chrono == 0 else " chrono: "+str(time.time() - self.chrono))
     
     def send_all_diags(self):
         if self.chrono == 0:
-            self.send_diagnostic(DiagnosticStatus.OK,
-                                 "Strategy: match", "Match has not started")
+            self.send_diagnostic(DiagnosticStatus.OK, "Strategy: match", "Match has not started")
         elif self.chrono != 0 and (time.time() - self.chrono) > self.end:
-            self.send_diagnostic(
-                DiagnosticStatus.ERROR, "Strategy: match", "Match has ended, strategy is blocked")
+            self.send_diagnostic(DiagnosticStatus.ERROR, "Strategy: match", "Match has ended, strategy is blocked")
         else:
-            self.send_diagnostic(DiagnosticStatus.OK if ((time.time() - self.chrono) < self.end - 10)
-                                 else DiagnosticStatus.WARN, "Strategy: match", f"{str(time.time() - self.chrono)[:7]} seconds have passed")
-        self.send_diagnostic(DiagnosticStatus.STALE, "Strategy: state",
-                             f"{str(self.state_machine.current_state)}")
+            self.send_diagnostic(DiagnosticStatus.OK if ((time.time() - self.chrono) < self.end - 10) else DiagnosticStatus.WARN, "Strategy: match", f"{str(time.time() - self.chrono)[:7]} seconds have passed")
+        self.send_diagnostic(DiagnosticStatus.STALE, "Strategy: state", f"{str(self.state_machine.current_state)}")
 
         self.send_tf_map_corners()
 
@@ -343,14 +335,14 @@ class Strategy(Node):
         msg.pose.orientation.z = qz
         msg.pose.orientation.w = qw
         self.nav_pub.publish(msg)
-
+    
     def send_periph_msg(self, id, cmd):
         msg = PeriphValue()
         msg.header.stamp = self.get_clock().now().to_msg()
         msg.header.frame_id = "raspberry"
         msg.periph_name = str(id)
         msg.value = int(cmd)
-        # envoyer les infos sur le bon topic
+        #envoyer les infos sur le bon topic
         self.ros_periph_pub.publish(msg)
 
     def send_cmd_vel(self, vlin, vtheta):
@@ -601,9 +593,8 @@ class Strategy(Node):
 
     def on_end(self):
         print("End: stop everything")
-        self.send_nav_msg(1, -1, -1, -1)  # nav shut up pls
-        self.send_cmd_vel(0, 0)  # stop
-
+        self.send_nav_msg(1, -1, -1, -1) #nav shut up pls
+        self.send_cmd_vel(0, 0) # stop
 
 def main(args=None):
     rclpy.init(args=args)
@@ -617,7 +608,6 @@ def main(args=None):
     # when the garbage collector destroys the node object)
     strat.destroy_node()
     rclpy.shutdown()
-
 
 if __name__ == '__main__':
     main()
