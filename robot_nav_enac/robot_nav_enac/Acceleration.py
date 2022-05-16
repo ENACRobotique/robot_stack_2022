@@ -1,5 +1,3 @@
-from turtle import speed
-
 """ how to use
 Use minus sign outside of the acceleration class -> Only used for "positive" acceleration
 Use geogebra to check if slope are coherent or not

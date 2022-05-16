@@ -122,8 +122,15 @@ class Navigator(Node):
         self.cur_position.updataOdomData(x, y, rotation)
         self.cur_speed.updataOdomData(msg.twist.twist.linear.x, 0, msg.twist.twist.angular.z)
 
+        dt = 0.0
         if self.last_time_stamp == -1.0:
-
+            self.last_time_stamp = msg.header.stamp.to_sec()
+            dt = 0.05 #TODO : not zero in case it could create problem, need to check that
+        else:
+            timestamp = msg.header.stamp.to_sec()
+            dt = timestamp - self.last_time_stamp
+            self.last_time_stamp = timestamp
+            
         self.navigation_type.update_odom(self.publish_nav, self.cur_position, self.cur_speed, dt) #TODO voir quel type de données mettre (OdomData ??)
         
     def publish_nav(self, linear_speed: float, angular_speed: float):
