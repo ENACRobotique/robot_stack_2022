@@ -306,13 +306,18 @@ class Strategy(Node):
                 abs(self.vtheta) <= vtheta_tol and
                 math.sqrt((self.x - self.goalx)**2 + (self.y - self.goaly)**2) <= distmax_m) #TODO: add condition sur theta si utile
 
+    def is_at_pos(self, vlin_tol, vtheta_tol, distmax_m, goalx, goaly, goaltheta):
+        return (abs(self.vlin) <= vlin_tol and
+                abs(self.vtheta) <= vtheta_tol and
+                math.sqrt((self.x - goalx)**2 + (self.y - goaly)**2) <= distmax_m) #TODO: add condition sur theta si utile
+
     def check_transitions(self):
-        self.send_all_diags()
         try:
             self.EnacStrat.check_transitions()
         except Exception as e:
             print("Strategy: crap in transition")
             print(e)
+        self.send_all_diags()
     
     def send_nav_msg(self, nav_type, x, y, theta):
         self.goalx = float(x)
@@ -363,29 +368,32 @@ class Strategy(Node):
 
     #callbacks des transitions
     def go_recup_statuette(self):
-        pass
+        print("Strategy: tirette activée")
+        self.send_nav_msg(1, 0.45, 0.45, math.radians(45))
     def is_tirette_activee(self):
-        return True
+        return (self.periphs.get("TI", None) == 42)
 
     def recup_statuette(self):
+        #todo macro bas-niveau
         pass
     def is_at_statuette(self):
-        return True
+        return self.is_at_goal(0.001, 0.001, 0.01)
 
     def turn_around_replique(self):
-        pass
+        self.send_nav_msg(1, 0.45, 0.45, math.radians(135))
     def has_gotten_statuette(self):
-        return True
+        return (self.periphs.get("mr", None) == -1) #FIXME: coder l'état de neutre avec statuette en bas niveau et le renseigner ici
 
     def drop_replique(self):
+        #todo macro bas-niveau
         pass
     def has_turned_around_replique(self):
-        return True
+        return self.is_at_goal(0.001, 0.001, 0.01)
 
     def go_vitrine(self):
-        pass
+        self.send_nav_msg(1, 0.24, 1.8, math.radians(90))
     def has_dropped_replique(self):
-        return True
+        return (self.periphs.get("mv", None) == 1) #la state_machine avant est revenue en position neutre sans charge
 
     def drop_statuette(self):
         pass
@@ -513,7 +521,7 @@ class Strategy(Node):
         return True
 
     def go_bercail(self):
-        pass
+        self.send_nav_msg(1, 0.14, 1.14, 0)
     def has_deja_fait_galerie(self):
         return True
 
@@ -522,20 +530,24 @@ class Strategy(Node):
     def pas_deja_fait_galerie(self):
         return True
 
-    def go_bercail(self):
-        pass
     def quinze_dernieres_secondes(self):
         return True
 
     def quitter_mur_rentrer_poelon(self):
         pass
-    def quinze_dernieres_secondes(self):
-        return True
 
     def things_todo_at_bercail(self):
-        pass
+        #shutter la configuration
+        self.send_nav_msg(1, -1, -1, -1)
+        #être sûr d'arrêter le robot
+        self.send_cmd_vel(0, 0)
+        #déposer tous les palets
+        if self.periphs.get("hv", 0) == 1:
+            self.send_periph_msg("mg", 0)
+        if self.periphs.get("hr", 0):
+            self.send_periph_msg("mh", 0)
     def is_at_bercail(self):
-        return True
+        return (self.is_at_pos(0.001, 0.001, 0.01, 0.14, 1.14, 0))
     
     #vieux code tout pourri
     def on_start(self):

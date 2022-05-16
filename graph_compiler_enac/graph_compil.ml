@@ -62,7 +62,7 @@ let generate_fricking_placeholder_functions = fun st ->
       | [on_transition] -> 
           Printf.sprintf "def %s(self):\n    pass\n" on_transition
       | _ -> failwith (Printf.sprintf "Too much in transition %s" (st_str st)) end
-
+(*virer les duplicatas*)
 let generate_stm_py = fun stm ->
   match stm with
     StateMachine(init, name, st_ls) ->
