@@ -8,7 +8,7 @@ class Stop(NavigationType):
     def set_target(self, target_pose):
         pass
 
-    def update_odom(self, callback_speed, position, speed):
+    def update_odom(self, callback_speed, position, speed, dt=0.0):
         callback_speed(0, 0)
         pass
     

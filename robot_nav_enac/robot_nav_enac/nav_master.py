@@ -35,6 +35,13 @@ class Navigator(Node):
     def __init__(self):
         super().__init__('navigator')
 
+        self.last_time_stamp = -1.0
+        self.dt = 0.0
+        self.robot_radius = 0.0885 #in meter
+        #epaisseur roue : 0.022
+        #distance max entre roues (de bout à bout ) : 0.199
+        #diameter = 0.177
+        
         self.target_position = OdomData(0, 0, 0) #TODO : set it to initial position from state machine on beggining
         self.cur_position = OdomData(0, 0, 0)
         self.cur_speed = OdomData(0,0,0)
@@ -119,7 +126,17 @@ class Navigator(Node):
         self.cur_position.updataOdomData(x, y, rotation)
         self.cur_speed.updataOdomData(msg.twist.twist.linear.x, 0, msg.twist.twist.angular.z)
 
-        self.navigation_type.update_odom(self.publish_nav, self.cur_position, self.cur_speed) #TODO voir quel type de données mettre (OdomData ??)
+        dt = 0.0
+        if self.last_time_stamp == -1.0:
+            self.last_time_stamp = msg.header.stamp.sec + msg.header.stamp.nanosec * 1e-9
+            dt = 0.05 #TODO : not zero in case it could create problem, need to check that
+        else:
+            timestamp = msg.header.stamp.sec + msg.header.stamp.nanosec * 1e-9
+            
+            dt = timestamp - self.last_time_stamp
+            self.last_time_stamp = timestamp
+            
+        self.navigation_type.update_odom(self.publish_nav, self.cur_position, self.cur_speed, dt) #TODO voir quel type de données mettre (OdomData ??)
         
     def publish_nav(self, linear_speed: float, angular_speed: float):
         msg = Twist()
