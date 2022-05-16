@@ -3,7 +3,7 @@ Use minus sign outside of the acceleration class -> Only used for "positive" acc
 Use geogebra to check if slope are coherent or not
 """
 class Acceleration():
-    def __init__(self, max_speed, min_speed = 0.1, time_acceleration = 1.0, time_deceleration = 1.0):
+    def __init__(self, max_speed, min_speed = 0.1, time_acceleration = 1.0, time_deceleration = 1.0, precision_error = 0.018): #~ 2 cm and ~ 1 deg
         self.max_speed = max_speed
         self.min_speed = min_speed
         self.time_acceleration = time_acceleration #time to reach max speed from 0
@@ -11,6 +11,7 @@ class Acceleration():
         accel_dist = 0.5 * self.time_acceleration * max_speed
         decel_dist = 0.5 * self.time_deceleration * max_speed
         self.accel_decel_dist = accel_dist + decel_dist
+        self.precision_error = precision_error
 
         self.cur_time = 0
         self.top_speed_time = -1
@@ -45,7 +46,9 @@ class Acceleration():
             #speed_decel = max(0, #manage both trapezoid and triangle not on top case
             #    - ((self.cur_time)/ self.time_deceleration - (self.start_decel_time - self.time_deceleration) / self.time_deceleration)
             #    )    
-            pass
+            if speed_decel == 0 and distance_left >= self.precision_error:
+                print("undershooting target position")
+
         elif self.coeff_decel != -1000000000 and distance_left >= theoric_decel_dist:
             print("overshooting : distance_left >= theoric_decel_dist")
         
@@ -53,42 +56,6 @@ class Acceleration():
 
 
         return min(speed_accel, speed_decel)
-
-
-
-
-#TODO : prendre en compte les décélération trop tôt, ne pas décélérer entièrement ?
-    def get_speed_2(self, cur_speed, distance_left, dt):
-        #careful between max_speed and self.max_speed, not the same use case (maybe)
-        self.cur_time += dt
-
-        max_speed = self.max_speed
-        #if distance_left <= self.accel_decel_dist: #lower max speed
-        #    max_speed = distance_left/(2 * self.time_deceleration) #TODO : check if self.time_acceleration is better?
-        #TODO : check if using a calculated live max_speed is better than using a constant max_speed when doing a full trapeze (and also when doing a triangle only)
-
-        #normal acceleration trapezoid
-        speed_accel = self.cur_time * self.max_speed / self.time_acceleration
-        #time_at_max_speed = max(0, self.total_dist - self.accel_decel_dist)
-        #time_at_max_speed = max(0, 
-        #    (distance_left / self.max_speed) - self.accel_decel_dist
-        #)
-        future_speed = max(speed_accel, cur_speed) #if the speed_accel is higher, in case of triangle shape, the deceleration calculation is wrong using cur_speed, need to take into account accel_speed
-        theoric_decel_dist = self.time_deceleration * (future_speed / max_speed) #self.max_speed ?
-        if distance_left <= theoric_decel_dist: #slow down as much as possible to go back under the deceleration slope
-            speed_decel = self.min_speed 
-            print("overshooting - fast deceleration triggered")
-        elif distance_left <= ((self.time_deceleration / max_speed) + dt): #normal deceleration trapezoid #adding dt to avoid rounding errors
-            if self.start_decel_time == -1:
-                self.start_decel_time = self.cur_time - dt #Adding dt margin ??
-            speed_decel= max(0, 
-            (-self.cur_time/self.time_deceleration)+(
-                (self.time_acceleration + self.start_decel_time + self.time_deceleration)/ self.time_deceleration)  #theoric deceleration
-        )
-        else: #TODO : check if it's needed because also present in the return
-            speed_decel = max_speed
-        
-        return min(speed_accel, speed_decel, max_speed)
 
 if __name__ == "__main__":
     acc = Acceleration(max_speed = 1.0, min_speed = 0.1, time_acceleration = 2.0, time_deceleration = 0.5)

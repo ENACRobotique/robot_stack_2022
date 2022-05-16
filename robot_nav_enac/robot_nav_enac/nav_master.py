@@ -36,7 +36,11 @@ class Navigator(Node):
         super().__init__('navigator')
 
         self.last_time_stamp = -1.0
-        self.dt
+        self.dt = 0.0
+        self.robot_radius = 0.0885 #in meter
+        #epaisseur roue : 0.022
+        #distance max entre roues (de bout à bout ) : 0.199
+        #diameter = 0.177
         
         self.target_position = OdomData(0, 0, 0) #TODO : set it to initial position from state machine on beggining
         self.cur_position = OdomData(0, 0, 0)
@@ -124,10 +128,11 @@ class Navigator(Node):
 
         dt = 0.0
         if self.last_time_stamp == -1.0:
-            self.last_time_stamp = msg.header.stamp.to_sec()
+            self.last_time_stamp = msg.header.stamp.sec + msg.header.stamp.nanosec * 1e-9
             dt = 0.05 #TODO : not zero in case it could create problem, need to check that
         else:
-            timestamp = msg.header.stamp.to_sec()
+            timestamp = msg.header.stamp.sec + msg.header.stamp.nanosec * 1e-9
+            
             dt = timestamp - self.last_time_stamp
             self.last_time_stamp = timestamp
             

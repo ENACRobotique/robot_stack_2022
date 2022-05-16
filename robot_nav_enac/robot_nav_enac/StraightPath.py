@@ -76,8 +76,9 @@ class StraightPath():
 	
 	#### Goal Pose : rotation de fin de déplacement??
 	
-	def __init__(self, logger, maxSpeed=None):
+	def __init__(self, logger, maxSpeed=None, wheel_radius=0.885):
 		self.logger = logger
+		self.wheel_radius = wheel_radius
 
 		self._isNavigating = False
 		self._isRotating = False
@@ -96,7 +97,7 @@ class StraightPath():
 		if self.target != target_pose: #TODO : check if it's enough to avoid "jerking" from acceleration module
 			self.target = target_pose
 			self.accel_linear.reset_accel()
-			self.rotation_precision.reset_accel()
+			self.accel_rotat.reset_accel()
 			self.logger("updated target in StraightPath navigationType")
 		#TODO : take into account obstacles
 
@@ -120,22 +121,25 @@ class StraightPath():
 
 		if  abs(relative_rotation_rad) > self.rotation_precision and is_not_at_target: #first rotation
 			self.accel_linear.reset_accel()
-			self.logger(f"Rotating with relative angle to target of : {relative_rotation_rad} at speed {self.get_rotate_speed(relative_rotation_rad)}")
+			rot_speed = self.get_rotate_speed(relative_rotation_rad, speed.rotation_rad,dt)
+			self.logger(f"Rotating with relative angle to target of : {relative_rotation_rad} at speed {rot_speed}")
 			self._isNavigating = False
 			self._isRotating = True
-			callback_speed(0, self.get_rotate_speed(relative_rotation_rad, speed.rotation_rad,dt))
+			callback_speed(0, rot_speed)
 			return
 
 		elif abs(relative_rotation_rad) <= self.rotation_precision and is_not_at_target : #aligned to path
 			self.accel_rotat.reset_accel()
+			lin_speed = self.get_linear_speed(speed.x, dt)
 			self._isNavigating = True
 			self._isRotating = False
-			callback_speed(self.get_linear_speed(speed.x, dt), 0)
-			self.logger(f"Aligned to path - going forward at {self.get_linear_speed()}")
+			callback_speed(lin_speed, 0)
+			self.logger(f"Aligned to path - going forward at {lin_speed}")
 			return
 			
 		elif not (is_not_at_target) and abs(rotation_to_final_angle) > self.rotation_precision: #final alignment
-			self.logger(f"At target - Aligning to angle {rotation_to_final_angle} at speed {self.get_rotate_speed(rotation_to_final_angle)}")
+			rot_speed = self.get_rotate_speed(rotation_to_final_angle, speed.rotation_rad, dt)
+			self.logger(f"At target - Aligning to angle {rotation_to_final_angle} at speed {rot_speed}")
 			self._isNavigating = False
 			self._isRotating = True
 			callback_speed(0, self.get_rotate_speed(rotation_to_final_angle, speed.rotation_rad, dt))
@@ -149,31 +153,31 @@ class StraightPath():
 
 	
 	def get_rotate_speed(self, relative_rotation_rad, cur_rot_speed_rad, dt):
-		distance = ?? #TODO : calculate distance to target
-		self.accel_rotat.get_speed(self.speed.rotation_rad, relative_rotation_rad)
+		distance = abs(2 * relative_rotation_rad/pi * self.wheel_radius) #TODO : calculate distance to target
+		return self.accel_rotat.get_speed(self.speed.rotation_rad, relative_rotation_rad, dt)
 
-		if (relative_rotation_rad <= 0):
-			rot_speed = -0.5
-		else:
-			rot_speed = 0.5
-		if abs(relative_rotation_rad) <= self.rotation_precision:
-			rot_speed = 0
-		
-		return rot_speed
+		#if (relative_rotation_rad <= 0):
+		#	rot_speed = -0.5
+		#else:
+		#	rot_speed = 0.5
+		#if abs(relative_rotation_rad) <= self.rotation_precision:
+		#	rot_speed = 0
+		#
+		#return rot_speed
 	
 	def get_linear_speed(self, cur_lin_speed, dt):
 		distance = ((self.current_position.x - self.target.x)**2 + (self.current_position.y - self.target.y)**2 )**0.5
-
+		return self.accel_linear.get_speed(cur_lin_speed, distance, dt)
 		#TODO : speed curve depending on distance
-		speed = 0.5 #m/s
+		#speed = 0.5 #m/s
 
-		print("Move: vlin: "+str(speed))
+		#print("Move: vlin: "+str(speed))
 
-		if distance < 0.1 : 
-			#To Test
-			return float(0)
-		else:
-			return float(speed)
+		#if distance < 0.1 : 
+		#	#To Test
+		#	return float(0)
+		#else:
+		#	return float(speed)
 
 	def diff_angle(self, target, current):
 		#https://stackoverflow.com/questions/1878907/how-can-i-find-the-difference-between-two-angles
