@@ -31,6 +31,8 @@ ros2 run ros2serial ros2serial --ros-args -p serial_port:=/dev/ttyACM0 -p baudra
 ```
 docker exec -it club_robot bash
 
+ros2 run robot_simu_enac simu_robot
+
 ros2 bag play /enac_ws/bag/one_marker_1/one_marker_1_0.db3 -l
 ```
 #### durant un run, supprimer les containers en exitant :

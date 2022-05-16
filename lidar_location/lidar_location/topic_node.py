@@ -39,15 +39,17 @@ class lidarlocation(Node):
             TransformStamped, 'carte_coins', 10)
         self.publish_position = self.create_publisher(
             TransformStamped, 'robot_position', 10)
-        ## CRITIACL CODE AHEAD : DO NOT TOUCH
-        self.publisher_proxomity_warning = self.create_publisher(Bool, 'stop', 10)
+        ## CRITICAL CODE AHEAD : DO NOT TOUCH
+        self.publisher_proximity_warning = self.create_publisher(Bool, 'stop', 10)
+        self.proximity_distance = 0.35 #CRITICAL: Trigger distance of the proximity sensor
+        self.proximity_threshold = 3  # CRITICAL: number of times after which an intrusion is detected before a proximity warning is raised
+        self.proximity_threshold_counter = 0 # CRITICAL: Counts the number of detections before raising a stop
         ## END OF CRITICAL CODE
         self.timer = self.create_timer(1, self.test)
         self.positions = [[0,0],[0,0],[0,0],[0,0],[0,0]] # Defines a list of positions to be evened out
         self.pos_counter = 0 #Incremented at every new position to return the median value
         self.last_good = 0 # Used in determiner_position for abborhent values
         self.start = timeit.default_timer()
-        self.proximity_distance = 0.20 #CRITICAL: Trigger distance of the proximity sensor
 
     def test(self):
         msg_out = TransformStamped()
@@ -137,11 +139,15 @@ class lidarlocation(Node):
         # PROXIMITY WARNING SYSTEM
         # Detects any object closer than self.proximity_distance and triggers a STOP message
         for distance in msg.ranges:
-            if distance < self.proximity_distance:
-                # SENDS A PROXIMITY STOP
-                msg_prox = Bool()
-                msg_prox.bool = True
-                self.publisher_proxomity_warning.publish(msg_prox)
+            if distance < self.proximity_distance and distance > 0.10:
+                self.proximity_threshold_counter += 1 # This counter eleiminates artefacts
+                if self.proximity_threshold_counter > self.proximity_threshold:
+                    # SENDS A PROXIMITY STOP
+                    msg_prox = Bool()
+                    msg_prox.data = True
+                    self.publisher_proximity_warning.publish(msg_prox)
+                    print("AIRPROX", distance)
+        self.proximity_threshold_counter -= 1
         ## END OF CRITICAL CODE ##
         
         
