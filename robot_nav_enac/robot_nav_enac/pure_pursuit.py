@@ -1,7 +1,5 @@
 # COLL SACHA pursuit
-from functools import total_ordering
 import math
-from tkinter import IntVar
 #from winreg import QueryReflectionKey
 import numpy as np
 import numpy as numpy

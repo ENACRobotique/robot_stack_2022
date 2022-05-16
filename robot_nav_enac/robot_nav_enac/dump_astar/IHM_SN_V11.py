@@ -397,23 +397,6 @@ def Recuperation_IHM(liste_rectangle,liste_rond):
     return liste_obstacle
 
 
-def Map_init(liste_obs):
-    c = Coin()
-    #liste_obs.append(c)
-
-    r1 = Rectangle(Points(45,0),Points(117,8.5))
-    r2 = Rectangle(Points(127.5,0),Points(142.5,10.2))
-    barre = Rond(Points(150, 5), 5)
-    moitie = 1500
-    r2_bis = Rectangle(Points((moitie+75)/10,0),Points((moitie+225)/10,10.2))
-    r1_bis = Rectangle(Points((moitie+330)/10,0),Points((moitie+1050)/10,8.5))
-    liste_obs.append(r1)
-    liste_obs.append(r2)
-    liste_obs.append(r1_bis)
-    liste_obs.append(r2_bis)
-    #liste_obs.append(barre)
-
-    return liste_obs # return liste_obs apres debugage
 
     #Rectangle decor (fond)
 

@@ -84,8 +84,8 @@ class Navigator(Node):
             elif self.navigation_type == 1:
                 self.navigation_type = self.straight_path
                 #self.navigation_type.set_target = cur_position or reset button??
-            #elif self.navigation_type == 2:
-            #    self.navigation_type = self.pure_pursuit
+            elif self.navigation_type == 2:
+                self.navigation_type = self.pure_pursuit
             #elif self.navigation_type == 3:
             #    self.navigation_type = self.wall_follower
             #elif self.navigation_type == 4:

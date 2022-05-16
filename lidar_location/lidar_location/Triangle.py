@@ -10,7 +10,7 @@ class Triangle:
         self.pt_list = [pt1, pt2, pt3]
         self.angles = self.get_angles()
         self.distances = self.get_distances()
-        self.sort()
+        #self.sort()
 
     # Returns distances between [pt1 and pt2, pt2 and pt3, pt3 and pt1]
     def get_distances(self):
@@ -35,31 +35,31 @@ class Triangle:
                     2-pt3.distance**2)/(2*pt1.distance*self.get_distance_pt(pt1, pt3))))
         # print(beta1)
         gamma1 = abs(math.acos((self.get_distance_pt(
-            pt1, pt2)**2+pt1.distance**2-pt2.distance**2)/(2*pt1.distance*self.get_distance_pt(pt1, pt2)))
+            pt1, pt2)**2+pt1.distance**2-pt2.distance**2)/(2*pt1.distance*self.get_distance_pt(pt1, pt2))))
         # print(gamma1)
         # print(abs(pt2.angle - pt1.angle))
 
-        beta2=abs(math.acos((self.get_distance_pt(pt1, pt2)**2+pt2.distance **
-                    2-pt1.distance**2)/(2*pt2.distance*self.get_distance_pt(pt1, pt2))))
-        gamma2=abs(math.acos((self.get_distance_pt(
-            pt2, pt3)**2+pt2.distance**2-pt3.distance**2)/(2*pt2.distance*self.get_distance_pt(pt2, pt3)))
+        beta2 = abs(math.acos((self.get_distance_pt(pt1, pt2)**2+pt2.distance **
+                               2-pt1.distance**2)/(2*pt2.distance*self.get_distance_pt(pt1, pt2))))
+        gamma2 = abs(math.acos((self.get_distance_pt(
+            pt2, pt3)**2+pt2.distance**2-pt3.distance**2)/(2*pt2.distance*self.get_distance_pt(pt2, pt3))))
         # print(beta2)
         # print(gamma2)
         # print(abs(pt3.angle - pt2.angle))
 
-        gamma3=abs(math.acos((self.get_distance_pt(
-            pt3, pt1)**2+pt3.distance**2-pt1.distance**2)/(2*pt3.distance*self.get_distance_pt(pt3, pt1)))
+        gamma3 = abs(math.acos((self.get_distance_pt(
+            pt3, pt1)**2+pt3.distance**2-pt1.distance**2)/(2*pt3.distance*self.get_distance_pt(pt3, pt1))))
 
-        beta3=abs(math.acos((self.get_distance_pt(pt3, pt2)**2+pt3.distance **
-                    2-pt2.distance**2)/(2*pt3.distance*self.get_distance_pt(pt3, pt2))))
+        beta3 = abs(math.acos((self.get_distance_pt(pt3, pt2)**2+pt3.distance **
+                               2-pt2.distance**2)/(2*pt3.distance*self.get_distance_pt(pt3, pt2))))
 
         # print(beta3)
         # print(gamma3)
         # print(abs(pt1.angle - pt3.angle))
 
-        angle1=gamma1 + beta1
-        angle2=gamma2 + beta2
-        angle3=gamma3 + beta3
+        angle1 = gamma1 + beta1
+        angle2 = gamma2 + beta2
+        angle3 = gamma3 + beta3
 
         return [angle1, angle2, angle3]
 
@@ -72,21 +72,22 @@ class Triangle:
             return False
 
     def compare_angles(self, triangle2):
-        sorted_local=self.angles
+        
+        sorted_local = self.angles.copy()
         sorted_local.sort()
-        sorted_in=triangle2.angles
+        sorted_in = triangle2.angles.copy()
         sorted_in.sort()
 
         for i in range(0, 2):
             if abs(sorted_local[i] - sorted_in[i]) > self.jitter_angle:
                 return False
-
+        
         return True
 
     def compare_distances(self, triangle2):
-        sorted_local=self.distances
+        sorted_local = self.distances.copy()
         sorted_local.sort()
-        sorted_in=triangle2.distances
+        sorted_in = triangle2.distances.copy()
         sorted_in.sort()
 
         for i in range(0, 2):
@@ -101,10 +102,10 @@ class Triangle:
         else:
             return 0.001
 
-    def sort(self):
+    """def sort(self):
         for i in range(0, 2):
             for j in range(0, 2):
                 if self.pt_list[i].angle > self.pt_list[j].angle:
-                    inter=self.pt_list[i]
-                    self.pt_list[i]=self.pt_list[j]
-                    self.pt_list[j]=inter
+                    inter = self.pt_list[i]
+                    self.pt_list[i] = self.pt_list[j]
+                    self.pt_list[j] = inter"""

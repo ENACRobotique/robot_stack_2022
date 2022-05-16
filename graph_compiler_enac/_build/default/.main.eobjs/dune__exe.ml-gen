@@ -1,0 +1,18 @@
+(** @canonical Dune__exe.Graph_compil *)
+module Graph_compil = Dune__exe__Graph_compil
+
+
+(** @canonical Dune__exe.Lexer *)
+module Lexer = Dune__exe__Lexer
+
+
+(** @canonical Dune__exe.Main *)
+module Main = Dune__exe__Main
+
+
+(** @canonical Dune__exe.Parser *)
+module Parser = Dune__exe__Parser
+
+
+(** @canonical Dune__exe.State_machine *)
+module State_machine = Dune__exe__State_machine

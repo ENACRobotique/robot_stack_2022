@@ -151,7 +151,6 @@ class StraightPath():
 			callback_speed(0,0)
 			return
 
-	
 	def get_rotate_speed(self, relative_rotation_rad, cur_rot_speed_rad, dt):
 		distance = abs(2 * relative_rotation_rad/pi * self.wheel_radius) #TODO : calculate distance to target
 		return self.accel_rotat.get_speed(self.speed.rotation_rad, relative_rotation_rad, dt)
@@ -164,6 +163,7 @@ class StraightPath():
 		#	rot_speed = 0
 		#
 		#return rot_speed
+
 	
 	def get_linear_speed(self, cur_lin_speed, dt):
 		distance = ((self.current_position.x - self.target.x)**2 + (self.current_position.y - self.target.y)**2 )**0.5
