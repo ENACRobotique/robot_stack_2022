@@ -1,6 +1,7 @@
 from lidar_location.Amalgame_list import Amalgame_list
 from lidar_location.Triangle import Triangle
 from lidar_location.Point import Point
+import math
 
 
 class Triangulation:
@@ -24,6 +25,17 @@ class Triangulation:
 
     def __init__(self, message):
         self.obj_list = Amalgame_list(message)
+        """
+        obj_list_filtered = []
+        for amalgame in self.obj_list.list_obj:
+            for amalgame2 in self.obj_list.list_obj:
+                distance = self.get_distance_pt(amalgame.relative_center, amalgame2.relative_center)
+                if distance > 1.8 and distance < 2.1 or distance > 3.0 and distance < 3.5:
+                    #print(distance)
+                    obj_list_filtered.append(amalgame2)
+
+        self.obj_list.list_obj=obj_list_filtered  
+        """
         self.tri_list = self.create_triangle_list()
         self.valid_triangles = self.find_triangles()
         # self.location = self.find_location()
@@ -55,3 +67,8 @@ class Triangulation:
         return valid_list
 
     # def find_location(self):
+
+    def get_distance_pt(self, pt1, pt2):
+       
+            return math.sqrt(pt2.distance**2 + pt1.distance**2 - 2*pt1.distance*pt2.distance*math.cos(abs(pt1.angle-pt2.angle)))
+      

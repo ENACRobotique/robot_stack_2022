@@ -1,5 +1,5 @@
 
-from Points import Points
+from robot_nav_enac.Points import Points
 
 class Chemin:
     def __init__(self,liste_Points=[]):

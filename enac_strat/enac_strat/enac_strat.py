@@ -1,4 +1,6 @@
-import math, time
+from statemachine import StateMachine, State
+import math
+import time
 from enac_strat.conversions import z_euler_from_quaternions, quaternion_from_euler
 import rclpy
 from rclpy.node import Node
@@ -16,13 +18,13 @@ PeriphValue = _periph_value.PeriphValue
 Pid = _pid.Pid
 SetNavigation = _set_navigation.SetNavigation
 
-#uses python-statemachine
-from statemachine import StateMachine, State
+# uses python-statemachine
 
-#see for documentation https://github.com/fgmacedo/python-statemachine
+# see for documentation https://github.com/fgmacedo/python-statemachine
+
 
 class StratStateMachine(StateMachine):
-    #états
+    # états
     init = State("Init", initial=True)
     outhome = State("OutHome")
     chope_palet_un = State("Chope palet un")
@@ -33,7 +35,7 @@ class StratStateMachine(StateMachine):
     almost_end = State("Almost End")
     end = State("End")
 
-    #transitions
+    # transitions
     start = init.to(outhome)
     turn_palet = outhome.to(chope_palet_un)
     a_chope = chope_palet_un.to(chope_palet_deux)
@@ -46,11 +48,12 @@ class StratStateMachine(StateMachine):
     last_ten_seconds = init.to(almost_end) | outhome.to(almost_end) | chope_palet_un.to(almost_end) | chope_palet_deux.to(almost_end) | chope_palet_trois.to(almost_end)
     stop = almost_end.to(end)
 
+
 class Strategy(Node):
 
-    #valeurs stockées
-    x = 0.140 #appuyé sur le rebord
-    y = 1.140 # l'encodeur noir est sur le bord intérieur de la bande jaune
+    # valeurs stockées
+    x = 0.140  # appuyé sur le rebord
+    y = 1.140  # l'encodeur noir est sur le bord intérieur de la bande jaune
     theta = 0
     vlin = 0
     vtheta = 0
@@ -72,16 +75,20 @@ class Strategy(Node):
 
         self.state_machine = StratStateMachine()
 
-        #paramétrage ROS
-        self.ros_periph_pub = self.create_publisher(PeriphValue, '/peripherals', 10)
-        self.ros_diag_pub = self.create_publisher(DiagnosticArray, '/diagnostics', 10)
+        # paramétrage ROS
+        self.ros_periph_pub = self.create_publisher(
+            PeriphValue, '/peripherals', 10)
+        self.ros_diag_pub = self.create_publisher(
+            DiagnosticArray, '/diagnostics', 10)
         self.ros_vel_pub = self.create_publisher(Twist, '/cmd_vel', 10)
         self.nav_pub = self.create_publisher(SetNavigation, '/navigation', 10)
         self.publisher_map = self.create_publisher(
             TransformStamped, 'carte_coins', 10)
-        
-        self.ros_odom_sub = self.create_subscription(Odometry, '/odom', self.on_ros_odom, 10)
-        self.ros_periph_sub = self.create_subscription(PeriphValue, '/peripherals', self.on_ros_periph, 10)
+
+        self.ros_odom_sub = self.create_subscription(
+            Odometry, '/odom', self.on_ros_odom, 10)
+        self.ros_periph_sub = self.create_subscription(
+            PeriphValue, '/peripherals', self.on_ros_periph, 10)
         print(self)
         self.send_periph_msg("d", self.score)
         self.send_all_diags()
@@ -161,18 +168,22 @@ class Strategy(Node):
         msg_out_d.transform.rotation.z = qzd
         msg_out_d.transform.rotation.w = qwd
         self.publisher_map.publish(msg_out_d)
-    
+
     def __str__(self):
         return "Strategy: state: "+str(self.state_machine.current_state)+" x: "+str(self.x)+" y: "+str(self.y)+" theta: "+str(self.theta)+(" match unstarted "if self.chrono == 0 else " chrono: "+str(time.time() - self.chrono))
-    
+
     def send_all_diags(self):
         if self.chrono == 0:
-            self.send_diagnostic(DiagnosticStatus.OK, "Strategy: match", "Match has not started")
+            self.send_diagnostic(DiagnosticStatus.OK,
+                                 "Strategy: match", "Match has not started")
         elif self.chrono != 0 and (time.time() - self.chrono) > self.end:
-            self.send_diagnostic(DiagnosticStatus.ERROR, "Strategy: match", "Match has ended, strategy is blocked")
+            self.send_diagnostic(
+                DiagnosticStatus.ERROR, "Strategy: match", "Match has ended, strategy is blocked")
         else:
-            self.send_diagnostic(DiagnosticStatus.OK if ((time.time() - self.chrono) < self.end - 10) else DiagnosticStatus.WARN, "Strategy: match", f"{str(time.time() - self.chrono)[:7]} seconds have passed")
-        self.send_diagnostic(DiagnosticStatus.STALE, "Strategy: state", f"{str(self.state_machine.current_state)}")
+            self.send_diagnostic(DiagnosticStatus.OK if ((time.time() - self.chrono) < self.end - 10)
+                                 else DiagnosticStatus.WARN, "Strategy: match", f"{str(time.time() - self.chrono)[:7]} seconds have passed")
+        self.send_diagnostic(DiagnosticStatus.STALE, "Strategy: state",
+                             f"{str(self.state_machine.current_state)}")
 
         self.send_tf_map_corners()
 
@@ -204,7 +215,7 @@ class Strategy(Node):
     def check_transitions(self):
         self.send_all_diags()
         try:
-            #trucs liés au temps
+            # trucs liés au temps
             if not(self.state_machine.is_almost_end) and self.chrono != 0 and (time.time() - self.chrono) > self.end - 10 and (time.time() - self.chrono) < self.end:
                 #go home
 
@@ -229,7 +240,7 @@ class Strategy(Node):
                 while (True):
                     time.sleep(1)
 
-            #transitions normales
+            # transitions normales
             if self.state_machine.is_init:
                 if self.periphs.get("TI") == 42:
                     self.state_machine.start()
@@ -241,16 +252,17 @@ class Strategy(Node):
                     self.on_turn_palet()
                     print(self)
             if self.state_machine.is_chope_palet_un:
-                if self.periphs.get("mv") == 3: #il y a un palet dans la main avant
+                if self.periphs.get("hv") == 1:  # il y a un palet dans la main avant
                     self.state_machine.a_chope()
-                    self.on_a_chope()
-                    print(self)
-            
-    
+                    self.on_almost_end()
+
         except Exception as e:
             print("Strategy: crap in transition")
             print(e)
-    
+
+        finally:
+            print(self)
+
     def send_nav_msg(self, nav_type, x, y, theta):
         self.goalx = float(x)
         self.goaly = float(y)
@@ -267,14 +279,14 @@ class Strategy(Node):
         msg.pose.orientation.z = qz
         msg.pose.orientation.w = qw
         self.nav_pub.publish(msg)
-    
+
     def send_periph_msg(self, id, cmd):
         msg = PeriphValue()
         msg.header.stamp = self.get_clock().now().to_msg()
         msg.header.frame_id = "raspberry"
         msg.periph_name = str(id)
         msg.value = int(cmd)
-        #envoyer les infos sur le bon topic
+        # envoyer les infos sur le bon topic
         self.ros_periph_pub.publish(msg)
 
     def send_cmd_vel(self, vlin, vtheta):
@@ -294,7 +306,7 @@ class Strategy(Node):
         msg.status = [reference]
         self.ros_diag_pub.publish(msg)
 
-    #fonctions des transitions
+    # fonctions des transitions
     def on_start(self):
         print("Strategy: Tirette détectée: start")
         self.chrono = time.time()
@@ -338,8 +350,9 @@ class Strategy(Node):
 
     def on_end(self):
         print("End: stop everything")
-        self.send_nav_msg(1, -1, -1, -1) #nav shut up pls
-        self.send_cmd_vel(0, 0) # stop
+        self.send_nav_msg(1, -1, -1, -1)  # nav shut up pls
+        self.send_cmd_vel(0, 0)  # stop
+
 
 def main(args=None):
     rclpy.init(args=args)
@@ -353,6 +366,7 @@ def main(args=None):
     # when the garbage collector destroys the node object)
     strat.destroy_node()
     rclpy.shutdown()
+
 
 if __name__ == '__main__':
     main()

@@ -7,8 +7,13 @@ xhost local:root
 ```
 For the rest : 
 ```
-docker run -it -d --net=host -e DISPLAY --name club_robot --volume /home/robot/ros_aruco/src/robot_stack_2022:/enac_ws/src --volume /home/robot/bag_files:/enac_ws/bag enacrobotique/enac-base:dev bash
+docker run -it --rm --net=host -e DISPLAY --name club_robot --volume /home/robot/ros_aruco/src/robot_stack_2022:/enac_ws/src --volume /home/robot/bag_files:/enac_ws/bag enacrobotique/enac-base:dev bash
 ```
+
+Ordi de gauche :
+docker run -it --rm --net=host -e DISPLAY --name club_robot --volume /home/robot/Documents/robot_stack/robot_stack_2022:/enac_ws/src --volume /home/robot/bag_files:/enac_ws/bag enacrobotique/enac-base:dev bash
+
+
 PI 4 with camera :
 docker run -it --privileged --rm --name club_robot --net=host --pid=host -e DISPLAY --device=/dev/ttyACM0 enacrobotique/enac-base:prod bash
 
@@ -25,6 +30,8 @@ ros2 run ros2serial ros2serial --ros-args -p serial_port:=/dev/ttyACM0 -p baudra
 
 ```
 docker exec -it club_robot bash
+
+ros2 run robot_simu_enac simu_robot
 
 ros2 bag play /enac_ws/bag/one_marker_1/one_marker_1_0.db3 -l
 ```

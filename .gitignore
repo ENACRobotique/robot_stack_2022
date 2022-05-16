@@ -10,3 +10,5 @@ aruco_analysis_enac/aruco_analysis_enac/__pycache__/detect_aruco.cpython-38.pyc
 rosbag2_2022_02_08-17_30_22/rosbag2_2022_02_08-17_30_22_0.db3
 aruco_analysis_enac/.vscode/browse.vc.db
 aruco_analysis_enac/.vscode/browse.vc.db
+.vscode/c_cpp_properties.json
+.vscode/settings.json
