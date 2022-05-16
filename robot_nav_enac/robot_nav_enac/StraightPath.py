@@ -1,7 +1,6 @@
-import numpy as np
-
 from math import atan2, cos, sin, pi
 
+from robot_nav_enac.Acceleration import Acceleration
 from interfaces_enac.msg import _set_navigation
 
 SetNavigation = _set_navigation.SetNavigation
@@ -89,22 +88,33 @@ class StraightPath():
 		
 		self.rotation_precision = 0.08 #~4.5 deg
 		self.position_precision = 0.1 # 10 cm
+
+		self.accel_linear = Acceleration(0.6, 0.1, 2.0, 1.0)
+		self.accel_rotat = Acceleration(1.85, 0.05, 2.0, 1.0)
+
+		self.dt = 0
+		self.last_time = 0
 	
 	def set_target(self, target_pose:OdomData):
-		self.target = target_pose
-		self.logger("updated target in StraightPath navigationType")
+		if self.target != target_pose: #TODO : check if it's enough to avoid "jerking" from acceleration module
+			self.target = target_pose
+			self.accel_linear.reset_accel()
+			self.rotation_precision.reset_accel()
+			self.logger("updated target in StraightPath navigationType")
 		#TODO : take into account obstacles
 
 	def update_dyn_obstacles(self, dyn_obstacles = None):
 		pass
 		#TODO : take into account obstacles
 
-	def update_odom(self, callback_speed, position, speed):
+	def update_odom(self, callback_speed, position, speed, dt):
 
 		self.current_position = position
 		self.speed = speed
 		x = position.x
 		y = position.y
+
+		self.dt = dt
 
 		is_not_at_target = abs(x - self.target.x) >= self.position_precision or abs(y - self.target.y) >= self.position_precision #check only position not rotation
 		
@@ -114,6 +124,7 @@ class StraightPath():
 		rotation_to_final_angle = self.diff_angle(self.target.rotation_rad, self.current_position.rotation_rad)
 
 		if  abs(relative_rotation_rad) > self.rotation_precision and is_not_at_target: #first rotation
+			self.accel_linear.reset_accel()
 			self.logger(f"Rotating with relative angle to target of : {relative_rotation_rad} at speed {self.get_rotate_speed(relative_rotation_rad)}")
 			self._isNavigating = False
 			self._isRotating = True
@@ -121,6 +132,7 @@ class StraightPath():
 			return
 
 		elif abs(relative_rotation_rad) <= self.rotation_precision and is_not_at_target : #aligned to path
+			self.accel_rotat.reset_accel()
 			self._isNavigating = True
 			self._isRotating = False
 			callback_speed(self.get_linear_speed(), 0)
@@ -141,7 +153,9 @@ class StraightPath():
 			return
 
 	
-	def get_rotate_speed(self, relative_rotation_rad):
+	def get_rotate_speed(self, cur_rot_speed_rad, relative_rotation_rad):
+		distance = ?? #TODO : calculate distance to target
+		self.accel_rotat.get_speed(self.speed.rotation_rad, relative_rotation_rad)
 
 		if (relative_rotation_rad <= 0):
 			rot_speed = -0.5
