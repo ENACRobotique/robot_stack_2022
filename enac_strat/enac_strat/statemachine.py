@@ -33,7 +33,7 @@ class State:
             self.on_enter = self.on_enter_default
         else:
             self.on_enter = on_enter
-        if on_enter is None:
+        if on_leave is None:
             self.on_leave = self.on_leave_default
         else:
             self.on_leave = on_leave

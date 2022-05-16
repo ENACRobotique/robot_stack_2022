@@ -61,7 +61,7 @@ class Navigator(Node):
 
         # subscribe to nav
         navigation_subscriber = self.create_subscription(
-            SetNavigation, 'set_nav', self.on_nav_callback, 10)
+            SetNavigation, 'navigation', self.on_nav_callback, 10)
         #subscribe to odom
         odom_subscriber = self.create_subscription(
             Odometry, 'odom', self.on_odom_callback, 10)

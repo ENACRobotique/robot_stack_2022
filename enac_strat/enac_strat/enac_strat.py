@@ -285,6 +285,7 @@ class Strategy(Node):
         if (msg.header.frame_id == "stm32"):#to prevent looping from self messages
             id = msg.periph_name[:2]
             cmd = int(msg.value)
+            print(f"ros_periph [{id}] {cmd}")
             self.periphs[id] = cmd
             self.check_transitions()
 
