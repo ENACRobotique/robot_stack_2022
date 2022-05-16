@@ -22,25 +22,46 @@ let generate_state_transition_py = fun st ->
     State(id, on_enter_and_on_leave) ->
       begin match String.split_on_char '/' on_enter_and_on_leave with
         enter::[leave] -> 
-          Printf.sprintf "%s = State(\"%s\", %s, %s)" id id enter leave
+          Printf.sprintf "%s = State(\"%s\", self.%s, self.%s)" id id enter leave
       | [nope] when nope = "" ->
         Printf.sprintf "%s = State(\"%s\")" id id
       | [enter] ->
-        Printf.sprintf "%s = State(\"%s\", %s)" id id enter
+        Printf.sprintf "%s = State(\"%s\", self.%s)" id id enter
       | _ -> failwith (Printf.sprintf "Too much in state %s" (st_str st)) end
   | Transition(id_ls, id_dest, guard_and_on_transition) ->
       let tent_name = String.concat "To" [(String.concat "" id_ls); id_dest] in
       let name = if String.length tent_name > 40 then String.concat "" ["tr"; string_of_int (Hashtbl.hash (tent_name)); "To"; id_dest] else tent_name in
       let decl = begin match String.split_on_char '/' guard_and_on_transition with
         on_transition::[guard] ->
-          Printf.sprintf "%s = Transition(\"%s\", %s, %s, %s)" name name id_dest on_transition guard
+          Printf.sprintf "%s = Transition(\"%s\", %s, self.%s, self.%s)" name name id_dest on_transition guard
       | [nope] when nope = "" ->
           Printf.sprintf "%s = Transition(\"%s\", %s)" name name id_dest
       | [on_transition] -> 
-          Printf.sprintf "%s = Transition(\"%s\", %s, %s)" name name id_dest on_transition
+          Printf.sprintf "%s = Transition(\"%s\", %s, self.%s)" name name id_dest on_transition
       | _ -> failwith (Printf.sprintf "Too much in transition %s" (st_str st)) end in
       let adding_to_states = String.concat "\n" (List.map (fun x -> Printf.sprintf "%s.add_transition(%s)" x name) id_ls) in
       String.concat "\n" [decl; adding_to_states]
+
+let generate_fricking_placeholder_functions = fun st ->
+  match st with
+    State(_, on_enter_and_on_leave) ->
+      begin match String.split_on_char '/' on_enter_and_on_leave with
+        enter::[leave] -> 
+          Printf.sprintf "def %s(self):\n    pass\ndef %s(self):\n    pass\n" enter leave
+      | [nope] when nope = "" ->
+        ""
+      | [enter] ->
+        Printf.sprintf "def %s(self):\n    pass\n" enter
+      | _ -> failwith (Printf.sprintf "Too much in state %s" (st_str st)) end
+  | Transition(_, _, guard_and_on_transition) ->
+      begin match String.split_on_char '/' guard_and_on_transition with
+        on_transition::[guard] ->
+          Printf.sprintf "def %s(self):\n    pass\ndef %s(self):\n    return True\n" on_transition guard
+      | [nope] when nope = "" ->
+          ""
+      | [on_transition] -> 
+          Printf.sprintf "def %s(self):\n    pass\n" on_transition
+      | _ -> failwith (Printf.sprintf "Too much in transition %s" (st_str st)) end
 
 let generate_stm_py = fun stm ->
   match stm with
@@ -74,4 +95,5 @@ let generate_stm_py = fun stm ->
                       | None -> begin match List.nth_opt list_states 0 with
                                         Some (State(y, _)) -> y
                                       | _ -> "None" end) in
-      Printf.sprintf "from statemachine import State, Transition, StateMachine\n\n%s\n%s" all_printed py_stm
+      let placeholders = String.concat "\n" (List.map generate_fricking_placeholder_functions st_ls) in
+      Printf.sprintf "from statemachine import State, Transition, StateMachine\n\n%s\n%s\n%s" all_printed py_stm placeholders

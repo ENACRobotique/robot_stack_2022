@@ -55,10 +55,15 @@ class State:
 class StateMachine:
     def __init__(self, init_state = None):
         self.state = init_state
-        self.state.on_enter()
+        self.is_started = False
+    
+    def start(self):
+        if not self.is_started:
+            self.state.on_enter()
+            self.is_started = True
     
     def check_transitions(self):
-        if self.state is not None:
+        if self.state is not None and self.is_started:
             new_state = self.state.check_transitions()
             if new_state is not None:
                 if new_state != self.state:
