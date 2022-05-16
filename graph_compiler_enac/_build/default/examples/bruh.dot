@@ -1,0 +1,6 @@
+//init Bruh
+digraph bruhMachine {
+        Stonks -> Argh [label=""]
+        Argh -> Stonks [label=""]
+        Bruh -> Argh [label=""]
+}

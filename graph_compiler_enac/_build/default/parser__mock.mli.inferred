@@ -1,0 +1,21 @@
+type token =
+    RCBR
+  | RBR
+  | LCBR
+  | LBR
+  | LABEL
+  | INIT
+  | IDENTIFIER of string
+  | EQUAL
+  | EOF
+  | DIGRAPH
+  | COMMENT
+  | ARROW_LEFT
+val menhir_begin_marker : int
+val xv_statement_list : Graph_compil.statement list
+val xv_statement : Graph_compil.statement
+val xv_node_statement : Graph_compil.statement
+val xv_main : Graph_compil.statemachine
+val xv_id_list : string list
+val xv_edge_statement : Graph_compil.statement
+val menhir_end_marker : int
