@@ -39,6 +39,11 @@ https://pypi.org/project/simple-pid/ --> PID
 Basic navigation script : 
 Input : take a destination position + rotation [ROS odometrie classic msg] + Max Speed
 Result : Move Robot and stop at the right point, In case of update, stop robot and restart with new data
+
+How does it work :
+1. Align to target
+2. go in straight path (correcting for deviation in path by constantly checking angle to target, due to the not perfect angle)
+3.
 """
 
 class OdomData:
@@ -88,13 +93,13 @@ class StraightPath():
 		self.speed = OdomData(0,0,0)
 		
 		self.min_rotation_precision = 0.08 #~4.5 deg
-		self.max_rotation_precision = 0.16 #~ 9 deg
+		self.max_rotation_precision = 0.24 #~ 13 deg
 		#Explanation -> When travelling in straight line, if the robot stop before reaching the perfect angle, there'll be a time during a travel when it has to "correct for the angle"
 		#so we need to set a value when the robot can start moving forward (under max_rotation_precision) and stop moving forward if too far from the target (above max_rotation_precision), and stop moving for "precision rotation" (under min_rotation_precision)
 		self.position_precision = 0.1 # 10 cm
 
-		self.accel_linear = Acceleration(0.6, 0.1, 2.0, 1.0)
-		self.accel_rotat = Acceleration(1.85, 0.05, 2.0, 1.0)
+		self.accel_linear = Acceleration(0.6, 0.1, 3.0, 2.0)
+		self.accel_rotat = Acceleration(1.2, 0.05, 3.0, 2.0)
 	
 	def set_target(self, target_pose:OdomData):
 		if self.target != target_pose: #TODO : check if it's enough to avoid "jerking" from acceleration module
@@ -172,9 +177,9 @@ class StraightPath():
 
 	def get_rotate_correction_speed(self, relative_rotation_rad): #quick correction at "small speed" without ramp to correct when traveling in straight line if not following correctly
 		if (relative_rotation_rad <= 0):
-			rot_speed = -0.1 #take ~ 1 second to go from min_precision to max_precision
+			rot_speed = -0.05 #take ~ 2 second to go from min_precision to max_precision
 		else:
-			rot_speed = 0.1
+			rot_speed = 0.05
 		return rot_speed
 
 	def get_linear_speed(self, cur_lin_speed, dt):

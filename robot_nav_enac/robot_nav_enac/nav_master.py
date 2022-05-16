@@ -76,6 +76,7 @@ class Navigator(Node):
         pass
 
     def on_nav_callback(self, msg):
+        self.get_logger().info("receiving nav_cons ")
         #switch nav type if changed
         if self.nav_type_int != msg.navigation_type:
             self.navigation_type = msg.navigation_type
