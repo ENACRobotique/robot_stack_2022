@@ -35,12 +35,13 @@ class Strategy(Node):
     goaltheta = 0
 
     score = 4 #pour avoir déposé une statuette et une vitrine sur le terrain
+    what_done = "has_stat has_vitr "#indiquer ce qui a été fait
     chrono = 0
     end = 100
 
     dont_do_shit_anymore = False
 
-    prio_galerie = True
+    prio_galerie = False
 
     #vars galerie
 
@@ -294,7 +295,9 @@ class Strategy(Node):
         else:
             self.send_diagnostic(DiagnosticStatus.OK if ((time.time() - self.chrono) < self.end - 15) else DiagnosticStatus.WARN, "ST: match", f"{str(time.time() - self.chrono)[:7]} seconds have passed")
         self.send_diagnostic(DiagnosticStatus.STALE, "ST: state", f"{str(self.EnacStrat.state)}")
-        self.send_diagnostic(DiagnosticStatus.STALE, "ST: score", f"{str(self.score)}")
+        self.send_diagnostic(DiagnosticStatus.STALE, "ST: score", f"{str(self.score)} - {str(self.what_done)}")
+        self.send_diagnostic(DiagnosticStatus.STALE, "ST: odom", "x:{:.3f} y:{:.3f} theta:{:1f}".format(self.x, self.y, math.degrees(self.theta)))
+        self.send_diagnostic(DiagnosticStatus.STALE, "ST: color", f"{('yellow' if self.color_is_jaune() else 'violet')}")
         self.send_tf_map_corners()
 
     def on_ros_periph(self, msg):
@@ -316,7 +319,7 @@ class Strategy(Node):
             self.theta = z_euler_from_quaternions(qx, qy, qz, qw)
             self.vlin = msg.twist.twist.linear.x
             self.vtheta = msg.twist.twist.angular.z
-            print(f"ros_odom x:{self.x} y:{self.y} theta:{self.theta}")
+            print(f"ros_odom x:{self.x} y:{self.y} theta:{math.degrees(self.theta)}")
             self.check_transitions()
 
     def is_at_goal(self, vlin_tol, vtheta_tol, distmax_m):
@@ -331,6 +334,11 @@ class Strategy(Node):
         return (abs(self.vlin) <= vlin_tol and
                 abs(self.vtheta) <= vtheta_tol and
                 math.sqrt((self.x - goalx)**2 + (self.y - goaly)**2) <= distmax_m) #TODO: add condition sur theta si utile
+
+    def update_score(self, act_name, pts):
+        self.score += pts
+        self.what_done += (act_name + " ")
+        self.update_score_display()
 
     def check_transitions(self):
         if not self.dont_do_shit_anymore:
@@ -415,8 +423,7 @@ class Strategy(Node):
 
     def turn_around_replique(self):
         #ajouter les points car la statuette a été enlevée
-        self.score += 5
-        self.update_score_display()
+        self.update_score("enlv_stat", 5)
         #se retourner pour déposer la réplique
         if self.color_is_jaune():
             self.send_nav_msg(1, 0.45, 0.45, math.radians(225))
@@ -435,8 +442,7 @@ class Strategy(Node):
 
     def go_vitrine(self):
         #ajouter les points car réplique droppée
-        self.score += 10
-        self.update_score_display()
+        self.update_score("drop_repl", 10)
         #aller à la vitrine
         if self.color_is_jaune():
             self.send_nav_msg(1, 0.24, 1.8, math.radians(-90))
@@ -448,6 +454,8 @@ class Strategy(Node):
 
     def drop_statuette(self):
         #TODO: code bas-niveau
+
+        self.update_score("stat_vitr", 15)
         pass
 
     def is_at_vitrine(self):
@@ -480,7 +488,7 @@ class Strategy(Node):
         if self.color_is_jaune():
             self.send_nav_msg(1, 1.0, 1.205, math.radians(45))
         else:
-            self.send_nav_msg(21, 3.0*1.0, 1.205, math.radians(180-45))
+            self.send_nav_msg(1, 3.0-1.0, 1.205, math.radians(180-45))
 
     def has_backhand_rouge(self):
         return (self.periphs.get("mr", None) == 3)
@@ -525,6 +533,7 @@ class Strategy(Node):
         return self.check_goal()
 
     def go_galerie_vert(self):
+        self.update_score("gal_rouge", 6)
         if self.color_is_jaune():
             self.send_nav_msg(1, 0.81, 1.8, math.radians(-90))
         else:
@@ -540,6 +549,7 @@ class Strategy(Node):
         return self.check_goal()
 
     def store_bleu_from_front_hand_and_go_galerie_bleu(self):
+        self.update_score("gal_vert", 6)
         self.send_periph_msg("mc", 0)
         if self.color_is_jaune():
             self.send_nav_msg(1, 0.57, 1.8, math.radians(-90))
@@ -556,8 +566,8 @@ class Strategy(Node):
     def is_at_galerie_bleu(self):
         return self.check_goal()
 
-    def do_nothing(self):
-        pass
+    def do_nothing(self): #au final on fait un truc: mettre à jour le score
+        self.update_score("gal_bleu", 6)
 
     def has_dropped_bleu(self):
         return (self.periphs.get("mr", None) == 1)
@@ -635,17 +645,17 @@ class Strategy(Node):
 
     def things_todo_at_bercail(self):
         #être sûr d'arrêter le robot
+        self.update_score("bercail", 20)
         self.dont_do_shit_anymore = True
         self.send_cmd_vel(0.0, 0.0)
         #déposer tous les palets dans les mains si il y en a
         if self.periphs.get("mv", None) == 3:
             self.send_periph_msg("mg", 0)
             self.score += 1
-            self.update_score_display()
         if self.periphs.get("mr", None) == 3:
             self.send_periph_msg("mh", 0)
             self.score += 1
-            self.update_score_display()
+        self.update_score_display()
         self.send_periph_msg("p1", 0)
         self.send_periph_msg("p2", 0)
 
