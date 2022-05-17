@@ -22,6 +22,7 @@ from enac_strat.statemachine import State, Transition, StateMachine
 class Strategy(Node):
 
     #valeurs stockées
+    #TODO: refaire pour gestion violet
     x = 0.140 #appuyé sur le rebord
     y = 1.140 # l'encodeur noir est sur le bord intérieur de la bande jaune
     theta = 0
@@ -36,6 +37,8 @@ class Strategy(Node):
     score = 4 #pour avoir déposé une statuette et une vitrine sur le terrain
     chrono = 0
     end = 100
+
+    prio_galerie = True
 
     #vars galerie
 
@@ -280,13 +283,13 @@ class Strategy(Node):
     
     def send_all_diags(self):
         if self.chrono == 0:
-            self.send_diagnostic(DiagnosticStatus.OK, "Strategy: match", "Match has not started")
+            self.send_diagnostic(DiagnosticStatus.OK, "ST: match", "Match has not started")
         elif self.chrono != 0 and (time.time() - self.chrono) > self.end:
-            self.send_diagnostic(DiagnosticStatus.ERROR, "Strategy: match", "Match has ended, strategy is blocked")
+            self.send_diagnostic(DiagnosticStatus.ERROR, "ST: match", "Match has ended, strategy is blocked")
         else:
-            self.send_diagnostic(DiagnosticStatus.OK if ((time.time() - self.chrono) < self.end - 15) else DiagnosticStatus.WARN, "Strategy: match", f"{str(time.time() - self.chrono)[:7]} seconds have passed")
-        self.send_diagnostic(DiagnosticStatus.STALE, "Strategy: state", f"{str(self.EnacStrat.state)}")
-        self.send_diagnostic(DiagnosticStatus.STALE, "Strategy: Score", f"{str(self.score)}")
+            self.send_diagnostic(DiagnosticStatus.OK if ((time.time() - self.chrono) < self.end - 15) else DiagnosticStatus.WARN, "ST: match", f"{str(time.time() - self.chrono)[:7]} seconds have passed")
+        self.send_diagnostic(DiagnosticStatus.STALE, "ST: state", f"{str(self.EnacStrat.state)}")
+        self.send_diagnostic(DiagnosticStatus.STALE, "ST: score", f"{str(self.score)}")
         self.send_tf_map_corners()
 
     def on_ros_periph(self, msg):
@@ -315,6 +318,9 @@ class Strategy(Node):
         return (abs(self.vlin) <= vlin_tol and
                 abs(self.vtheta) <= vtheta_tol and
                 math.sqrt((self.x - self.goalx)**2 + (self.y - self.goaly)**2) <= distmax_m) #TODO: add condition sur theta si utile
+
+    def check_goal(self):
+        return self.is_at_goal(0.001, 0.001, 0.1)
 
     def is_at_pos(self, vlin_tol, vtheta_tol, distmax_m, goalx, goaly, goaltheta):
         return (abs(self.vlin) <= vlin_tol and
@@ -394,14 +400,14 @@ class Strategy(Node):
         pass
 
     def is_at_statuette(self):
-        return self.is_at_goal(0.001, 0.001, 0.1)
+        return self.check_goal()
 
     def turn_around_replique(self):
         #ajouter les points car la statuette a été enlevée
         self.score += 5
         self.update_score_display()
         #se retourner pour déposer la réplique
-        self.send_nav_msg(1, 0.45, 0.45, math.radians(135))
+        self.send_nav_msg(1, 0.45, 0.45, math.radians(225))
 
     def has_gotten_statuette(self):
         return (self.periphs.get("mr", None) == -1) #FIXME: coder l'état de neutre avec statuette en bas niveau et le renseigner ici
@@ -411,122 +417,131 @@ class Strategy(Node):
         pass
 
     def has_turned_around_replique(self):
-        return self.is_at_goal(0.001, 0.001, 0.1)
+        return self.check_goal()
 
     def go_vitrine(self):
         #ajouter les points car réplique droppée
         self.score += 10
         self.update_score_display()
         #aller à la vitrine
-        self.send_nav_msg(1, 0.24, 1.8, math.radians(90))
+        self.send_nav_msg(1, 0.24, 1.8, math.radians(-90))
 
     def has_dropped_replique(self):
         return (self.periphs.get("mv", None) == 1) #la state_machine avant est revenue en position neutre sans charge
 
     def drop_statuette(self):
+        #TODO: code bas-niveau
         pass
 
     def is_at_vitrine(self):
-        return True
+        return self.check_goal()
 
     def go_palet_rouge(self):
-        pass
+        self.done_galerie = True
+        self.send_nav_msg(1, 1.0, 0.6675, math.radians(47.34))
 
     def is_prio_galerie(self):
-        return True
+        return (self.periphs.get("mr", None) == 1) and (self.prio_galerie == True)
 
     def recup_rouge_stocker(self):
-        pass
+        self.send_periph_msg("ma", 0)
+        self.send_periph_msg("mc", 0)
 
     def is_at_palet_rouge(self):
-        return True
+        return self.check_goal()
 
     def put_back_rouge(self):
-        pass
+        self.send_periph_msg("mf", 0)
 
     def has_stored_rouge(self):
-        return True
+        return (self.periphs.get("sc", None) == 1)
 
     def go_palet_vert(self):
-        pass
+        self.send_nav_msg(1, 1.0, 1.205, math.radians(45))
 
     def has_backhand_rouge(self):
-        return True
+        return (self.periphs.get("mr", None) == 3)
 
     def recup_vert_stocker(self):
-        pass
+        self.send_periph_msg("ma", 0)
+        self.send_periph_msg("mc", 0)
 
     def is_at_palet_vert(self):
-        return True
+        return self.check_goal()
 
     def go_palet_bleu(self):
-        pass
+        self.send_nav_msg(1, 1.0, 1.455, math.radians(0))
 
     def has_stored_vert(self):
-        return True
+        return (self.periphs.get("sc", None) == 1)
 
     def recup_bleu(self):
-        pass
+        self.send_periph_msg("ma", 0)
 
     def is_at_palet_bleu(self):
-        return True
+        return self.check_goal()
 
     def go_galerie_rouge(self):
-        pass
+        self.send_nav_msg(1, 1.05, 1.8, math.radians(-90))
 
     def has_recup_bleu(self):
-        return True
+        return (self.periphs.get("mv", None) == 3)
 
     def depot_rouge_arriere(self):
-        pass
+        #TODO: code bas-niveau
+        self.send_periph_msg("mh", 0) #placeholder pour dépôt arrière sur galerie ->force les AX12 comme un bourrin
+        self.send_periph_msg("mf", 0)
 
     def is_at_galerie_rouge_retourne(self):
-        return True
+        return self.check_goal()
 
     def go_galerie_vert(self):
-        pass
+        self.send_nav_msg(1, 0.81, 1.8, math.radians(-90))
 
     def has_dropped_rouge(self):
-        return True
+        return (self.periphs.get("mr", None) == 1)
 
     def destore_drop_vert_arriere(self):
-        pass
+        self.send_periph_msg("mh", 0) #placeholder pour dépôt arrière sur galerie ->force les AX12 comme un bourrin
 
     def is_at_galerie_vert_retourne(self):
-        return True
+        return self.check_goal()
 
     def store_bleu_from_front_hand_and_go_galerie_bleu(self):
-        pass
+        self.send_periph_msg("mc", 0)
+        self.send_nav_msg(1, 0.57, 1.8, math.radians(-90))
 
     def has_dropped_vert(self):
-        return True
+        return (self.periphs.get("mr", None) == 1)
 
     def destore_drop_bleu_arriere(self):
-        pass
+        self.send_periph_msg("mf", 0)
+        self.send_periph_msg("mh", 0) #placeholder pour dépôt arrière sur galerie ->force les AX12 comme un bourrin
 
     def is_at_galerie_bleu(self):
-        return True
+        return self.check_goal()
 
     def do_nothing(self):
         pass
 
     def has_dropped_bleu(self):
-        return True
+        return (self.periphs.get("mr", None) == 1)
 
     def go_carres(self):
-        pass
+        self.done_carres = True
+        self.send_nav_msg(1, 0.6675, 0.2, math.radians(-90))
 
     def pas_deja_fait_carres(self):
         return not self.done_carres
 
     def go_bercail(self):
-        self.send_nav_msg(1, 0.14, 1.14, 0)
+        self.send_nav_msg(1, 0.2, 1.16, 0)
 
     def has_deja_fait_carres(self):
         return self.done_carres
 
     def is_prio_carres(self):
-        return True
+        return (self.periphs.get("mr", None) == 1) and (self.prio_galerie == False)
 
     def se_coller_au_mur_deployer_poelon(self):
         pass
@@ -578,14 +593,12 @@ class Strategy(Node):
         return ((time.time() - self.chrono) > self.end - 15.0)
 
     def things_todo_at_bercail(self):
-        #shutter la configuration
-        #self.send_nav_msg(1, -1.0, -1.0, 0.0)
         #être sûr d'arrêter le robot
         self.send_cmd_vel(0.0, 0.0)
-        #déposer tous les palets
-        if self.periphs.get("hv", 0) == 1:
+        #déposer tous les palets dans les mains si il y en a
+        if self.periphs.get("mv", None) == 3:
             self.send_periph_msg("mg", 0)
-        if self.periphs.get("hr", 0):
+        if self.periphs.get("mr", None) == 3:
             self.send_periph_msg("mh", 0)
 
     def is_at_bercail(self):
