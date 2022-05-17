@@ -48,7 +48,11 @@ class Strategy(Node):
     done_galerie = False
     
     #vars carres
+    pushed_at_least_one = False
     nombre_carres_done = 0
+    checked_last_carre = False
+    can_bypass_lecture = False
+    carres = {}
     
     done_carres = False
 
@@ -454,9 +458,7 @@ class Strategy(Node):
 
     def drop_statuette(self):
         #TODO: code bas-niveau
-
         self.update_score("stat_vitr", 15)
-        pass
 
     def is_at_vitrine(self):
         return self.check_goal()
@@ -562,12 +564,13 @@ class Strategy(Node):
     def destore_drop_bleu_arriere(self):
         self.send_periph_msg("mf", 0)
         self.send_periph_msg("mh", 0) #placeholder pour dépôt arrière sur galerie ->force les AX12 comme un bourrin
+        self.update_score("gal_bleu", 6)
 
     def is_at_galerie_bleu(self):
         return self.check_goal()
 
-    def do_nothing(self): #au final on fait un truc: mettre à jour le score
-        self.update_score("gal_bleu", 6)
+    def do_nothing(self):
+        pass
 
     def has_dropped_bleu(self):
         return (self.periphs.get("mr", None) == 1)
@@ -601,31 +604,50 @@ class Strategy(Node):
         return True
 
     def lire_carre_si_besoin(self):
-        pass
+        self.checked_last_carre = False
+        self.periphs.pop("LR", None)
+        if (self.nombre_carres_done == 0 or self.nombre_carres_done == 3):
+            self.send_periph_msg("r", 0)
+            self.can_bypass_lecture = False
+        else:
+            self.can_bypass_lecture = True
+        
 
     def is_au_mur(self):
         return True
 
     def pousser_si_besoin(self):
-        pass
+        if not self.can_bypass_lecture:
+            should_pousse = self.periphs.get("LR", None)
+            self.carres[self.nombre_carres_done] = should_pousse
+        else:
+            pass
+        self.nombre_carres_done += 1
+        if should_pousse == 1:
+            self.send_periph_msg("s1", 90) #placeholder, peut être avoir repli auto?
+        self.checked_last_carre = True
 
     def has_lu_carre_si_besoin(self):
-        return True
+        return (self.periphs.get("LR", None) is not None) or self.can_bypass_lecture
 
     def go_prochain_carre(self):
-        pass
+        self.send_periph_msg("s1", 110) #replier poelon en position lecture au cas où
+        #self.send_nav_msg(3, ) #nav3: suivi mur, si ça marche pas repasser nav 1
 
     def has_checked_carre(self):
-        return True
+        return self.checked_last_carre
 
     def is_at_prochain(self):
-        return True
+        return self.check_goal()
 
     def quitter_mur_rentrer_poelon(self):
-        pass
+        self.send_periph_msg("s1", 130) #replier poelon en position repliée pour se barrer
 
     def tous_carres_lus(self):
-        return True
+        if self.carres.get(3, None) == 1:
+            return (self.nombre_carres_done >= 6)
+        else:
+            return (self.nombre_carres_done >= 5)
 
     def has_quitte_mur(self):
         return True
