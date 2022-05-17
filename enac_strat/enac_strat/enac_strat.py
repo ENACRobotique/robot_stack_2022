@@ -38,6 +38,8 @@ class Strategy(Node):
     chrono = 0
     end = 100
 
+    dont_do_shit_anymore = False
+
     prio_galerie = True
 
     #vars galerie
@@ -331,14 +333,17 @@ class Strategy(Node):
                 math.sqrt((self.x - goalx)**2 + (self.y - goaly)**2) <= distmax_m) #TODO: add condition sur theta si utile
 
     def check_transitions(self):
-        try:
-            old_state = self.EnacStrat.state
-            self.EnacStrat.check_transitions()
-            if self.EnacStrat.state != old_state:
-                print(self)
-        except Exception as e:
-            print("Strategy: crap in transition")
-            print(e)
+        if not self.dont_do_shit_anymore:
+            try:
+                old_state = self.EnacStrat.state
+                self.EnacStrat.check_transitions()
+                if self.EnacStrat.state != old_state:
+                    print(self)
+            except Exception as e:
+                print("Strategy: crap in transition")
+                print(e)
+        else:
+            print("Strategy blocked: end of match")
         self.send_all_diags()
     
     def send_nav_msg(self, nav_type, x, y, theta):
@@ -630,6 +635,7 @@ class Strategy(Node):
 
     def things_todo_at_bercail(self):
         #être sûr d'arrêter le robot
+        self.dont_do_shit_anymore = True
         self.send_cmd_vel(0.0, 0.0)
         #déposer tous les palets dans les mains si il y en a
         if self.periphs.get("mv", None) == 3:
@@ -640,6 +646,8 @@ class Strategy(Node):
             self.send_periph_msg("mh", 0)
             self.score += 1
             self.update_score_display()
+        self.send_periph_msg("p1", 0)
+        self.send_periph_msg("p2", 0)
 
     def is_at_bercail(self):
         if self.color_is_jaune():
