@@ -65,7 +65,7 @@ class AccelCalibration(Node):
                 self.init_timestamp = self.get_clock().now().nanoseconds
                 return
         if self.init_timestamp != 0.0:
-            if not self.reached_high and msg.twist.twist.linear.x >= self.cons_speed - self.epsilon_cons_speed:
+            if not self.reached_high and linear_speed >= self.cons_speed - self.epsilon_cons_speed:
                 self.get_logger().info(f"Reached max speed : {self.cons_speed} in \
                     {(self.get_clock().now().nanoseconds - self.init_timestamp) * 1e-9} secs")
                 self.init_timestamp = self.get_clock().now().nanoseconds 
@@ -77,6 +77,7 @@ class AccelCalibration(Node):
                     {(self.get_clock().now().nanoseconds -self.init_timestamp) * 1e-9 } secs")
                 self.cons_speed = -1.0
                 self.rot_cons_speed = -1.0
+                self.init_timestamp = 0.0
 
 
 
