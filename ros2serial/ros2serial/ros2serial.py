@@ -190,7 +190,7 @@ class Ros2Serial(Node):
         msg.pose.pose.orientation.w = qw
         #msg.pose.covariance = []
         #TwistWithCovariance
-        msg.twist.twist.linear.x = float(args[3])
+        msg.twist.twist.linear.x = float(args[3])/1000
         msg.twist.twist.linear.y = 0.0
         msg.twist.twist.linear.z = 0.0
         msg.twist.twist.angular.x = 0.0
