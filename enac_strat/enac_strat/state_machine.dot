@@ -75,12 +75,12 @@ digraph EnacStrat {
         [label="lire_carre_si_besoin/is_au_mur"]
     LireCarre -> PousserSiBesoin
         [label="pousser_si_besoin/has_lu_carre_si_besoin"]
+    PousserSiBesoin -> QuitterMur
+        [label="quitter_mur_rentrer_poelon/tous_carres_lus"]
     PousserSiBesoin -> ProchainCarre
         [label="go_prochain_carre/has_checked_carre"]
     ProchainCarre -> LireCarre
         [label="lire_carre_si_besoin/is_at_prochain"]
-    PousserSiBesoin -> QuitterMur
-        [label="quitter_mur_rentrer_poelon/tous_carres_lus"]
     QuitterMur -> FinCarres
         [label="do_nothing/has_quitte_mur"]
     
