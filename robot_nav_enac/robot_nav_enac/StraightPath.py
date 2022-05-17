@@ -1,4 +1,4 @@
-from math import atan2, cos, sin, pi
+from math import atan2, cos, sin, pi, copysign
 
 from robot_nav_enac.Acceleration import Acceleration
 from interfaces_enac.msg import _set_navigation
@@ -39,6 +39,11 @@ https://pypi.org/project/simple-pid/ --> PID
 Basic navigation script : 
 Input : take a destination position + rotation [ROS odometrie classic msg] + Max Speed
 Result : Move Robot and stop at the right point, In case of update, stop robot and restart with new data
+
+How does it work :
+1. Align to target
+2. go in straight path (correcting for deviation in path by constantly checking angle to target, due to the not perfect angle)
+3.
 """
 
 class OdomData:
@@ -87,15 +92,18 @@ class StraightPath():
 		self.target = OdomData(-1, -1, -1)
 		self.speed = OdomData(0,0,0)
 		
-		self.rotation_precision = 0.08 #~4.5 deg
+		self.min_rotation_precision = 0.08 #~4.5 deg
+		self.max_rotation_precision = 0.24 #~ 13 deg
+		#Explanation -> When travelling in straight line, if the robot stop before reaching the perfect angle, there'll be a time during a travel when it has to "correct for the angle"
+		#so we need to set a value when the robot can start moving forward (under max_rotation_precision) and stop moving forward if too far from the target (above max_rotation_precision), and stop moving for "precision rotation" (under min_rotation_precision)
 		self.position_precision = 0.1 # 10 cm
 
-		self.accel_linear = Acceleration(0.6, 0.1, 2.0, 1.0)
-		self.accel_rotat = Acceleration(1.85, 0.05, 2.0, 1.0)
+		self.accel_linear = Acceleration(0.6, 0.1, 3.0, 2.0)
+		self.accel_rotat = Acceleration(1.2, 0.05, 3.0, 2.0)
 	
 	def set_target(self, target_pose:OdomData):
 		if self.target != target_pose: #TODO : check if it's enough to avoid "jerking" from acceleration module
-			self.target = target_pose
+			self.target = target_pose #TODO : check out of bounds
 			self.accel_linear.reset_accel()
 			self.accel_rotat.reset_accel()
 			self.logger("updated target in StraightPath navigationType")
@@ -119,7 +127,7 @@ class StraightPath():
 
 		rotation_to_final_angle = self.diff_angle(self.target.rotation_rad, self.current_position.rotation_rad)
 
-		if  abs(relative_rotation_rad) > self.rotation_precision and is_not_at_target: #first rotation
+		if  abs(relative_rotation_rad) > self.max_rotation_precision and is_not_at_target: #first rotation
 			self.accel_linear.reset_accel()
 			rot_speed = self.get_rotate_speed(relative_rotation_rad, speed.rotation_rad,dt)
 			self.logger(f"Rotating with relative angle to target of : {relative_rotation_rad} at speed {rot_speed}")
@@ -128,16 +136,22 @@ class StraightPath():
 			callback_speed(0, rot_speed)
 			return
 
-		elif abs(relative_rotation_rad) <= self.rotation_precision and is_not_at_target : #aligned to path
+		elif abs(relative_rotation_rad) <= self.max_rotation_precision and is_not_at_target : #aligned to path
 			self.accel_rotat.reset_accel()
 			lin_speed = self.get_linear_speed(speed.x, dt)
 			self._isNavigating = True
-			self._isRotating = False
-			callback_speed(lin_speed, 0)
+			if abs(relative_rotation_rad) >= self.min_rotation_precision:
+				self._isRotating = True
+				rot_speed = self.get_rotate_correction_speed(relative_rotation_rad)
+			else:
+				self._isRotating = False
+				self.accel_rotat.reset_accel()
+				rot_speed = 0
+			callback_speed(lin_speed, rot_speed)
 			self.logger(f"Aligned to path - going forward at {lin_speed}")
 			return
 			
-		elif not (is_not_at_target) and abs(rotation_to_final_angle) > self.rotation_precision: #final alignment
+		elif not (is_not_at_target) and abs(rotation_to_final_angle) > self.min_rotation_precision: #final alignment
 			rot_speed = self.get_rotate_speed(rotation_to_final_angle, speed.rotation_rad, dt)
 			self.logger(f"At target - Aligning to angle {rotation_to_final_angle} at speed {rot_speed}")
 			self._isNavigating = False
@@ -152,32 +166,32 @@ class StraightPath():
 			return
 
 	def get_rotate_speed(self, relative_rotation_rad, cur_rot_speed_rad, dt):
+		sign = lambda x: copysign(1, x) #https://moonbooks.org/Articles/How-to-get-the-sign-of-a-number-eg--1-or-1-in-python-/
 		distance = abs(2 * relative_rotation_rad/pi * self.wheel_radius) #TODO : calculate distance to target
-		return self.accel_rotat.get_speed(self.speed.rotation_rad, relative_rotation_rad, dt)
+		direction = sign(relative_rotation_rad) #Acceleration don't manage negative values
+		return direction * self.accel_rotat.get_speed(self.speed.rotation_rad, abs(relative_rotation_rad), dt)
 
-		#if (relative_rotation_rad <= 0):
-		#	rot_speed = -0.5
-		#else:
-		#	rot_speed = 0.5
-		#if abs(relative_rotation_rad) <= self.rotation_precision:
-		#	rot_speed = 0
-		#
-		#return rot_speed
 
-	
+		
+		return rot_speed
+
+	def get_rotate_correction_speed(self, relative_rotation_rad): #quick correction at "small speed" without ramp to correct when traveling in straight line if not following correctly
+		if (relative_rotation_rad <= 0):
+			rot_speed = -0.05 #take ~ 2 second to go from min_precision to max_precision
+		else:
+			rot_speed = 0.05
+		return rot_speed
+
 	def get_linear_speed(self, cur_lin_speed, dt):
 		distance = ((self.current_position.x - self.target.x)**2 + (self.current_position.y - self.target.y)**2 )**0.5
-		return self.accel_linear.get_speed(cur_lin_speed, distance, dt)
+		#return self.accel_linear.get_speed(cur_lin_speed, distance, dt)
 		#TODO : speed curve depending on distance
-		#speed = 0.5 #m/s
-
-		#print("Move: vlin: "+str(speed))
-
-		#if distance < 0.1 : 
-		#	#To Test
-		#	return float(0)
-		#else:
-		#	return float(speed)
+		speed = 0.5 #m/s	print("Move: vlin: "+str(speed))	
+		if distance < 0.1 : 
+			#To Test
+			return float(0)
+		else:
+			return float(speed)
 
 	def diff_angle(self, target, current):
 		#https://stackoverflow.com/questions/1878907/how-can-i-find-the-difference-between-two-angles

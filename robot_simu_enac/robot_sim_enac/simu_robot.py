@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 import time
 from enum import Enum
-import sys
+import sys, math
 
 INTERFACE = "ROS"
 
@@ -26,7 +26,7 @@ class Robot:
         #ODOM_REPORT = 1
         ACTUATORS = 1
 
-    def __init__(self, robot_name="robot_sim", pos_init=(140, 1140, 0)):
+    def __init__(self, robot_name="robot_sim", pos_init=(3000-140, 1140, math.radians(180))):
         self.actuators = Actuators()
         #self.com = IvyInterface(robot_name, self.actuators, bus)
         self.nav = Navigation(pos_init)

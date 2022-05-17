@@ -1,6 +1,19 @@
 //init Init
 digraph EnacStrat {
     Init [comment="on_init"]
+    //retour au bercail en cas de pb de temps
+    {AtStatuette HasRecupStatuette HasTurnedAroundReplique HasDroppedReplique AtVitrine HasDroppedStatuette
+        DevantPaletRouge HasRecupPaletRougeAndStored RougeInBackHand DevantPaletVert HasRecupPaletVertAndStored DevantPaletBleu HasRecupPaletBleu
+        DevantGalerieRougeRetourne HasDroppedRougeGalerie DevantGalerieVertRetourne HasDroppedVertGalerie DevantGalerieBleuRetourne HasDroppedBleuGalerie FinGalerie
+        DevantCarres FinCarres
+    } -> IsRentringAuBercail
+        [label="go_bercail/quinze_dernieres_secondes"]
+    
+    PousserSiBesoin -> QuitterMur
+        [label="quitter_mur_rentrer_poelon/quinze_dernieres_secondes"]
+    
+    IsRentringAuBercail -> HasRentreAuBercail [label="things_todo_at_bercail/is_at_bercail"]
+
     //sequence: depot de la replique et recuperation de la statuette
     Init -> AtStatuette
         [label="go_recup_statuette/is_tirette_activee"]
@@ -75,19 +88,4 @@ digraph EnacStrat {
         [label="go_bercail/has_deja_fait_galerie"]
     FinCarres -> DevantPaletRouge
         [label="go_palet_rouge_depuis_mur/pas_deja_fait_galerie"]
-
-    //retour au bercail en cas de pb de temps
-    {Init AtStatuette HasRecupStatuette HasTurnedAroundReplique HasDroppedReplique AtVitrine HasDroppedStatuette
-        DevantPaletRouge HasRecupPaletRougeAndStored RougeInBackHand DevantPaletVert HasRecupPaletVertAndStored DevantPaletBleu HasRecupPaletBleu
-        DevantGalerieRougeRetourne HasDroppedRougeGalerie DevantGalerieVertRetourne HasDroppedVertGalerie DevantGalerieBleuRetourne HasDroppedBleuGalerie FinGalerie
-        DevantCarres FinCarres
-    } -> IsRentringAuBercail
-        [label="go_bercail/quinze_dernieres_secondes"]
-    
-    PousserSiBesoin -> QuitterMur
-        [label="quitter_mur_rentrer_poelon/quinze_dernieres_secondes"]
-    
-    
-
-    IsRentringAuBercail -> HasRentreAuBercail [label="things_todo_at_bercail/is_at_bercail"]
 }
