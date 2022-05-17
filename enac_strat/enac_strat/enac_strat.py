@@ -602,9 +602,10 @@ class Strategy(Node):
             self.send_nav_msg(1, 0.6675, 0.2, math.radians(0))
         else:
             self.send_nav_msg(1, 3.0-0.6675, 0.2, math.radians(0))
+        self.send_periph_msg("s1", 100)#TODO: remplacer valeur au pif par vraie valeur
 
     def is_devant_carres(self):
-        return self.check_goal()
+        return self.is_at_goal(0.001, 0.001, 0.2) #seuil relevé car nav pourrie atm
 
     def lire_carre_si_besoin(self):
         self.checked_last_carre = False
@@ -627,8 +628,8 @@ class Strategy(Node):
                 self.send_periph_msg("s1", 90) #placeholder, peut être avoir repli auto?
                 if not self.pushed_at_least_one:
                     self.pushed_at_least_one = True
-                    self.update_score("first_carre", 5)
-                self.update_score("carre", 5)
+                    self.update_score("atleast1_carre", 5)
+                self.update_score(f"carre_{self.nombre_carres_done}", 5)
         else:
             should_pousse = {
                 1: True,
@@ -641,8 +642,8 @@ class Strategy(Node):
                 self.send_periph_msg("s1", 90)
                 if not self.pushed_at_least_one:
                     self.pushed_at_least_one = True
-                    self.update_score("first_carre", 5)
-                self.update_score("carre", 5)
+                    self.update_score("atleast1_carre", 5)
+                self.update_score(f"carre_{self.nombre_carres_done}", 5)
 
         self.nombre_carres_done += 1
         
@@ -663,16 +664,16 @@ class Strategy(Node):
         return self.checked_last_carre
 
     def is_at_prochain(self):
-        return self.check_goal()
+        return True#placeholder
 
     def quitter_mur_rentrer_poelon(self):
         self.send_periph_msg("s1", 130) #replier poelon en position repliée pour se barrer
 
     def tous_carres_lus(self):
         if self.carres.get(3, None) == True:
-            return (self.nombre_carres_done >= 6)
+            return (self.nombre_carres_done >= 7)
         else:
-            return (self.nombre_carres_done >= 5)
+            return (self.nombre_carres_done >= 6)
 
     def has_quitte_mur(self):
         return True
