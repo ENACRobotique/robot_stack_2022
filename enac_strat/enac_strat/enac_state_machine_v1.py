@@ -110,12 +110,12 @@ ColleAuMurToLireCarre = Transition("ColleAuMurToLireCarre", LireCarre, self.lire
 ColleAuMur.add_transition(ColleAuMurToLireCarre)
 LireCarreToPousserSiBesoin = Transition("LireCarreToPousserSiBesoin", PousserSiBesoin, self.pousser_si_besoin, self.has_lu_carre_si_besoin)
 LireCarre.add_transition(LireCarreToPousserSiBesoin)
+PousserSiBesoinToQuitterMur = Transition("PousserSiBesoinToQuitterMur", QuitterMur, self.quitter_mur_rentrer_poelon, self.tous_carres_lus)
+PousserSiBesoin.add_transition(PousserSiBesoinToQuitterMur)
 PousserSiBesoinToProchainCarre = Transition("PousserSiBesoinToProchainCarre", ProchainCarre, self.go_prochain_carre, self.has_checked_carre)
 PousserSiBesoin.add_transition(PousserSiBesoinToProchainCarre)
 ProchainCarreToLireCarre = Transition("ProchainCarreToLireCarre", LireCarre, self.lire_carre_si_besoin, self.is_at_prochain)
 ProchainCarre.add_transition(ProchainCarreToLireCarre)
-PousserSiBesoinToQuitterMur = Transition("PousserSiBesoinToQuitterMur", QuitterMur, self.quitter_mur_rentrer_poelon, self.tous_carres_lus)
-PousserSiBesoin.add_transition(PousserSiBesoinToQuitterMur)
 QuitterMurToFinCarres = Transition("QuitterMurToFinCarres", FinCarres, self.do_nothing, self.has_quitte_mur)
 QuitterMur.add_transition(QuitterMurToFinCarres)
 FinCarresToIsRentringAuBercail = Transition("FinCarresToIsRentringAuBercail", IsRentringAuBercail, self.go_bercail, self.has_deja_fait_galerie)
@@ -291,6 +291,9 @@ def pousser_si_besoin(self):
 def has_lu_carre_si_besoin(self):
     return True
 
+def tous_carres_lus(self):
+    return True
+
 def go_prochain_carre(self):
     pass
 
@@ -298,9 +301,6 @@ def has_checked_carre(self):
     return True
 
 def is_at_prochain(self):
-    return True
-
-def tous_carres_lus(self):
     return True
 
 def has_quitte_mur(self):

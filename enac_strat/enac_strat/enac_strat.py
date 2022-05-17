@@ -176,12 +176,12 @@ class Strategy(Node):
         ColleAuMur.add_transition(ColleAuMurToLireCarre)
         LireCarreToPousserSiBesoin = Transition("LireCarreToPousserSiBesoin", PousserSiBesoin, self.pousser_si_besoin, self.has_lu_carre_si_besoin)
         LireCarre.add_transition(LireCarreToPousserSiBesoin)
+        PousserSiBesoinToQuitterMur = Transition("PousserSiBesoinToQuitterMur", QuitterMur, self.quitter_mur_rentrer_poelon, self.tous_carres_lus)
+        PousserSiBesoin.add_transition(PousserSiBesoinToQuitterMur)
         PousserSiBesoinToProchainCarre = Transition("PousserSiBesoinToProchainCarre", ProchainCarre, self.go_prochain_carre, self.has_checked_carre)
         PousserSiBesoin.add_transition(PousserSiBesoinToProchainCarre)
         ProchainCarreToLireCarre = Transition("ProchainCarreToLireCarre", LireCarre, self.lire_carre_si_besoin, self.is_at_prochain)
         ProchainCarre.add_transition(ProchainCarreToLireCarre)
-        PousserSiBesoinToQuitterMur = Transition("PousserSiBesoinToQuitterMur", QuitterMur, self.quitter_mur_rentrer_poelon, self.tous_carres_lus)
-        PousserSiBesoin.add_transition(PousserSiBesoinToQuitterMur)
         QuitterMurToFinCarres = Transition("QuitterMurToFinCarres", FinCarres, self.do_nothing, self.has_quitte_mur)
         QuitterMur.add_transition(QuitterMurToFinCarres)
         FinCarresToIsRentringAuBercail = Transition("FinCarresToIsRentringAuBercail", IsRentringAuBercail, self.go_bercail, self.has_deja_fait_galerie)
@@ -598,10 +598,13 @@ class Strategy(Node):
         return (self.periphs.get("mr", None) == 1) and (self.prio_galerie == False)
 
     def se_coller_au_mur_deployer_poelon(self):
-        pass
+        if self.color_is_jaune():
+            self.send_nav_msg(1, 0.6675, 0.2, math.radians(0))
+        else:
+            self.send_nav_msg(1, 3.0-0.6675, 0.2, math.radians(0))
 
     def is_devant_carres(self):
-        return True
+        return self.check_goal()
 
     def lire_carre_si_besoin(self):
         self.checked_last_carre = False
@@ -618,13 +621,31 @@ class Strategy(Node):
 
     def pousser_si_besoin(self):
         if not self.can_bypass_lecture:
-            should_pousse = self.periphs.get("LR", None)
+            should_pousse = self.periphs.get("LR", None) == 1
             self.carres[self.nombre_carres_done] = should_pousse
+            if should_pousse:
+                self.send_periph_msg("s1", 90) #placeholder, peut être avoir repli auto?
+                if not self.pushed_at_least_one:
+                    self.pushed_at_least_one = True
+                    self.update_score("first_carre", 5)
+                self.update_score("carre", 5)
         else:
-            pass
+            should_pousse = {
+                1: True,
+                2: not self.carres.get(0, 0),
+                4: not self.carres.get(3, 0),
+                5: not self.carres.get(3, 0),
+                6: self.carres.get(3, 0)
+            }.get(self.nombre_carres_done, False)
+            if should_pousse:
+                self.send_periph_msg("s1", 90)
+                if not self.pushed_at_least_one:
+                    self.pushed_at_least_one = True
+                    self.update_score("first_carre", 5)
+                self.update_score("carre", 5)
+
         self.nombre_carres_done += 1
-        if should_pousse == 1:
-            self.send_periph_msg("s1", 90) #placeholder, peut être avoir repli auto?
+        
         self.checked_last_carre = True
 
     def has_lu_carre_si_besoin(self):
@@ -632,6 +653,10 @@ class Strategy(Node):
 
     def go_prochain_carre(self):
         self.send_periph_msg("s1", 110) #replier poelon en position lecture au cas où
+        if self.color_is_jaune():
+            pass
+        else:
+            pass
         #self.send_nav_msg(3, ) #nav3: suivi mur, si ça marche pas repasser nav 1
 
     def has_checked_carre(self):
@@ -644,7 +669,7 @@ class Strategy(Node):
         self.send_periph_msg("s1", 130) #replier poelon en position repliée pour se barrer
 
     def tous_carres_lus(self):
-        if self.carres.get(3, None) == 1:
+        if self.carres.get(3, None) == True:
             return (self.nombre_carres_done >= 6)
         else:
             return (self.nombre_carres_done >= 5)
