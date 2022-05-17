@@ -281,6 +281,9 @@ class Strategy(Node):
     def __str__(self):
         return "Strategy: state: "+str(self.EnacStrat.state)+" x: "+str(self.x)+" y: "+str(self.y)+" theta: "+str(self.theta)+(" match unstarted "if self.chrono == 0 else " chrono: "+str(time.time() - self.chrono))
     
+    def color_is_jaune(self):
+        return (self.periphs.get("co", 0) == 0) #retourne jaune par défaut
+
     def send_all_diags(self):
         if self.chrono == 0:
             self.send_diagnostic(DiagnosticStatus.OK, "ST: match", "Match has not started")
@@ -390,7 +393,10 @@ class Strategy(Node):
     def go_recup_statuette(self):
         print("Strategy: tirette activée")
         self.chrono = time.time()
-        self.send_nav_msg(1, 0.45, 0.45, math.radians(45))
+        if self.color_is_jaune():
+            self.send_nav_msg(1, 0.45, 0.45, math.radians(45))
+        else:
+            self.send_nav_msg(1, 3.0-0.45, 0.45, math.radians(45+90))
 
     def is_tirette_activee(self):
         return (self.periphs.get("TI", None) is not None)
@@ -407,7 +413,10 @@ class Strategy(Node):
         self.score += 5
         self.update_score_display()
         #se retourner pour déposer la réplique
-        self.send_nav_msg(1, 0.45, 0.45, math.radians(225))
+        if self.color_is_jaune():
+            self.send_nav_msg(1, 0.45, 0.45, math.radians(225))
+        else:
+            self.send_nav_msg(1, 3.0-0.45, 0.45, math.radians(-45))
 
     def has_gotten_statuette(self):
         return (self.periphs.get("mr", None) == -1) #FIXME: coder l'état de neutre avec statuette en bas niveau et le renseigner ici
@@ -424,7 +433,10 @@ class Strategy(Node):
         self.score += 10
         self.update_score_display()
         #aller à la vitrine
-        self.send_nav_msg(1, 0.24, 1.8, math.radians(-90))
+        if self.color_is_jaune():
+            self.send_nav_msg(1, 0.24, 1.8, math.radians(-90))
+        else:
+            self.send_nav_msg(1, 3.0-0.24, 1.8, math.radians(-90))
 
     def has_dropped_replique(self):
         return (self.periphs.get("mv", None) == 1) #la state_machine avant est revenue en position neutre sans charge
@@ -438,7 +450,10 @@ class Strategy(Node):
 
     def go_palet_rouge(self):
         self.done_galerie = True
-        self.send_nav_msg(1, 1.0, 0.6675, math.radians(47.34))
+        if self.color_is_jaune():
+            self.send_nav_msg(1, 1.0, 0.6675, math.radians(47.34))
+        else:
+            self.send_nav_msg(1, 3.0-1.0, 0.6675, math.radians(180-47.34))
 
     def is_prio_galerie(self):
         return (self.periphs.get("mr", None) == 1) and (self.prio_galerie == True)
@@ -457,7 +472,10 @@ class Strategy(Node):
         return (self.periphs.get("sc", None) == 1)
 
     def go_palet_vert(self):
-        self.send_nav_msg(1, 1.0, 1.205, math.radians(45))
+        if self.color_is_jaune():
+            self.send_nav_msg(1, 1.0, 1.205, math.radians(45))
+        else:
+            self.send_nav_msg(21, 3.0*1.0, 1.205, math.radians(180-45))
 
     def has_backhand_rouge(self):
         return (self.periphs.get("mr", None) == 3)
@@ -470,7 +488,10 @@ class Strategy(Node):
         return self.check_goal()
 
     def go_palet_bleu(self):
-        self.send_nav_msg(1, 1.0, 1.455, math.radians(0))
+        if self.color_is_jaune():
+            self.send_nav_msg(1, 1.0, 1.455, math.radians(0))
+        else:
+            self.send_nav_msg(1, 3.0-1.0, 1.455, math.radians(180))
 
     def has_stored_vert(self):
         return (self.periphs.get("sc", None) == 1)
@@ -482,7 +503,10 @@ class Strategy(Node):
         return self.check_goal()
 
     def go_galerie_rouge(self):
-        self.send_nav_msg(1, 1.05, 1.8, math.radians(-90))
+        if self.color_is_jaune():
+            self.send_nav_msg(1, 1.05, 1.8, math.radians(-90))
+        else:
+            self.send_nav_msg(1, 3.0-1.05, 1.8, math.radians(-90))
 
     def has_recup_bleu(self):
         return (self.periphs.get("mv", None) == 3)
@@ -496,7 +520,10 @@ class Strategy(Node):
         return self.check_goal()
 
     def go_galerie_vert(self):
-        self.send_nav_msg(1, 0.81, 1.8, math.radians(-90))
+        if self.color_is_jaune():
+            self.send_nav_msg(1, 0.81, 1.8, math.radians(-90))
+        else:
+            self.send_nav_msg(1, 3.0-0.81, 1.8, math.radians(-90))
 
     def has_dropped_rouge(self):
         return (self.periphs.get("mr", None) == 1)
@@ -509,7 +536,10 @@ class Strategy(Node):
 
     def store_bleu_from_front_hand_and_go_galerie_bleu(self):
         self.send_periph_msg("mc", 0)
-        self.send_nav_msg(1, 0.57, 1.8, math.radians(-90))
+        if self.color_is_jaune():
+            self.send_nav_msg(1, 0.57, 1.8, math.radians(-90))
+        else:
+            self.send_nav_msg(1, 3.0-0.57, 1.8, math.radians(-90))
 
     def has_dropped_vert(self):
         return (self.periphs.get("mr", None) == 1)
@@ -529,13 +559,19 @@ class Strategy(Node):
 
     def go_carres(self):
         self.done_carres = True
-        self.send_nav_msg(1, 0.6675, 0.2, math.radians(-90))
+        if self.color_is_jaune():
+            self.send_nav_msg(1, 0.6675, 0.2, math.radians(-90))
+        else:
+            self.send_nav_msg(1, 3.0-0.6675, 0.2, math.radians(-90))
 
     def pas_deja_fait_carres(self):
         return not self.done_carres
 
     def go_bercail(self):
-        self.send_nav_msg(1, 0.2, 1.16, 0)
+        if self.color_is_jaune():
+            self.send_nav_msg(1, 0.2, 1.16, math.radians(180))
+        else:
+            self.send_nav_msg(1, 3.0-0.2, 1.16, 0)
 
     def has_deja_fait_carres(self):
         return self.done_carres
@@ -598,11 +634,18 @@ class Strategy(Node):
         #déposer tous les palets dans les mains si il y en a
         if self.periphs.get("mv", None) == 3:
             self.send_periph_msg("mg", 0)
+            self.score += 1
+            self.update_score_display()
         if self.periphs.get("mr", None) == 3:
             self.send_periph_msg("mh", 0)
+            self.score += 1
+            self.update_score_display()
 
     def is_at_bercail(self):
-        return (self.is_at_pos(0.001, 0.001, 0.1, 0.14, 1.14, 0))
+        if self.color_is_jaune():
+            return (self.is_at_pos(0.001, 0.001, 0.1, 0.2, 1.16, math.radians(180)))
+        else:
+            return (self.is_at_pos(0.001, 0.001, 0.1, 3.0- 0.2, 1.16, 0))
 
 def main(args=None):
     rclpy.init(args=args)
