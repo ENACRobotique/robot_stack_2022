@@ -1,14 +1,13 @@
 #generated using graph_compil v0.1
 from statemachine import State, Transition, StateMachine
 
-HasRentreAuBercail = State("HasRentreAuBercail")
-FinCarres = State("FinCarres")
-QuitterMur = State("QuitterMur")
 ProchainCarre = State("ProchainCarre")
-PousserSiBesoin = State("PousserSiBesoin")
 LireCarre = State("LireCarre")
 ColleAuMur = State("ColleAuMur")
-IsRentringAuBercail = State("IsRentringAuBercail")
+HasRentreAuBercail = State("HasRentreAuBercail")
+PousserSiBesoin = State("PousserSiBesoin")
+QuitterMur = State("QuitterMur")
+FinCarres = State("FinCarres")
 DevantCarres = State("DevantCarres")
 FinGalerie = State("FinGalerie")
 HasDroppedBleuGalerie = State("HasDroppedBleuGalerie")
@@ -30,7 +29,35 @@ HasDroppedReplique = State("HasDroppedReplique")
 HasTurnedAroundReplique = State("HasTurnedAroundReplique")
 HasRecupStatuette = State("HasRecupStatuette")
 AtStatuette = State("AtStatuette")
+IsRentringAuBercail = State("IsRentringAuBercail")
 Init = State("Init", self.on_init)
+tr139301719ToIsRentringAuBercail = Transition("tr139301719ToIsRentringAuBercail", IsRentringAuBercail, self.go_bercail, self.quinze_dernieres_secondes)
+AtStatuette.add_transition(tr139301719ToIsRentringAuBercail)
+HasRecupStatuette.add_transition(tr139301719ToIsRentringAuBercail)
+HasTurnedAroundReplique.add_transition(tr139301719ToIsRentringAuBercail)
+HasDroppedReplique.add_transition(tr139301719ToIsRentringAuBercail)
+AtVitrine.add_transition(tr139301719ToIsRentringAuBercail)
+HasDroppedStatuette.add_transition(tr139301719ToIsRentringAuBercail)
+DevantPaletRouge.add_transition(tr139301719ToIsRentringAuBercail)
+HasRecupPaletRougeAndStored.add_transition(tr139301719ToIsRentringAuBercail)
+RougeInBackHand.add_transition(tr139301719ToIsRentringAuBercail)
+DevantPaletVert.add_transition(tr139301719ToIsRentringAuBercail)
+HasRecupPaletVertAndStored.add_transition(tr139301719ToIsRentringAuBercail)
+DevantPaletBleu.add_transition(tr139301719ToIsRentringAuBercail)
+HasRecupPaletBleu.add_transition(tr139301719ToIsRentringAuBercail)
+DevantGalerieRougeRetourne.add_transition(tr139301719ToIsRentringAuBercail)
+HasDroppedRougeGalerie.add_transition(tr139301719ToIsRentringAuBercail)
+DevantGalerieVertRetourne.add_transition(tr139301719ToIsRentringAuBercail)
+HasDroppedVertGalerie.add_transition(tr139301719ToIsRentringAuBercail)
+DevantGalerieBleuRetourne.add_transition(tr139301719ToIsRentringAuBercail)
+HasDroppedBleuGalerie.add_transition(tr139301719ToIsRentringAuBercail)
+FinGalerie.add_transition(tr139301719ToIsRentringAuBercail)
+DevantCarres.add_transition(tr139301719ToIsRentringAuBercail)
+FinCarres.add_transition(tr139301719ToIsRentringAuBercail)
+PousserSiBesoinToQuitterMur = Transition("PousserSiBesoinToQuitterMur", QuitterMur, self.quitter_mur_rentrer_poelon, self.quinze_dernieres_secondes)
+PousserSiBesoin.add_transition(PousserSiBesoinToQuitterMur)
+IsRentringAuBercailToHasRentreAuBercail = Transition("IsRentringAuBercailToHasRentreAuBercail", HasRentreAuBercail, self.things_todo_at_bercail, self.is_at_bercail)
+IsRentringAuBercail.add_transition(IsRentringAuBercailToHasRentreAuBercail)
 InitToAtStatuette = Transition("InitToAtStatuette", AtStatuette, self.go_recup_statuette, self.is_tirette_activee)
 Init.add_transition(InitToAtStatuette)
 AtStatuetteToHasRecupStatuette = Transition("AtStatuetteToHasRecupStatuette", HasRecupStatuette, self.recup_statuette, self.is_at_statuette)
@@ -95,37 +122,24 @@ FinCarresToIsRentringAuBercail = Transition("FinCarresToIsRentringAuBercail", Is
 FinCarres.add_transition(FinCarresToIsRentringAuBercail)
 FinCarresToDevantPaletRouge = Transition("FinCarresToDevantPaletRouge", DevantPaletRouge, self.go_palet_rouge_depuis_mur, self.pas_deja_fait_galerie)
 FinCarres.add_transition(FinCarresToDevantPaletRouge)
-tr992703258ToIsRentringAuBercail = Transition("tr992703258ToIsRentringAuBercail", IsRentringAuBercail, self.go_bercail, self.quinze_dernieres_secondes)
-Init.add_transition(tr992703258ToIsRentringAuBercail)
-AtStatuette.add_transition(tr992703258ToIsRentringAuBercail)
-HasRecupStatuette.add_transition(tr992703258ToIsRentringAuBercail)
-HasTurnedAroundReplique.add_transition(tr992703258ToIsRentringAuBercail)
-HasDroppedReplique.add_transition(tr992703258ToIsRentringAuBercail)
-AtVitrine.add_transition(tr992703258ToIsRentringAuBercail)
-HasDroppedStatuette.add_transition(tr992703258ToIsRentringAuBercail)
-DevantPaletRouge.add_transition(tr992703258ToIsRentringAuBercail)
-HasRecupPaletRougeAndStored.add_transition(tr992703258ToIsRentringAuBercail)
-RougeInBackHand.add_transition(tr992703258ToIsRentringAuBercail)
-DevantPaletVert.add_transition(tr992703258ToIsRentringAuBercail)
-HasRecupPaletVertAndStored.add_transition(tr992703258ToIsRentringAuBercail)
-DevantPaletBleu.add_transition(tr992703258ToIsRentringAuBercail)
-HasRecupPaletBleu.add_transition(tr992703258ToIsRentringAuBercail)
-DevantGalerieRougeRetourne.add_transition(tr992703258ToIsRentringAuBercail)
-HasDroppedRougeGalerie.add_transition(tr992703258ToIsRentringAuBercail)
-DevantGalerieVertRetourne.add_transition(tr992703258ToIsRentringAuBercail)
-HasDroppedVertGalerie.add_transition(tr992703258ToIsRentringAuBercail)
-DevantGalerieBleuRetourne.add_transition(tr992703258ToIsRentringAuBercail)
-HasDroppedBleuGalerie.add_transition(tr992703258ToIsRentringAuBercail)
-FinGalerie.add_transition(tr992703258ToIsRentringAuBercail)
-DevantCarres.add_transition(tr992703258ToIsRentringAuBercail)
-FinCarres.add_transition(tr992703258ToIsRentringAuBercail)
-PousserSiBesoinToQuitterMur = Transition("PousserSiBesoinToQuitterMur", QuitterMur, self.quitter_mur_rentrer_poelon, self.quinze_dernieres_secondes)
-PousserSiBesoin.add_transition(PousserSiBesoinToQuitterMur)
-IsRentringAuBercailToHasRentreAuBercail = Transition("IsRentringAuBercailToHasRentreAuBercail", HasRentreAuBercail, self.things_todo_at_bercail, self.is_at_bercail)
-IsRentringAuBercail.add_transition(IsRentringAuBercailToHasRentreAuBercail)
 EnacStrat = StateMachine(Init)
 def on_init(self):
     pass
+
+def go_bercail(self):
+    pass
+
+def quinze_dernieres_secondes(self):
+    return True
+
+def quitter_mur_rentrer_poelon(self):
+    pass
+
+def things_todo_at_bercail(self):
+    pass
+
+def is_at_bercail(self):
+    return True
 
 def go_recup_statuette(self):
     pass
@@ -253,9 +267,6 @@ def go_carres(self):
 def pas_deja_fait_carres(self):
     return True
 
-def go_bercail(self):
-    pass
-
 def has_deja_fait_carres(self):
     return True
 
@@ -289,9 +300,6 @@ def has_checked_carre(self):
 def is_at_prochain(self):
     return True
 
-def quitter_mur_rentrer_poelon(self):
-    pass
-
 def tous_carres_lus(self):
     return True
 
@@ -305,13 +313,4 @@ def go_palet_rouge_depuis_mur(self):
     pass
 
 def pas_deja_fait_galerie(self):
-    return True
-
-def quinze_dernieres_secondes(self):
-    return True
-
-def things_todo_at_bercail(self):
-    pass
-
-def is_at_bercail(self):
     return True

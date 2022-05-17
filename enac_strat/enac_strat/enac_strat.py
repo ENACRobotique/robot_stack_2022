@@ -33,11 +33,17 @@ class Strategy(Node):
     goaly = 0
     goaltheta = 0
 
-    score = 4
+    score = 4 #pour avoir déposé une statuette et une vitrine sur le terrain
     chrono = 0
     end = 100
 
+    #vars galerie
+
     done_galerie = False
+    
+    #vars carres
+    nombre_carres_done = 0
+    
     done_carres = False
 
     released_everything = False
@@ -82,6 +88,33 @@ class Strategy(Node):
         AtStatuette = State("AtStatuette")
         Init = State("Init", self.on_init)
         InitToAtStatuette = Transition("InitToAtStatuette", AtStatuette, self.go_recup_statuette, self.is_tirette_activee)
+        tr139301719ToIsRentringAuBercail = Transition("tr139301719ToIsRentringAuBercail", IsRentringAuBercail, self.go_bercail, self.quinze_dernieres_secondes)
+        AtStatuette.add_transition(tr139301719ToIsRentringAuBercail)
+        HasRecupStatuette.add_transition(tr139301719ToIsRentringAuBercail)
+        HasTurnedAroundReplique.add_transition(tr139301719ToIsRentringAuBercail)
+        HasDroppedReplique.add_transition(tr139301719ToIsRentringAuBercail)
+        AtVitrine.add_transition(tr139301719ToIsRentringAuBercail)
+        HasDroppedStatuette.add_transition(tr139301719ToIsRentringAuBercail)
+        DevantPaletRouge.add_transition(tr139301719ToIsRentringAuBercail)
+        HasRecupPaletRougeAndStored.add_transition(tr139301719ToIsRentringAuBercail)
+        RougeInBackHand.add_transition(tr139301719ToIsRentringAuBercail)
+        DevantPaletVert.add_transition(tr139301719ToIsRentringAuBercail)
+        HasRecupPaletVertAndStored.add_transition(tr139301719ToIsRentringAuBercail)
+        DevantPaletBleu.add_transition(tr139301719ToIsRentringAuBercail)
+        HasRecupPaletBleu.add_transition(tr139301719ToIsRentringAuBercail)
+        DevantGalerieRougeRetourne.add_transition(tr139301719ToIsRentringAuBercail)
+        HasDroppedRougeGalerie.add_transition(tr139301719ToIsRentringAuBercail)
+        DevantGalerieVertRetourne.add_transition(tr139301719ToIsRentringAuBercail)
+        HasDroppedVertGalerie.add_transition(tr139301719ToIsRentringAuBercail)
+        DevantGalerieBleuRetourne.add_transition(tr139301719ToIsRentringAuBercail)
+        HasDroppedBleuGalerie.add_transition(tr139301719ToIsRentringAuBercail)
+        FinGalerie.add_transition(tr139301719ToIsRentringAuBercail)
+        DevantCarres.add_transition(tr139301719ToIsRentringAuBercail)
+        FinCarres.add_transition(tr139301719ToIsRentringAuBercail)
+        PousserSiBesoinToQuitterMur = Transition("PousserSiBesoinToQuitterMur", QuitterMur, self.quitter_mur_rentrer_poelon, self.quinze_dernieres_secondes)
+        PousserSiBesoin.add_transition(PousserSiBesoinToQuitterMur)
+        IsRentringAuBercailToHasRentreAuBercail = Transition("IsRentringAuBercailToHasRentreAuBercail", HasRentreAuBercail, self.things_todo_at_bercail, self.is_at_bercail)
+        IsRentringAuBercail.add_transition(IsRentringAuBercailToHasRentreAuBercail)
         Init.add_transition(InitToAtStatuette)
         AtStatuetteToHasRecupStatuette = Transition("AtStatuetteToHasRecupStatuette", HasRecupStatuette, self.recup_statuette, self.is_at_statuette)
         AtStatuette.add_transition(AtStatuetteToHasRecupStatuette)
@@ -145,34 +178,6 @@ class Strategy(Node):
         FinCarres.add_transition(FinCarresToIsRentringAuBercail)
         FinCarresToDevantPaletRouge = Transition("FinCarresToDevantPaletRouge", DevantPaletRouge, self.go_palet_rouge_depuis_mur, self.pas_deja_fait_galerie)
         FinCarres.add_transition(FinCarresToDevantPaletRouge)
-        tr992703258ToIsRentringAuBercail = Transition("tr992703258ToIsRentringAuBercail", IsRentringAuBercail, self.go_bercail, self.quinze_dernieres_secondes)
-        Init.add_transition(tr992703258ToIsRentringAuBercail)
-        AtStatuette.add_transition(tr992703258ToIsRentringAuBercail)
-        HasRecupStatuette.add_transition(tr992703258ToIsRentringAuBercail)
-        HasTurnedAroundReplique.add_transition(tr992703258ToIsRentringAuBercail)
-        HasDroppedReplique.add_transition(tr992703258ToIsRentringAuBercail)
-        AtVitrine.add_transition(tr992703258ToIsRentringAuBercail)
-        HasDroppedStatuette.add_transition(tr992703258ToIsRentringAuBercail)
-        DevantPaletRouge.add_transition(tr992703258ToIsRentringAuBercail)
-        HasRecupPaletRougeAndStored.add_transition(tr992703258ToIsRentringAuBercail)
-        RougeInBackHand.add_transition(tr992703258ToIsRentringAuBercail)
-        DevantPaletVert.add_transition(tr992703258ToIsRentringAuBercail)
-        HasRecupPaletVertAndStored.add_transition(tr992703258ToIsRentringAuBercail)
-        DevantPaletBleu.add_transition(tr992703258ToIsRentringAuBercail)
-        HasRecupPaletBleu.add_transition(tr992703258ToIsRentringAuBercail)
-        DevantGalerieRougeRetourne.add_transition(tr992703258ToIsRentringAuBercail)
-        HasDroppedRougeGalerie.add_transition(tr992703258ToIsRentringAuBercail)
-        DevantGalerieVertRetourne.add_transition(tr992703258ToIsRentringAuBercail)
-        HasDroppedVertGalerie.add_transition(tr992703258ToIsRentringAuBercail)
-        DevantGalerieBleuRetourne.add_transition(tr992703258ToIsRentringAuBercail)
-        HasDroppedBleuGalerie.add_transition(tr992703258ToIsRentringAuBercail)
-        FinGalerie.add_transition(tr992703258ToIsRentringAuBercail)
-        DevantCarres.add_transition(tr992703258ToIsRentringAuBercail)
-        FinCarres.add_transition(tr992703258ToIsRentringAuBercail)
-        PousserSiBesoinToQuitterMur = Transition("PousserSiBesoinToQuitterMur", QuitterMur, self.quitter_mur_rentrer_poelon, self.quinze_dernieres_secondes)
-        PousserSiBesoin.add_transition(PousserSiBesoinToQuitterMur)
-        IsRentringAuBercailToHasRentreAuBercail = Transition("IsRentringAuBercailToHasRentreAuBercail", HasRentreAuBercail, self.things_todo_at_bercail, self.is_at_bercail)
-        IsRentringAuBercail.add_transition(IsRentringAuBercailToHasRentreAuBercail)
         self.EnacStrat = StateMachine(Init)
 
         ### fin partie générée automatiquement
@@ -281,7 +286,7 @@ class Strategy(Node):
         else:
             self.send_diagnostic(DiagnosticStatus.OK if ((time.time() - self.chrono) < self.end - 15) else DiagnosticStatus.WARN, "Strategy: match", f"{str(time.time() - self.chrono)[:7]} seconds have passed")
         self.send_diagnostic(DiagnosticStatus.STALE, "Strategy: state", f"{str(self.EnacStrat.state)}")
-
+        self.send_diagnostic(DiagnosticStatus.STALE, "Strategy: Score", f"{str(self.score)}")
         self.send_tf_map_corners()
 
     def on_ros_periph(self, msg):
@@ -318,7 +323,10 @@ class Strategy(Node):
 
     def check_transitions(self):
         try:
+            old_state = self.EnacStrat.state
             self.EnacStrat.check_transitions()
+            if self.EnacStrat.state != old_state:
+                print(self)
         except Exception as e:
             print("Strategy: crap in transition")
             print(e)
@@ -366,6 +374,9 @@ class Strategy(Node):
         reference.values = []
         msg.status = [reference]
         self.ros_diag_pub.publish(msg)
+    
+    def update_score_display(self):
+        self.send_periph_msg("d", self.score)
 
     def on_init(self):
         pass
@@ -376,16 +387,20 @@ class Strategy(Node):
         self.send_nav_msg(1, 0.45, 0.45, math.radians(45))
 
     def is_tirette_activee(self):
-        return (self.periphs.get("TI", None) == 42)
+        return (self.periphs.get("TI", None) is not None)
 
     def recup_statuette(self):
         #TODO: code bas-niveau
         pass
 
     def is_at_statuette(self):
-        return self.is_at_goal(0.001, 0.001, 0.01)
+        return self.is_at_goal(0.001, 0.001, 0.1)
 
     def turn_around_replique(self):
+        #ajouter les points car la statuette a été enlevée
+        self.score += 5
+        self.update_score_display()
+        #se retourner pour déposer la réplique
         self.send_nav_msg(1, 0.45, 0.45, math.radians(135))
 
     def has_gotten_statuette(self):
@@ -396,9 +411,13 @@ class Strategy(Node):
         pass
 
     def has_turned_around_replique(self):
-        return self.is_at_goal(0.001, 0.001, 0.01)
+        return self.is_at_goal(0.001, 0.001, 0.1)
 
     def go_vitrine(self):
+        #ajouter les points car réplique droppée
+        self.score += 10
+        self.update_score_display()
+        #aller à la vitrine
         self.send_nav_msg(1, 0.24, 1.8, math.radians(90))
 
     def has_dropped_replique(self):
@@ -556,11 +575,11 @@ class Strategy(Node):
         return not self.done_galerie
 
     def quinze_dernieres_secondes(self):
-        return (self.chrono - time.time() <= 15.0)
+        return ((time.time() - self.chrono) > self.end - 15.0)
 
     def things_todo_at_bercail(self):
         #shutter la configuration
-        self.send_nav_msg(1, -1.0, -1.0, 0.0)
+        #self.send_nav_msg(1, -1.0, -1.0, 0.0)
         #être sûr d'arrêter le robot
         self.send_cmd_vel(0.0, 0.0)
         #déposer tous les palets
@@ -570,55 +589,7 @@ class Strategy(Node):
             self.send_periph_msg("mh", 0)
 
     def is_at_bercail(self):
-        return (self.is_at_pos(0.001, 0.001, 0.01, 0.14, 1.14, 0))
-
-
-    #vieux code tout pourri
-    def on_start(self):
-        print("Strategy: Tirette détectée: start")
-        self.chrono = time.time()
-        #if (self.periphs.get("co", 0) == 0):
-        print("start yellow")
-        self.send_nav_msg(1, 0.700, 1.140, 0.0)
-        #else:
-        #    print("start violet")
-        #    self.send_nav_msg(1, 3.0-0.700, 1.140, math.radians(180))
-
-    def on_turn_palet(self):
-        print("Strategy: Arrivé destination: Tourner palet")
-        #self.send_cmd_vel(-0.001, 0.0029) #je tente des trucs, faire tourner le robot vers la gauche?
-        self.send_nav_msg(1, 0.7, 1.140, math.radians(15))
-        time.sleep(0.2)
-        self.send_periph_msg("ma", 0) #choper un palet au sol
-        self.send_periph_msg("mc", 0) # et mettre dans la réserve
-
-    def on_a_chope(self):
-        #self.send_cmd_vel(0.0001, 0.0025) #tourner un peu à gauche
-        self.send_nav_msg(1, self.x, self.y, math.radians(45))
-        print("Strategy: choper second")
-        time.sleep(1)
-        self.send_periph_msg("mf", 0)
-        self.send_periph_msg("ma", 0)
-        self.send_periph_msg("mc", 0)
-
-    def on_almost_end(self):
-        print("Strategy: returning to home")
-        self.score += 20
-        self.send_periph_msg("d", self.score)
-        #if (self.periphs.get("co", 0) == 0):
-        self.send_nav_msg(1, 0.200, 1.200, math.radians(90)) # retourner au bercail
-        #else:
-        #self.send_nav_msg(1, 3.0-0.2, 1.140, math.radians(90))
-    
-    def tout_lacher_avant_fin(self):
-        self.score += 2
-        self.send_periph_msg("mg", 0)
-        self.send_periph_msg("mh", 0)
-
-    def on_end(self):
-        print("End: stop everything")
-        self.send_nav_msg(1, -1, -1, -1) #nav shut up pls
-        self.send_cmd_vel(0, 0) # stop
+        return (self.is_at_pos(0.001, 0.001, 0.1, 0.14, 1.14, 0))
 
 def main(args=None):
     rclpy.init(args=args)
