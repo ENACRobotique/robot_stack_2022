@@ -5,7 +5,7 @@ import numpy as np
 import numpy as numpy
 import matplotlib.pyplot as plt
 from robot_nav_enac.Points import Points
-
+from robot_nav_enac.conversions import z_euler_from_quaternions, quaternion_from_euler
 
 # Vitesse de Target :
 Vtarget = 0.1 # k
@@ -43,11 +43,14 @@ class State:
         liste_waypoint.append(47)
         # self.vang = vang
 
+    def __repr__(self) -> str:
+        return "x = {} y = {} yaw = {} v = {} dyaw = {} ".format(self.x, self.y, self.yaw, self.v, self.dyaw)
+
 
 def InObjectif(self):
     global IsInObjectif
-    print("CECI EST ISINOBJECTIF")
-    print(IsInObjectif)
+    #print("CECI EST ISINOBJECTIF")
+    #print(IsInObjectif)
     i = 0 
     while i < len(liste_waypoint):
         pointest = liste_waypoint[i]
@@ -75,10 +78,10 @@ def update(state, a, delta):
     state.x = state.x + state.v * math.cos(state.yaw) * dt      # Update Position X
     state.y = state.y + state.v * math.sin(state.yaw) * dt      # Update Position Y
     InObjectif(state)
-    print(state.v / L * math.tan(delta) * dt)
+    #print(state.v / L * math.tan(delta) * dt)
     state.dyaw = state.v / L * math.tan(delta) * dt
-    print(tryagain)
-    print(cpt)
+    #print(tryagain)
+    #print(cpt)
 
 
 
@@ -99,12 +102,12 @@ def update(state, a, delta):
         cpt = 0
 
     if tryagain:
-        target_speed = 1.0/3.6
+        target_speed = 0.3
         #cpt = 0
     elif IsInObjectif:
-        target_speed = 3.0/3.6
+        target_speed = 0.1
     else:
-        target_speed = 13.0/3.6
+        target_speed = 0.6
     
     state.yaw = state.yaw + state.v / L * math.tan(delta) * dt  # Update Angle Rotation Yaw
     state.v = state.v + a * dt                                  # Update Vitesse
@@ -167,94 +170,28 @@ def pure_pursuit_control(state, cx, cy, pind):
 
 target_speed = 0
 cpt = 0
-def main():
-
-    ## GÉNÉRATION D'UN FAUX CHEMIN ASTAR POUR TESTER LA RÉCUPÉRATION DES POINTS VIA CX ET CY
-    for n in range(1,101):
-        liste_astar.append(n)
-
-    ## CREATION CX ET CY QUI CORRESPONDENT AUX POINTS DU CHEMIN DE L'ASTAR
-    cx = np.array([])
-    cy = np.array([])
-
-    ## REMPLISSAGE DE CX ET CY VIA LA LISTE GÉNÉRÉE PAR L'ASTAR QUI CONTIENT LES POINTS DU CHEMIN À SUIVRE
-    n = 0 
-    while n < 10:
-        cx = numpy.append(cx,liste_astar[n])
-        cy = numpy.append(cy,liste_astar[n+1])
-        n += 2
-
-    #cx = np.arange(0, 60, 0.1) # (Xdebut, Xarrivée, Step)
-    #cy = [math.sin(ix / 5.0) * ix / 2.0 for ix in cx]
-
-    #cx = np.array([4.0 ,5.0 ,6.0 ,7.0 ,8.0 ,9.0 ,10.0 ,11.0 ,15.0 ,16.0]) # ABSCISSE DE CHAQUE POINT DU CHEMIN 
-    #cy = np.array([0.0 ,1.0 ,2.0 ,3.0 ,4.0 ,5.0 ,5.0 ,6.0 ,7.0 ,8.0]) # ORDONNÉE DE CHAQUE POINT DU CHEMIN
-
-    # RÉGLER VITESSE
-    #target_speed = 10.0 / 3.6  # [m/s]
-
-    # TEMPS MAX SIMULATION
-    T = 100.0 
-
-    # INITIALISATION DU ROBOT ( POSITION INITIALE )
-    state = State(x=-0.0, y=-3.0, yaw=0.0, v=0.0)
-
-    # Dernier Index = Index du Dernier Point - 1
-    lastIndex = len(cx) - 1
-    time = 0.0
-
-    # Récupère Infos du Robot
-    x = [state.x] 
-    y = [state.y]
-    yaw = [state.yaw]
-    v = [state.v]
-    t = [0.0]
-    dyaw = [0.0]
-
-    # Index de la Cible 
-    target_ind = calc_target_index(state, cx, cy)
-
-    # Tant que Tsimu>0 ou Point d'Arrivée Pas Passé
-    while T >= time and lastIndex > target_ind:
-        ai = PIDControl(target_speed, state.v)                           # Récupère le coef d'accélération ( PID )
-        di, target_ind = pure_pursuit_control(state, cx, cy, target_ind) # Récupère Delta et l'Indicateur à jour
-        state = update(state, ai, di)                                    # Met à jour infos robot
-
-        time = time + dt                                                 # Met à jour temps
-
-        # Init des Listes des infos du robot
-        x.append(state.x)
-        y.append(state.y)
-        yaw.append(state.yaw)
-        v.append(state.v)
-        t.append(time)
-        dyaw.append(state.dyaw)
-
-        if show_animation:
-            plt.cla()
-            plt.plot(cx, cy, ".r", label="course")                        # CHEMIN GÉNÉRÉ PAR A*
-            plt.plot(x, y, "-b", label="trajectory")                      # TRAJECTOIRE EMPRUNTÉ PAR ROBOT
-            plt.plot(cx[target_ind], cy[target_ind], "xg", label="target")
-            plt.axis("equal")
-            plt.grid(True)
-            plt.title("Speed[km/h]:" + str(state.v * 3.6)[:4])            # Affichage vitesse en [km/h]
-            plt.pause(0.001)
 
 
 
-def Pure_poursuit(chemin_astar):
+
+def Pure_poursuit(chemin_astar,angle_init):
      ## CREATION CX ET CY QUI CORRESPONDENT AUX POINTS DU CHEMIN DE L'ASTAR
     cx = np.array([])
     cy = np.array([])
+    #print(chemin_astar)
+    print("Purepoursuit called (x={}, y={})".format(chemin_astar[0].x, chemin_astar[0].y))
+
 
     ## REMPLISSAGE DE CX ET CY VIA LA LISTE GÉNÉRÉE PAR L'ASTAR QUI CONTIENT LES POINTS DU CHEMIN À SUIVRE
     n = 0 
-    while n < len(chemin_astar):
-        cx = numpy.append(cx,chemin_astar[n])
-        cy = numpy.append(cy,chemin_astar[n+1])
+    while n < min(len(chemin_astar), 10):
+        cx = numpy.append(cx,chemin_astar[n].x)
+        cy = numpy.append(cy,chemin_astar[n].y)
+        #cx = numpy.append(cx,5.0)
+        #cy = numpy.append(cy,5.0)
         if n == 0:
-            state = State(x=chemin_astar[n], y=chemin_astar[n+1], yaw=0.0, v=0.0)
-        n += 2
+            state = State(x=chemin_astar[n].x, y=chemin_astar[n].y, yaw=angle_init, v=0.0)
+        n += 1
 
     #cx = np.arange(0, 60, 0.1) # (Xdebut, Xarrivée, Step)
     #cy = [math.sin(ix / 5.0) * ix / 2.0 for ix in cx]
@@ -302,8 +239,10 @@ def Pure_poursuit(chemin_astar):
 
     liste_vitesse = []
     linear_speed = v
-    angular_speed = dyaw
+    angular_speed = state.yaw
     liste_vitesse = [linear_speed, angular_speed]
+    print(angular_speed)
+    print("state",state)
 
     return(liste_vitesse)
 
@@ -336,4 +275,5 @@ detect = 0
 
 if __name__ == '__main__':
     print("Pure pursuit path tracking simulation start")
-    main()
+    chemin_astar=[Points(20,20),Points(30,30),Points(40,40),Points(50,50)]
+    Pure_poursuit(chemin_astar)

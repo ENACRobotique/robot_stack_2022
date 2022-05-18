@@ -39,18 +39,18 @@ class PurePursuit(NavigationType):
         #self.path_to_follow = result_from_astar
         pass
 
-    def update_odom(self, callback_speed, position, speed, dyn_obstacle = []):
+    def update_odom(self, callback_speed, position, speed, dt):
 
         #finding astar path
-        liste_obstacle = self.fixed_obstacle + dyn_obstacle
+        liste_obstacle = self.fixed_obstacle
         graph = astar.AStarGraph(liste_obstacle)
-        depart = Points(position.x, position.y)
-        arrive = Points(self.target.x, self.target.y)
-        print("update_odm")
-        path_to_follow = astar.AStarSearch(depart, arrive, graph)
-        print("finupdate")
+        meter_to_astar_unit = 100 #convert to cm
+        depart = Points(int(position.x * meter_to_astar_unit), int(position.y * meter_to_astar_unit))
+        arrive = Points(int(self.target.x * meter_to_astar_unit), int(self.target.y * meter_to_astar_unit))
+        path_to_follow, cost = astar.AStarSearch(depart, arrive, graph)
         # generate cons_speed from pure pursuit algorithm
-        speeds = Pure_poursuit(path_to_follow)
-        callback_speed(speeds[0], speeds[1])
+        speeds = Pure_poursuit(path_to_follow, position.rotation_rad)
+        index_target = 10 #index of the next target to select
+        callback_speed(speeds[0][index_target], speeds[1])
         
         pass

@@ -79,6 +79,7 @@ class Navigator(Node):
         self.get_logger().info("receiving nav_cons ")
         #switch nav type if changed
         if self.nav_type_int != msg.navigation_type:
+            self.nav_type_int = msg.navigation_type
             self.navigation_type = msg.navigation_type
             if self.navigation_type == 0:
                 self.navigation_type = self.stop
@@ -91,6 +92,8 @@ class Navigator(Node):
             #    self.navigation_type = self.wall_follower
             #elif self.navigation_type == 4:
             #    self.navigation_type = self.wall_stop
+            else:
+                self.get_logger().error('wrong navigation type sent : not between 0 and 4 included (or 3 and 4 not implemented yet !)')
 
         #extracting goal_pose from msg
         x = msg.pose.position.x
@@ -123,7 +126,8 @@ class Navigator(Node):
         									msg.pose.pose.orientation.y,
         									msg.pose.pose.orientation.z,
         									msg.pose.pose.orientation.w)
-
+        #print("Le robot est à (x {},y {},r {})".format(x, y, rotation))
+        
         self.cur_position.updataOdomData(x, y, rotation)
         self.cur_speed.updataOdomData(msg.twist.twist.linear.x, 0, msg.twist.twist.angular.z)
 
