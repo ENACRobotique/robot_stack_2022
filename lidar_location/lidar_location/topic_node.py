@@ -215,9 +215,9 @@ class lidarlocation(Node):
 
         for tri in tri_list:
             position = self.determiner_position(tri)
-            #print("++++++++++++++++++++++++++++++")
+            print("++++++++++++++++++++++++++++++")
             if position[0] > 0 and position[1] > 0:
-                #print(position)
+                print(position)
                 self.send_position(position)
                 calc = timeit.default_timer() - self.start
                 #print(calc)
@@ -380,7 +380,7 @@ class lidarlocation(Node):
             x = self.positions[(self.pos_counter-self.last_good) % size_of_memory][0]
             y = self.positions[(self.pos_counter-self.last_good) % size_of_memory][1]
 
-        return [x, y, x2,y2,orientation]
+        return [x, y, orientation]
         
 
 
