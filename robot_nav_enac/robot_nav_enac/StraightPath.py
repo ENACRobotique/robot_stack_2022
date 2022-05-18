@@ -180,9 +180,9 @@ class StraightPath():
 
 	def get_rotate_correction_speed(self, relative_rotation_rad): #quick correction at "small speed" without ramp to correct when traveling in straight line if not following correctly
 		if (relative_rotation_rad <= 0):
-			rot_speed = -0.05 #take ~ 2 second to go from min_precision to max_precision
+			rot_speed = -1 #take ~ 2 second to go from min_precision to max_precision
 		else:
-			rot_speed = 0.05
+			rot_speed = 1
 		return rot_speed
 
 	def get_linear_speed(self, cur_lin_speed, dt):

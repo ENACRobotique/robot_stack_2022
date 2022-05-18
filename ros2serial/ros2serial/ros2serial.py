@@ -195,7 +195,7 @@ class Ros2Serial(Node):
         msg.twist.twist.linear.z = 0.0
         msg.twist.twist.angular.x = 0.0
         msg.twist.twist.angular.y = 0.0
-        msg.twist.twist.angular.z = float(args[4]) / 10
+        msg.twist.twist.angular.z = float(args[4])
 
         #envoyer les infos sur le bon topic
         self.ros_odom.publish(msg)
