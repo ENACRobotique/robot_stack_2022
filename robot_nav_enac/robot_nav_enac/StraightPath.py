@@ -70,16 +70,16 @@ class StraightPath():
 		self.target = OdomData(-1, -1, -1)
 		self.speed = OdomData(0,0,0)
 		
-		self.min_rotation_precision = 0.04 #~4.5 deg
-		self.max_rotation_precision = 0.20 #~ 13 deg
+		self.min_rotation_precision = 0.1 #~4.5 deg
+		self.max_rotation_precision = 0.24 #~ 13 deg
 		#Explanation -> When travelling in straight line, if the robot stop before reaching the perfect angle, there'll be a time during a travel when it has to "correct for the angle"
 		#so we need to set a value when the robot can start moving forward (under max_rotation_precision) and stop moving forward if too far from the target (above max_rotation_precision), and stop moving for "precision rotation" (under min_rotation_precision)
-		self.position_precision = 0.02 # 2 cm
+		self.position_precision = 0.06 # 6 cm
 
 		self.corr_lin_speed = 0.05 #m/s
 		self.corr_ang_speed = 0.05 #rad/s
 		self.accel_linear = Acceleration(0.6, 0.1, 3.0, 2.0)
-		self.accel_rotat = Acceleration(1.2, 0.05, 2.0, 2.0)
+		self.accel_rotat = Acceleration(1.57, 0.1, 2.0, 2.0)
 	
 	def set_target(self, target_pose:OdomData):
 		if self.target != target_pose: #TODO : check if it's enough to avoid "jerking" from acceleration module
@@ -180,9 +180,9 @@ class StraightPath():
 
 	def get_rotate_correction_speed(self, relative_rotation_rad): #quick correction at "small speed" without ramp to correct when traveling in straight line if not following correctly
 		if (relative_rotation_rad <= 0):
-			rot_speed = -1 #take ~ 2 second to go from min_precision to max_precision
+			rot_speed = -0.5 #take ~ 2 second to go from min_precision to max_precision
 		else:
-			rot_speed = 1
+			rot_speed = 0.5
 		return rot_speed
 
 	def get_linear_speed(self, cur_lin_speed, dt):
