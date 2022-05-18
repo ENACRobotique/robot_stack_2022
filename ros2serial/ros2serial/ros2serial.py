@@ -195,7 +195,7 @@ class Ros2Serial(Node):
         msg.twist.twist.linear.z = 0.0
         msg.twist.twist.angular.x = 0.0
         msg.twist.twist.angular.y = 0.0
-        msg.twist.twist.angular.z = float(args[4])
+        msg.twist.twist.angular.z = float(args[4]) #receiving rad/s
 
         #envoyer les infos sur le bon topic
         self.ros_odom.publish(msg)
@@ -263,7 +263,7 @@ class Ros2Serial(Node):
         vlin = msg.linear.x
         vtheta = msg.angular.z
         print("on_ros_cmd_vel "+str(vlin)+" "+str(vtheta))
-        self.serial_send(CMD_VEL.format(int(vlin*1000), int(vtheta*10)))
+        self.serial_send(CMD_VEL.format(int(vlin*1000), int(vtheta*10))) #sending déci rad/s due to not able to read float
 
     def on_ros_periph_cmd(self, msg):
         if (msg.header.frame_id != "stm32"):#to prevent looping from self messages
