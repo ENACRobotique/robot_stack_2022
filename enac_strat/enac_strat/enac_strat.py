@@ -694,6 +694,7 @@ class Strategy(Node):
     def things_todo_at_bercail(self):
         #être sûr d'arrêter le robot
         self.update_score("bercail", 20)
+        self.send_nav_msg(0, self.x, self.y, self.theta)
         self.dont_do_shit_anymore = True
         self.send_cmd_vel(0.0, 0.0)
         #déposer tous les palets dans les mains si il y en a
