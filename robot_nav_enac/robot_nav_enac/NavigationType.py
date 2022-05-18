@@ -2,24 +2,30 @@ from typing import Callable
 
 class OdomData:
 
-	def __init__(self, x, y, rotation):
-        #No Y if speed
-		self.x = x
-		self.y = y
-		self.rotation_rad = rotation
-		self.previous_x = x
-		self.previous_y = y
-		self.previous_rotation_rad = rotation
+    def __init__(self, x, y, rotation):
+    #No Y if speed
+        self.x = x
+        self.y = y
+        self.rotation_rad = rotation
+        self.previous_x = x
+        self.previous_y = y
+        self.previous_rotation_rad = rotation
 
-	def updataOdomData(self, x, y, rotation):
-		self.previous_x = self.x
-		self.previous_y = self.y
-		self.previous_rotation_rad = self.rotation_rad
+    def updataOdomData(self, x, y, rotation):
+        self.previous_x = self.x
+        self.previous_y = self.y
+        self.previous_rotation_rad = self.rotation_rad
 
-		self.x = x
-		self.y = y
-		self.rotation_rad = rotation
+        self.x = x
+        self.y = y
+        self.rotation_rad = rotation
+        
+    def set_nope(self): #set outside the map
+        self.x = -1
+        self.y = -1
 
+    def is_nope(self): #is outside the map (invalid odomData)
+        return self.x <0 or self.y <0 or self.x>3 or self.y > 2
 
 class NavigationType():
     def __init__(self, fixed_obstacles = None):
