@@ -129,7 +129,7 @@ class StraightPath():
                 rot_speed = self.get_rotate_speed(relative_rotation_rad, dt)
                 if not self.ramp_started and rot_speed <= -self.corr_ang_speed and rot_speed >= self.corr_ang_speed:
                     self.ramp_started = True
-                if not self.ramp_started and rot_speed >= -self.corr_ang_speed and rot_speed <= self.corr_ang_speed:  # really slow rot_speed
+                if self.ramp_started and rot_speed >= -self.corr_ang_speed and rot_speed <= self.corr_ang_speed:  # really slow rot_speed
                     self.nav_state = 1
             if self.nav_state == 1:  # if ramp is over and still not at target
                 rot_speed = self.get_rotate_correction_speed(
@@ -172,15 +172,19 @@ class StraightPath():
             if self.nav_state < 5 or self.nav_state > 6:
                 self.nav_state = 5
                 self.accel_rotat.reset_accel()
-            if self.nav_state == 5:
-                rot_speed = self.get_rotate_speed(rotation_to_final_angle, dt)
-                if rot_speed >= -self.corr_ang_speed and rot_speed <= self.corr_ang_speed:  # really slow rot_speed
+                self.ramp_started == False
+            if self.nav_state == 0:  # if in ramp state
+                rot_speed = self.get_rotate_speed(relative_rotation_rad, dt)
+                if not self.ramp_started and rot_speed <= -self.corr_ang_speed and rot_speed >= self.corr_ang_speed:
+                    self.ramp_started = True
+                if self.ramp_started and rot_speed >= -self.corr_ang_speed and rot_speed <= self.corr_ang_speed:  # really slow rot_speed
                     self.nav_state = 6
             if self.nav_state == 1:  # if ramp is over and still not at target
                 rot_speed = self.get_rotate_correction_speed(
                     relative_rotation_rad)
                 self.logger(
                     "robot is using minimal speed due to acceleration ramp finished")
+
             # TODO : check if need to implement state 6
             self.logger(f"At target - turning with speed {rot_speed}")
             self._isNavigating = False
