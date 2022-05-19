@@ -84,7 +84,7 @@ RUN apt install -y ros-galactic-rosbridge-suite
 
 #install robot_localization EKF - add ~200MB
 
-RUN apt install -y ros-galactic-robot_localization
+RUN apt install -y ros-galactic-robot-localization
 
 
 RUN echo "source /opt/ros/galactic/setup.bash" >> ~/.bashrc
