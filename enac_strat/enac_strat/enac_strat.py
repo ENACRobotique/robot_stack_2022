@@ -329,7 +329,8 @@ class Strategy(Node):
     def is_at_goal(self, vlin_tol, vtheta_tol, distmax_m):
         return (abs(self.vlin) <= vlin_tol and
                 abs(self.vtheta) <= vtheta_tol and
-                math.sqrt((self.x - self.goalx)**2 + (self.y - self.goaly)**2) <= distmax_m) #TODO: add condition sur theta si utile
+                math.sqrt((self.x - self.goalx)**2 + (self.y - self.goaly)**2) <= distmax_m and
+                abs(self.theta - self.goaltheta) < math.radians(6)) #TODO: add condition sur theta si utile
 
     def check_goal(self):
         return self.is_at_goal(0.001, 0.001, 0.1)
@@ -337,7 +338,8 @@ class Strategy(Node):
     def is_at_pos(self, vlin_tol, vtheta_tol, distmax_m, goalx, goaly, goaltheta):
         return (abs(self.vlin) <= vlin_tol and
                 abs(self.vtheta) <= vtheta_tol and
-                math.sqrt((self.x - goalx)**2 + (self.y - goaly)**2) <= distmax_m) #TODO: add condition sur theta si utile
+                math.sqrt((self.x - goalx)**2 + (self.y - goaly)**2) <= distmax_m and
+                abs(self.theta - goaltheta) < math.radians(6)) #TODO: add condition sur theta si utile
 
     def update_score(self, act_name, pts):
         self.score += pts
