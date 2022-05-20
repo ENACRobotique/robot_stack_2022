@@ -258,7 +258,7 @@ def Pure_poursuit(chemin_astar,angle_init):
     liste_vitesse = []
     linear_speed = v
     angular_speed = state.yaw
-    liste_vitesse = [linear_speed, angular_speed]
+    liste_vitesse = [linear_speed, angular_speed*0.25]
     print(angular_speed)
     print("state",state)
 

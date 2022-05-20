@@ -1,5 +1,10 @@
 import math, time
-from enac_strat.conversions import z_euler_from_quaternions, quaternion_from_euler
+try:
+    from enac_strat.conversions import z_euler_from_quaternions, quaternion_from_euler
+    from enac_strat.statemachine import State, Transition, StateMachine
+except:
+    from conversions import z_euler_from_quaternions, quaternion_from_euler
+    from statemachine import State, Transition, StateMachine
 import rclpy
 from rclpy.node import Node
 from std_msgs.msg import String
@@ -16,7 +21,7 @@ PeriphValue = _periph_value.PeriphValue
 Pid = _pid.Pid
 SetNavigation = _set_navigation.SetNavigation
 
-from enac_strat.statemachine import State, Transition, StateMachine
+
 
 #### fin partie générée automatiquement
 class Strategy(Node):
