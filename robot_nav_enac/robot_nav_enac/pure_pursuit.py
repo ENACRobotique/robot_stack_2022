@@ -17,6 +17,8 @@ Dtrob = 1.0   # Lfc = 1.0
 # Kp : https://ctms.engin.umich.edu/CTMS/index.php?example=Introduction&section=ControlPID
 Krampe = 2.0 # Kp = 1.0
 
+Kyaw = 0.5
+
 # Dt [s] ????
 dt = 0.1 
 
@@ -74,6 +76,8 @@ def update(state, a, delta):
     global tryagain
     global target_speed
     global cpt
+    global arret
+    global arret2
     # Calcul de X et Y p.6 : https://homes.cs.washington.edu/~todorov/courses/cseP590/05_Kinematics.pdf
     state.x = state.x + state.v * math.cos(state.yaw) * dt      # Update Position X
     state.y = state.y + state.v * math.sin(state.yaw) * dt      # Update Position Y
@@ -101,13 +105,17 @@ def update(state, a, delta):
         tryagain = False
         cpt = 0
 
-    if tryagain:
-        target_speed = 0.3
+    if tryagain or arret:
+        target_speed = 0.2 #0.3
         #cpt = 0
     elif IsInObjectif:
-        target_speed = 0.1
+        target_speed = 0.1 #0.1
+    elif arret:
+        target_speed = 0.0 #0.3
+    elif arret2:
+        target_speed = 0.0
     else:
-        target_speed = 0.6
+        target_speed = 0.3 # 0.6
     
     state.yaw = state.yaw + state.v / L * math.tan(delta) * dt  # Update Angle Rotation Yaw
     state.v = state.v + a * dt                                  # Update Vitesse
@@ -152,6 +160,16 @@ def pure_pursuit_control(state, cx, cy, pind):
     if ind < len(cx):                      # Si il reste des points du chemin
         tx = cx[ind]                       #Target(x = Xcheminprochainpoint ; y = Ycheminprochainpoint)
         ty = cy[ind]
+    if (ind > len(cx)-30) and (ind < len(cx)):
+        tx = cx[ind]                       #Target(x = Xcheminprochainpoint ; y = Ycheminprochainpoint)
+        ty = cy[ind]
+        arret = True
+        arret2 = False
+    if (ind > len(cx)-15) and (ind < len(cx)):
+        tx = cx[ind]                       #Target(x = Xcheminprochainpoint ; y = Ycheminprochainpoint)
+        ty = cy[ind]
+        arret = False
+        arret2 = True
     else:
         tx = cx[-1]                        # Sinon Target(x = Xcheminprochainpoint-1 ; y = Ycheminprochainpoint-1)
         ty = cy[-1]                        ############################ A modifier si on veut arriver à l'arrivée
@@ -269,6 +287,8 @@ def Pure_poursuit(chemin_astar,angle_init):
         plt.grid(True)
         plt.show()
 
+arret2 = False
+arret = False
 IsInObjectif = False
 tryagain = False
 detect = 0

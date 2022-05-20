@@ -9,6 +9,7 @@ class PurePursuit(NavigationType):
     def __init__(self):
         self.fixed_obstacle = self.Map_init()
         self.target = OdomData(-1,-1,-1)
+        self.position_precision = 0.02 #in meter
         pass
 
     def Map_init(self):
@@ -51,6 +52,10 @@ class PurePursuit(NavigationType):
         # generate cons_speed from pure pursuit algorithm
         speeds = Pure_poursuit(path_to_follow, position.rotation_rad)
         index_target = 10 #index of the next target to select
-        callback_speed(speeds[0][index_target], speeds[1])
-        
+        is_not_at_target = abs(position.x - self.target.x) >= self.position_precision or abs(
+            position.y - self.target.y) >= self.position_precision  # check only position not rotation
+        if is_not_at_target:
+            callback_speed(speeds[0][index_target], speeds[1])
+        else:
+            callback_speed(0.0,0.0)
         pass

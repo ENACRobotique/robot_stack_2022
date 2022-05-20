@@ -205,8 +205,8 @@ class StraightPath():
         # Acceleration don't manage negative values
         direction = sign(relative_rotation_rad)
         # cur_speed = abs(self.speed.rotation_rad)/self.robot_perimeter #speed is angle/perimeter to get speed in m/s intead of rad/s
-        cur_speed = self.speed.rotation_rad
-        distance = relative_rotation_rad
+        cur_speed = abs(self.speed.rotation_rad)
+        distance = abs(relative_rotation_rad)
         return direction * self.accel_rotat.get_speed(cur_speed, distance, dt)
 
     # quick correction at "small speed" without ramp to correct when traveling in straight line if not following correctly
