@@ -4,6 +4,7 @@ import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import Twist, Pose, TransformStamped
 from nav_msgs.msg import Odometry
+from std_msgs.msg import Float32
 
 from interfaces_enac.msg import _set_navigation
 from interfaces_enac.msg import _obstacles
@@ -37,7 +38,9 @@ class Navigator(Node):
 
         self.last_time_stamp = -1.0
         self.dt = 0.0
-        self.robot_radius = 0.0885 #in meter
+
+        self.is_stopped = False
+        self.last_nav_type = 0 #to resume navigation after obstacle
         #epaisseur roue : 0.022
         #distance max entre roues (de bout à bout ) : 0.199
         #diameter = 0.177
@@ -68,32 +71,32 @@ class Navigator(Node):
         #subscribe to obstacles
         obstacle_subscriber = self.create_subscription(
             Obstacles, 'obstacles', self.on_obstacle_callback, 10)
+        proximity_warning_sbuscriber = self.create_subscription(
+            Float32, 'front_distance', self.on_front_distance, 10)
         #publish to velocity
         self.velocity_publisher = self.create_publisher(Twist, 'cmd_vel', 10)
+        
 
     def on_obstacle_callback(self, msg):
         #TODO : maintain a list of dynamic obstacles and send it to PurePursuit astar planification on callback
         pass
 
+    def on_front_distance(self, msg):
+        if msg.data <= 0.5 and not self.is_stopped: #object in front at less than 0.5m
+            self.last_nav_type = self.nav_type_int
+            self.nav_type_int = 0
+            self.navigation_type = self.stop
+            self.is_stopped = True
+        if msg.data >= 0.5 and self.is_stopped: #resume navigation after proximity obstacle is leaving the vincinity of the robot
+            self.is_stopped = False
+            self.nav_type_int = self.last_nav_type
+            self.assign_navigation_from_int()
+
     def on_nav_callback(self, msg):
-        self.get_logger().info("receiving nav_cons ")
         #switch nav type if changed
         if self.nav_type_int != msg.navigation_type:
             self.nav_type_int = msg.navigation_type
-            self.navigation_type = msg.navigation_type
-            if self.navigation_type == 0:
-                self.navigation_type = self.stop
-            elif self.navigation_type == 1:
-                self.navigation_type = self.straight_path
-                #self.navigation_type.set_target = cur_position or reset button??
-            elif self.navigation_type == 2:
-                self.navigation_type = self.pure_pursuit
-            #elif self.navigation_type == 3:
-            #    self.navigation_type = self.wall_follower
-            #elif self.navigation_type == 4:
-            #    self.navigation_type = self.wall_stop
-            else:
-                self.get_logger().error('wrong navigation type sent : not between 0 and 4 included (or 3 and 4 not implemented yet !)')
+            self.assign_navigation_from_int()
 
         #extracting goal_pose from msg
         x = msg.pose.position.x
@@ -106,6 +109,8 @@ class Navigator(Node):
         #set target to the navigation_type selected
         self.target_position.updataOdomData(x,y, rotation)
         self.navigation_type.set_target(self.target_position)
+
+        self.get_logger().info(f"receiving nav_cons to target ({x}, {y}) and angle {rotation}")
 
 
     def on_odom_callback(self, msg):
@@ -149,6 +154,21 @@ class Navigator(Node):
         msg.angular.z = float(angular_speed)
         self.velocity_publisher.publish(msg)
 
+    def assign_navigation_from_int(self):
+        nb = self.nav_type_int
+        if nb == 0:
+                self.navigation_type = self.stop
+        elif nb == 1:
+            self.navigation_type = self.straight_path
+            #self.navigation_type.set_target = cur_position or reset button??
+        elif nb == 2:
+            self.navigation_type = self.pure_pursuit
+        #elif nb == 3:
+        #    self.navigation_type = self.wall_follower
+        #elif nb == 4:
+        #    self.navigation_type = self.wall_stop
+        else:
+            self.get_logger().error('wrong navigation type sent : not between 0 and 4 included (or 3 and 4 not implemented yet !)')
 	
 
 

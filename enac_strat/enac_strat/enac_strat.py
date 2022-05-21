@@ -1,10 +1,5 @@
 import math, time
-try:
-    from enac_strat.conversions import z_euler_from_quaternions, quaternion_from_euler
-    from enac_strat.statemachine import State, Transition, StateMachine
-except:
-    from conversions import z_euler_from_quaternions, quaternion_from_euler
-    from statemachine import State, Transition, StateMachine
+from enac_strat.conversions import z_euler_from_quaternions, quaternion_from_euler
 import rclpy
 from rclpy.node import Node
 from std_msgs.msg import String
@@ -21,7 +16,7 @@ PeriphValue = _periph_value.PeriphValue
 Pid = _pid.Pid
 SetNavigation = _set_navigation.SetNavigation
 
-
+from enac_strat.statemachine import State, Transition, StateMachine
 
 #### fin partie générée automatiquement
 class Strategy(Node):
@@ -334,8 +329,7 @@ class Strategy(Node):
     def is_at_goal(self, vlin_tol, vtheta_tol, distmax_m):
         return (abs(self.vlin) <= vlin_tol and
                 abs(self.vtheta) <= vtheta_tol and
-                math.sqrt((self.x - self.goalx)**2 + (self.y - self.goaly)**2) <= distmax_m and
-                abs(self.theta - self.goaltheta) < math.radians(6)) #TODO: add condition sur theta si utile
+                math.sqrt((self.x - self.goalx)**2 + (self.y - self.goaly)**2) <= distmax_m) #TODO: add condition sur theta si utile
 
     def check_goal(self):
         return self.is_at_goal(0.001, 0.001, 0.1)
@@ -343,8 +337,7 @@ class Strategy(Node):
     def is_at_pos(self, vlin_tol, vtheta_tol, distmax_m, goalx, goaly, goaltheta):
         return (abs(self.vlin) <= vlin_tol and
                 abs(self.vtheta) <= vtheta_tol and
-                math.sqrt((self.x - goalx)**2 + (self.y - goaly)**2) <= distmax_m and
-                abs(self.theta - goaltheta) < math.radians(6)) #TODO: add condition sur theta si utile
+                math.sqrt((self.x - goalx)**2 + (self.y - goaly)**2) <= distmax_m) #TODO: add condition sur theta si utile
 
     def update_score(self, act_name, pts):
         self.score += pts
