@@ -419,8 +419,8 @@ class Strategy(Node):
         return (self.periphs.get("TI", None) is not None)
 
     def recup_statuette(self):
-        #TODO: code bas-niveau
-        pass
+        self.send_periph_msg("mj", 0) # récup statuette arrière
+        #TODO: il faut faire qqch d'autre ici?
 
     def is_at_statuette(self):
         return self.check_goal()
@@ -435,11 +435,10 @@ class Strategy(Node):
             self.send_nav_msg(1, 3.0-0.45, 0.45, math.radians(-45))
 
     def has_gotten_statuette(self):
-        return (self.periphs.get("mr", None) == -1) #FIXME: coder l'état de neutre avec statuette en bas niveau et le renseigner ici
+        return (self.periphs.get("mr", None) == 16) #FIXME: coder l'état de neutre avec statuette en bas niveau et le renseigner ici
 
     def drop_replique(self):
-        #TODO: code bas-niveau
-        pass
+        self.send_periph_msg("mk", 0) #drop stat/repl avant
 
     def has_turned_around_replique(self):
         return self.check_goal()
@@ -457,7 +456,7 @@ class Strategy(Node):
         return (self.periphs.get("mv", None) == 1) #la state_machine avant est revenue en position neutre sans charge
 
     def drop_statuette(self):
-        #TODO: code bas-niveau
+        self.send_periph_msg("ml", 0) #drop stat arriere
         self.update_score("stat_vitr", 15)
 
     def is_at_vitrine(self):
