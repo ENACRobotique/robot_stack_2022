@@ -147,7 +147,11 @@ class lidarlocation(Node):
                 #if self.proximity_threshold_counter < self.proximity_threshold:
                 # SENDS A PROXIMITY STOP
         msg_prox = Float32()
-        msg_prox.data = distances_of_elements 
+        closest_element = 15
+        for el in distances_of_elements:
+            if el < closest_element and el > 0.10:
+                closest_element = el
+        msg_prox.data = closest_element 
         self.publisher_proximity_warning.publish(msg_prox)
         print("AIRPROX", distance)
         self.proximity_threshold_counter -= 1
@@ -220,7 +224,7 @@ class lidarlocation(Node):
             position = self.determiner_position(tri)
             print("++++++++++++++++++++++++++++++")
             if position[0] > 0 and position[1] > 0:
-                print(position)
+                #print(position)
                 self.send_position(position)
                 calc = timeit.default_timer() - self.start
                 #print(calc)
