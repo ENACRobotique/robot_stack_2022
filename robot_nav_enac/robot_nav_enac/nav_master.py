@@ -91,6 +91,7 @@ class Navigator(Node):
             self.is_stopped = False
             self.nav_type_int = self.last_nav_type
             self.assign_navigation_from_int()
+            self.navigation_type.set_target(self.target_position) #restart the ramp for straightPath
 
     def on_nav_callback(self, msg):
         #switch nav type if changed
