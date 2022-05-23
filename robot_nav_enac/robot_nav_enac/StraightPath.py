@@ -84,15 +84,15 @@ class StraightPath():
         self.accel_linear = Acceleration(0.6, 0.1, 3.0, 2.0)
         self.accel_rotat = Acceleration(1.57, 0.1, 2.0, 2.0)
 
-	def set_target(self, target_pose: OdomData):
-		if self.target != target_pose:  # TODO : check if it's enough to avoid "jerking" from acceleration module
-			self.target = target_pose  # TODO : check out of bounds
-			self.accel_linear.reset_accel()
-			self.accel_rotat.reset_accel()
-			self.logger("updated target in StraightPath navigationType")
-			self.nav_state = 0
-			self.ramp_started = False
-			self._isNavigating =False #TODO : check if could stop the robot when travelling
+    def set_target(self, target_pose: OdomData):
+        if self.target != target_pose:  # TODO : check if it's enough to avoid "jerking" from acceleration module
+            self.target = target_pose  # TODO : check out of bounds
+            self.accel_linear.reset_accel()
+            self.accel_rotat.reset_accel()
+            self.logger("updated target in StraightPath navigationType")
+            self.nav_state = 0
+            self.ramp_started = False
+            self._isNavigating = False  # TODO : check if could stop the robot when travelling
 
         # TODO : take into account obstacles
 
