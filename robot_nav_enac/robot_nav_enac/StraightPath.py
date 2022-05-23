@@ -90,6 +90,10 @@ class StraightPath():
             self.accel_linear.reset_accel()
             self.accel_rotat.reset_accel()
             self.logger("updated target in StraightPath navigationType")
+			self.nav_state = 0
+            self.ramp_started = False
+            self._isNavigating =False #TODO : check if could stop the robot when travelling
+
         # TODO : take into account obstacles
 
     def update_dyn_obstacles(self, dyn_obstacles=None):
