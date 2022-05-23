@@ -326,18 +326,20 @@ class Strategy(Node):
             print(f"ros_odom x:{self.x} y:{self.y} theta:{math.degrees(self.theta)}")
             self.check_transitions()
 
-    def is_at_goal(self, vlin_tol, vtheta_tol, distmax_m):
+    def is_at_goal(self, vlin_tol, vtheta_tol, distmax_m, theta_tol):
         return (abs(self.vlin) <= vlin_tol and
                 abs(self.vtheta) <= vtheta_tol and
-                math.sqrt((self.x - self.goalx)**2 + (self.y - self.goaly)**2) <= distmax_m) #TODO: add condition sur theta si utile
+                math.sqrt((self.x - self.goalx)**2 + (self.y - self.goaly)**2) <= distmax_m and
+                abs(self.theta%(2*math.pi) - self.goaltheta%(2*math.pi)) < theta_tol) #TODO: add condition sur theta si utile
 
     def check_goal(self):
-        return self.is_at_goal(0.001, 0.001, 0.1)
+        return self.is_at_goal(0.001, 0.001, 0.1, math.radians(5))
 
-    def is_at_pos(self, vlin_tol, vtheta_tol, distmax_m, goalx, goaly, goaltheta):
+    def is_at_pos(self, vlin_tol, vtheta_tol, distmax_m, goalx, goaly, goaltheta, theta_tol):
         return (abs(self.vlin) <= vlin_tol and
                 abs(self.vtheta) <= vtheta_tol and
-                math.sqrt((self.x - goalx)**2 + (self.y - goaly)**2) <= distmax_m) #TODO: add condition sur theta si utile
+                math.sqrt((self.x - goalx)**2 + (self.y - goaly)**2) <= distmax_m and
+                abs(self.theta%(2*math.pi) - goaltheta%(2*math.pi)) < theta_tol) #TODO: add condition sur theta si utile
 
     def update_score(self, act_name, pts):
         self.score += pts
@@ -411,9 +413,9 @@ class Strategy(Node):
         print("Strategy: tirette activée")
         self.chrono = time.time()
         if self.color_is_jaune():
-            self.send_nav_msg(1, 0.45, 0.45, math.radians(45))
+            self.send_nav_msg(1, 0.35, 0.35, math.radians(45))
         else:
-            self.send_nav_msg(1, 3.0-0.45, 0.45, math.radians(45+90))
+            self.send_nav_msg(1, 3.0-0.35, 0.35, math.radians(45+90))
 
     def is_tirette_activee(self):
         return (self.periphs.get("TI", None) is not None)
@@ -430,9 +432,9 @@ class Strategy(Node):
         self.update_score("enlv_stat", 5)
         #se retourner pour déposer la réplique
         if self.color_is_jaune():
-            self.send_nav_msg(1, 0.45, 0.45, math.radians(225))
+            self.send_nav_msg(1, 0.35, 0.35, math.radians(225))
         else:
-            self.send_nav_msg(1, 3.0-0.45, 0.45, math.radians(-45))
+            self.send_nav_msg(1, 3.0-0.35, 0.35, math.radians(-45))
 
     def has_gotten_statuette(self):
         return (self.periphs.get("mr", None) == 16) #FIXME: coder l'état de neutre avec statuette en bas niveau et le renseigner ici
@@ -709,9 +711,9 @@ class Strategy(Node):
 
     def is_at_bercail(self):
         if self.color_is_jaune():
-            return (self.is_at_pos(0.001, 0.001, 0.1, 0.2, 1.16, math.radians(180)))
+            return (self.is_at_pos(0.001, 0.001, 0.1, 0.2, 1.16, math.radians(180), math.radians(5)))
         else:
-            return (self.is_at_pos(0.001, 0.001, 0.1, 3.0- 0.2, 1.16, 0))
+            return (self.is_at_pos(0.001, 0.001, 0.1, 3.0- 0.2, 1.16, 0, math.radians(5)))
 
 def main(args=None):
     rclpy.init(args=args)
