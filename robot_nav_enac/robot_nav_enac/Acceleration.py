@@ -3,7 +3,9 @@ Use minus sign outside of the acceleration class -> Only used for "positive" acc
 Use geogebra to check if slope are coherent or not
 """
 class Acceleration():
-    def __init__(self, max_speed, min_speed = 0.1, time_acceleration = 1.0, time_deceleration = 1.0, precision_error = 0.018): #~ 2 cm and ~ 1 deg
+    def __init__(self, max_speed, min_speed = 0.1, time_acceleration = 1.0, time_deceleration = 1.0, precision_error = 0.018, decelerate_before = 0.0): #~ 2 cm and ~ 1 deg
+        #Decelerate before : the deceleration ramp will finish this value in meter before the target
+        self.decelerate_before = decelerate_before
         self.max_speed = max_speed
         self.min_speed = min_speed
         self.time_acceleration = time_acceleration #time to reach max speed from 0
@@ -36,7 +38,7 @@ class Acceleration():
             self.top_speed_time = self.cur_time
             
         speed_decel = self.max_speed
-        if distance_left <= theoric_decel_dist:
+        if distance_left <= theoric_decel_dist + self.decelerate_before: #adding a margin for deceleration
             if self.coeff_decel == -1000000000:
                 #ax+b equation : need to find params a and b (a -> self.top_speed_time and solving b right now)
                 self.coeff_decel = (- cur_speed)/ (self.time_deceleration)
@@ -47,13 +49,11 @@ class Acceleration():
             #    - ((self.cur_time)/ self.time_deceleration - (self.start_decel_time - self.time_deceleration) / self.time_deceleration)
             #    )    
             if speed_decel == 0 and distance_left >= self.precision_error:
-                print("undershooting target position")
+                speed_decel = self.min_speed
+                print(f"undershooting target position - going at min speed {self.min_speed}")
 
         elif self.coeff_decel != -1000000000 and distance_left >= theoric_decel_dist:
             print("overshooting : distance_left >= theoric_decel_dist")
-        
-
-
 
         return min(speed_accel, speed_decel)
 

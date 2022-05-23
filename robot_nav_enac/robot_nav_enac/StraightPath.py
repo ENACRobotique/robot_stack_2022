@@ -80,9 +80,9 @@ class StraightPath():
         self.position_precision = 0.02  # 4 cm
 
         self.corr_lin_speed = 0.1  # m/s
-        self.corr_ang_speed = 0.5  # rad/s
-        self.accel_linear = Acceleration(0.55, 0.1, 3.0, 2.0, self.position_precision) #TODO : vitesse max à 0.6 ?
-        self.accel_rotat = Acceleration(1.57, 0.5, 2.0, 2.0, self.max_rotation_precision)
+        self.corr_ang_speed = 0.75  # rad/s
+        self.accel_linear = Acceleration(0.55, 0.1, 2.0, 3.0, self.position_precision, 0.1) #TODO : vitesse max à 0.6 ?, deceleration 1 cm before
+        self.accel_rotat = Acceleration(2.0, 0.5, 2.0, 3.0, self.max_rotation_precision,0.05)
 
     def set_target(self, target_pose: OdomData):
         if self.target != target_pose:  # TODO : check if it's enough to avoid "jerking" from acceleration module
