@@ -412,6 +412,9 @@ class Strategy(Node):
     def go_recup_statuette(self):
         print("Strategy: tirette activée")
         self.chrono = time.time()
+        #fix pourri pour que le robot sorte de sa zone
+        self.send_cmd_vel(0.1, 0.0)
+        time.sleep(1.5)
         if self.color_is_jaune():
             self.send_nav_msg(1, 0.35, 0.35, math.radians(45))
         else:
