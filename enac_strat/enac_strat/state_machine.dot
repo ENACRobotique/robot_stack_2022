@@ -27,11 +27,22 @@ digraph EnacStrat {
         [label="go_vitrine/has_dropped_replique"]
     AtVitrine -> HasDroppedStatuette
         [label="drop_statuette/is_at_vitrine"]
+
+    HasDroppedStatuette -> RecalageA
+        [label="recalage_a/has_dropped_stat"]
+
+    RecalageA -> RecalageB
+        [label="recalage_b/has_recale_a"]
+    
+    RecalageB -> RecalageC
+        [label="recalage_c/has_recale_b"]
     
     //sequence: recuperation des palets et depot sur la galerie
     //recuperation des 3 palets
-    HasDroppedStatuette -> DevantPaletRouge
+    RecalageC -> DevantPaletRouge
         [label="go_palet_rouge/is_prio_galerie"]
+        //is_prio_galerie qui fait aussi is_recale_c
+
     DevantPaletRouge -> HasRecupPaletRougeAndStored
         [label="recup_rouge_stocker/is_at_palet_rouge"]
     HasRecupPaletRougeAndStored -> RougeInBackHand

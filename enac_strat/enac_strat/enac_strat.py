@@ -67,14 +67,16 @@ class Strategy(Node):
         ### début partie générée automatiquement
 
         #generated using graph_compil v0.1
-        HasRentreAuBercail = State("HasRentreAuBercail")
-        FinCarres = State("FinCarres")
-        QuitterMur = State("QuitterMur")
         ProchainCarre = State("ProchainCarre")
-        PousserSiBesoin = State("PousserSiBesoin")
         LireCarre = State("LireCarre")
         ColleAuMur = State("ColleAuMur")
-        IsRentringAuBercail = State("IsRentringAuBercail")
+        RecalageC = State("RecalageC")
+        RecalageB = State("RecalageB")
+        RecalageA = State("RecalageA")
+        HasRentreAuBercail = State("HasRentreAuBercail")
+        PousserSiBesoin = State("PousserSiBesoin")
+        QuitterMur = State("QuitterMur")
+        FinCarres = State("FinCarres")
         DevantCarres = State("DevantCarres")
         FinGalerie = State("FinGalerie")
         HasDroppedBleuGalerie = State("HasDroppedBleuGalerie")
@@ -96,8 +98,8 @@ class Strategy(Node):
         HasTurnedAroundReplique = State("HasTurnedAroundReplique")
         HasRecupStatuette = State("HasRecupStatuette")
         AtStatuette = State("AtStatuette")
+        IsRentringAuBercail = State("IsRentringAuBercail")
         Init = State("Init", self.on_init)
-        InitToAtStatuette = Transition("InitToAtStatuette", AtStatuette, self.go_recup_statuette, self.is_tirette_activee)
         tr139301719ToIsRentringAuBercail = Transition("tr139301719ToIsRentringAuBercail", IsRentringAuBercail, self.go_bercail, self.quinze_dernieres_secondes)
         AtStatuette.add_transition(tr139301719ToIsRentringAuBercail)
         HasRecupStatuette.add_transition(tr139301719ToIsRentringAuBercail)
@@ -125,6 +127,7 @@ class Strategy(Node):
         PousserSiBesoin.add_transition(PousserSiBesoinToQuitterMur)
         IsRentringAuBercailToHasRentreAuBercail = Transition("IsRentringAuBercailToHasRentreAuBercail", HasRentreAuBercail, self.things_todo_at_bercail, self.is_at_bercail)
         IsRentringAuBercail.add_transition(IsRentringAuBercailToHasRentreAuBercail)
+        InitToAtStatuette = Transition("InitToAtStatuette", AtStatuette, self.go_recup_statuette, self.is_tirette_activee)
         Init.add_transition(InitToAtStatuette)
         AtStatuetteToHasRecupStatuette = Transition("AtStatuetteToHasRecupStatuette", HasRecupStatuette, self.recup_statuette, self.is_at_statuette)
         AtStatuette.add_transition(AtStatuetteToHasRecupStatuette)
@@ -136,8 +139,14 @@ class Strategy(Node):
         HasDroppedReplique.add_transition(HasDroppedRepliqueToAtVitrine)
         AtVitrineToHasDroppedStatuette = Transition("AtVitrineToHasDroppedStatuette", HasDroppedStatuette, self.drop_statuette, self.is_at_vitrine)
         AtVitrine.add_transition(AtVitrineToHasDroppedStatuette)
-        HasDroppedStatuetteToDevantPaletRouge = Transition("HasDroppedStatuetteToDevantPaletRouge", DevantPaletRouge, self.go_palet_rouge, self.is_prio_galerie)
-        HasDroppedStatuette.add_transition(HasDroppedStatuetteToDevantPaletRouge)
+        HasDroppedStatuetteToRecalageA = Transition("HasDroppedStatuetteToRecalageA", RecalageA, self.recalage_a, self.has_dropped_stat)
+        HasDroppedStatuette.add_transition(HasDroppedStatuetteToRecalageA)
+        RecalageAToRecalageB = Transition("RecalageAToRecalageB", RecalageB, self.recalage_b, self.has_recale_a)
+        RecalageA.add_transition(RecalageAToRecalageB)
+        RecalageBToRecalageC = Transition("RecalageBToRecalageC", RecalageC, self.recalage_c, self.has_recale_b)
+        RecalageB.add_transition(RecalageBToRecalageC)
+        RecalageCToDevantPaletRouge = Transition("RecalageCToDevantPaletRouge", DevantPaletRouge, self.go_palet_rouge, self.is_prio_galerie)
+        RecalageC.add_transition(RecalageCToDevantPaletRouge)
         tr443085219ToHasRecupPaletRougeAndStored = Transition("tr443085219ToHasRecupPaletRougeAndStored", HasRecupPaletRougeAndStored, self.recup_rouge_stocker, self.is_at_palet_rouge)
         DevantPaletRouge.add_transition(tr443085219ToHasRecupPaletRougeAndStored)
         tr224422110ToRougeInBackHand = Transition("tr224422110ToRougeInBackHand", RougeInBackHand, self.put_back_rouge, self.has_stored_rouge)
@@ -416,9 +425,9 @@ class Strategy(Node):
         self.send_cmd_vel(0.1, 0.0)
         time.sleep(1.5)
         if self.color_is_jaune():
-            self.send_nav_msg(1, 0.35, 0.35, math.radians(45))
+            self.send_nav_msg(1, 0.39, 0.39, math.radians(45))
         else:
-            self.send_nav_msg(1, 3.0-0.35, 0.35, math.radians(45+90))
+            self.send_nav_msg(1, 3.0-0.39, 0.39, math.radians(45+90))
 
     def is_tirette_activee(self):
         return (self.periphs.get("TI", None) is not None)
@@ -435,9 +444,9 @@ class Strategy(Node):
         self.update_score("enlv_stat", 5)
         #se retourner pour déposer la réplique
         if self.color_is_jaune():
-            self.send_nav_msg(1, 0.35, 0.35, math.radians(225))
+            self.send_nav_msg(1, 0.38, 0.38, math.radians(225))
         else:
-            self.send_nav_msg(1, 3.0-0.35, 0.35, math.radians(-45))
+            self.send_nav_msg(1, 3.0-0.38, 0.38, math.radians(-45))
 
     def has_gotten_statuette(self):
         return (self.periphs.get("mr", None) == 16) #FIXME: coder l'état de neutre avec statuette en bas niveau et le renseigner ici
@@ -453,9 +462,9 @@ class Strategy(Node):
         self.update_score("drop_repl", 10)
         #aller à la vitrine
         if self.color_is_jaune():
-            self.send_nav_msg(1, 0.24, 1.8, math.radians(-90))
+            self.send_nav_msg(1, 0.24, 1.85, math.radians(-90))
         else:
-            self.send_nav_msg(1, 3.0-0.24, 1.8, math.radians(-90))
+            self.send_nav_msg(1, 3.0-0.24, 1.85, math.radians(-90))
 
     def has_dropped_replique(self):
         return (self.periphs.get("mv", None) == 1) #la state_machine avant est revenue en position neutre sans charge
@@ -466,6 +475,24 @@ class Strategy(Node):
 
     def is_at_vitrine(self):
         return self.check_goal()
+    
+    def recalage_a(self):
+        pass
+
+    def has_dropped_stat(self):
+        return (self.periphs.get("mr", None) == 1)
+
+    def recalage_b(self):
+        pass
+
+    def has_recale_a(self):
+        return True
+    
+    def recalage_c(self):
+        pass
+
+    def has_recale_b(self):
+        return True
 
     def go_palet_rouge(self):
         self.done_galerie = True
@@ -475,7 +502,7 @@ class Strategy(Node):
             self.send_nav_msg(1, 3.0-1.0, 0.6675, math.radians(180-47.34))
 
     def is_prio_galerie(self):
-        return (self.periphs.get("mr", None) == 1) and (self.prio_galerie == True)
+        return (True ) and (self.prio_galerie == True) #remplacer le premier True par has_recale_c
 
     def recup_rouge_stocker(self):
         self.send_periph_msg("ma", 0)
@@ -599,7 +626,7 @@ class Strategy(Node):
         return self.done_carres
 
     def is_prio_carres(self):
-        return (self.periphs.get("mr", None) == 1) and (self.prio_galerie == False)
+        return (True) and (self.prio_galerie == False)#TODO: remplacer with has_recale_c
 
     def se_coller_au_mur_deployer_poelon(self):
         if self.color_is_jaune():
