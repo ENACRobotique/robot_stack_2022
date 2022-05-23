@@ -35,8 +35,6 @@ ros2 run robot_simu_enac simu_robot
 
 ros2 bag play /enac_ws/bag/one_marker_1/one_marker_1_0.db3 -l
 ```
-#### durant un run, supprimer les containers en exitant :
-    -d
 
 
 
@@ -139,6 +137,7 @@ https://marinerobotics.gtorg.gatech.edu/running-ros-with-gui-in-docker-using-win
 ## Known issues :
 1. Rviz2 use all the cpu and at ~20fps with nothing
 2. GUI is a little bit slow in general 
+3. When using 
 
 ## improvement possibilities :
 1. Use NVIDIA cuda image as base to get graphic acceleration
