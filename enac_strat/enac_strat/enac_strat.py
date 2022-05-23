@@ -421,9 +421,6 @@ class Strategy(Node):
     def go_recup_statuette(self):
         print("Strategy: tirette activée")
         self.chrono = time.time()
-        #fix pourri pour que le robot sorte de sa zone
-        self.send_cmd_vel(0.1, 0.0)
-        time.sleep(1.5)
         if self.color_is_jaune():
             self.send_nav_msg(1, 0.39, 0.39, math.radians(45))
         else:
@@ -462,9 +459,9 @@ class Strategy(Node):
         self.update_score("drop_repl", 10)
         #aller à la vitrine
         if self.color_is_jaune():
-            self.send_nav_msg(1, 0.24, 1.85, math.radians(-90))
+            self.send_nav_msg(1, 0.24, 1.83, math.radians(-90))
         else:
-            self.send_nav_msg(1, 3.0-0.24, 1.85, math.radians(-90))
+            self.send_nav_msg(1, 3.0-0.24, 1.83, math.radians(-90))
 
     def has_dropped_replique(self):
         return (self.periphs.get("mv", None) == 1) #la state_machine avant est revenue en position neutre sans charge
