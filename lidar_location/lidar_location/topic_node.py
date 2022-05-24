@@ -151,7 +151,11 @@ class lidarlocation(Node):
         for el in distances_of_elements:
             if el < closest_element and el > 0.10:
                 closest_element = el
-        msg_prox.data = closest_element 
+        try:
+            msg_prox.data = closest_element 
+        except AssertionError:
+            print(f"erreur : type incorrect pour msg_prox.data {closest_element}")
+            msg_prox.data = 5.0
         self.publisher_proximity_warning.publish(msg_prox)
         print("AIRPROX", distance)
 
