@@ -13,6 +13,10 @@ docker run -it --rm --net=host -e DISPLAY --name club_robot --volume /home/robot
 Ordi de gauche :
 docker run -it --rm --net=host -e DISPLAY --name club_robot --volume /home/robot/Documents/robot_stack/robot_stack_2022:/enac_ws/src --volume /home/robot/bag_files:/enac_ws/bag enacrobotique/enac-base:dev bash
 
+--device=/dev/ldlidar --device=/dev/stm32 
+
+docker run -it --privileged --rm --name club_robot --net=host --pid=host -e DISPLAY -v /dev/bus/usb:/dev/bus/usb enacrobotique/enac-base:prod bash
+
 
 PI 4 with camera :
 docker run -it --privileged --rm --name club_robot --net=host --pid=host -e DISPLAY --device=/dev/ttyACM0 enacrobotique/enac-base:prod bash
