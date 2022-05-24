@@ -31,7 +31,14 @@ def z_euler_from_quaternions(qx, qy, qz, qw):
     t4 = +1.0 - 2.0 * (qy * qy + qz * qz)
     return np.arctan2(t3, t4)
 
+# angles en radians
+def pol_to_cart(x_rob, y_rob, theta_rob, offset_lidar, angle_loc_obst, dist_obst):
+    pass
 
+def is_obstacle_on_table(distance_from_robot):
+    #suppose que l'obstacle est parfaitement devant le robot
+    
+    pass
 class Navigator(Node):
     def __init__(self):
         super().__init__('navigator')
@@ -87,11 +94,13 @@ class Navigator(Node):
             self.nav_type_int = 0
             self.navigation_type = self.stop
             self.is_stopped = True
+            self.get_logger.info(f"stopping nav due to obstacle at {0.5} m ")
         if msg.data >= 0.5 and self.is_stopped: #resume navigation after proximity obstacle is leaving the vincinity of the robot
             self.is_stopped = False
             self.nav_type_int = self.last_nav_type
             self.assign_navigation_from_int()
             self.navigation_type.set_target(self.target_position) #restart the ramp for straightPath
+            self.get_logger.info("resuming nav")
 
     def on_nav_callback(self, msg):
         #switch nav type if changed

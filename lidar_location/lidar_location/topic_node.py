@@ -154,6 +154,7 @@ class lidarlocation(Node):
         msg_prox.data = closest_element 
         self.publisher_proximity_warning.publish(msg_prox)
         print("AIRPROX", distance)
+
         self.proximity_threshold_counter -= 1
         ## END OF CRITICAL CODE ##
         
