@@ -1,5 +1,7 @@
 import numpy as np
 
+import math
+
 import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import Twist, Pose, TransformStamped
@@ -33,7 +35,9 @@ def z_euler_from_quaternions(qx, qy, qz, qw):
 
 # angles en radians
 def pol_to_cart(x_rob, y_rob, theta_rob, offset_lidar, angle_loc_obst, dist_obst):
-    pass
+    offset_obst_x = dist_obst * math.cos(angle_loc_obst - offset_lidar + theta_rob)
+    offset_obst_y = dist_obst * math.sin(angle_loc_obst - offset_lidar + theta_rob)
+    return (x_rob + offset_obst_x, y_rob + offset_obst_y)
 
 def is_obstacle_on_table(distance_from_robot):
     #suppose que l'obstacle est parfaitement devant le robot
