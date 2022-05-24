@@ -421,16 +421,19 @@ class Strategy(Node):
     def go_recup_statuette(self):
         print("Strategy: tirette activée")
         self.chrono = time.time()
+        #fix pourri pour que le robot sorte de sa zone
+        #self.send_cmd_vel(0.1, 0.0)
+        #time.sleep(1.5)
         if self.color_is_jaune():
-            self.send_nav_msg(1, 0.39, 0.39, math.radians(45))
+            self.send_nav_msg(1, 0.39, 0.39, math.radians(-135))
         else:
-            self.send_nav_msg(1, 3.0-0.39, 0.39, math.radians(45+90))
+            self.send_nav_msg(1, 3.0-0.39, 0.39, math.radians(-45))
 
     def is_tirette_activee(self):
         return (self.periphs.get("TI", None) is not None)
 
     def recup_statuette(self):
-        self.send_periph_msg("mj", 0) # récup statuette arrière
+        self.send_periph_msg("mi", 0) # récup statuette avant
         #TODO: il faut faire qqch d'autre ici?
 
     def is_at_statuette(self):
@@ -441,15 +444,15 @@ class Strategy(Node):
         self.update_score("enlv_stat", 5)
         #se retourner pour déposer la réplique
         if self.color_is_jaune():
-            self.send_nav_msg(1, 0.38, 0.38, math.radians(225))
+            self.send_nav_msg(1, 0.38, 0.38, math.radians(45))
         else:
-            self.send_nav_msg(1, 3.0-0.38, 0.38, math.radians(-45))
+            self.send_nav_msg(1, 3.0-0.38, 0.38, math.radians(180-45))
 
     def has_gotten_statuette(self):
         return (self.periphs.get("mr", None) == 16) #FIXME: coder l'état de neutre avec statuette en bas niveau et le renseigner ici
 
     def drop_replique(self):
-        self.send_periph_msg("mk", 0) #drop stat/repl avant
+        self.send_periph_msg("ml", 0) #drop stat/repl arrière
 
     def has_turned_around_replique(self):
         return self.check_goal()
@@ -459,15 +462,15 @@ class Strategy(Node):
         self.update_score("drop_repl", 10)
         #aller à la vitrine
         if self.color_is_jaune():
-            self.send_nav_msg(1, 0.24, 1.83, math.radians(-90))
+            self.send_nav_msg(1, 0.24, 1.83, math.radians(90))
         else:
-            self.send_nav_msg(1, 3.0-0.24, 1.83, math.radians(-90))
+            self.send_nav_msg(1, 3.0-0.24, 1.83, math.radians(90))
 
     def has_dropped_replique(self):
-        return (self.periphs.get("mv", None) == 1) #la state_machine avant est revenue en position neutre sans charge
+        return (self.periphs.get("mr", None) == 1) #la state_machine arrière est revenue en position neutre sans charge
 
     def drop_statuette(self):
-        self.send_periph_msg("ml", 0) #drop stat arriere
+        self.send_periph_msg("mk", 0) #drop stat avant
         self.update_score("stat_vitr", 15)
 
     def is_at_vitrine(self):
@@ -477,7 +480,7 @@ class Strategy(Node):
         pass
 
     def has_dropped_stat(self):
-        return (self.periphs.get("mr", None) == 1)
+        return (self.periphs.get("mv", None) == 1)
 
     def recalage_b(self):
         pass
