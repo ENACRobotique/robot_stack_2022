@@ -25,6 +25,7 @@ CMD_PID = "g {} {} {}\n\r"
 
 MESSAGE = "m"
 ODOM_MOTOR = "r"
+ODOM_WHEEL = "f"
 PERIPH_DECL = "b"
 CAPT_VAL = "c"
 
@@ -96,6 +97,7 @@ class Ros2Serial(Node):
         #paramétrage ROS
         self.ros_raw_serial = self.create_publisher(String, "/raw_serial", 10)
         self.ros_odom = self.create_publisher(Odometry, '/odom', 10)
+        self.ros_odom_wheel = self.create_publisher(Odometry, '/odom_wheel', 10)
         self.ros_peripherals = self.create_publisher(PeriphValue, '/peripherals', 10)
         self.ros_diagnostics = self.create_publisher(DiagnosticArray, '/diagnostics', 10)
         
@@ -145,7 +147,9 @@ class Ros2Serial(Node):
                     if message[0] == MESSAGE:
                         self.on_serial_msg(message[2:])
                     elif message[0] == ODOM_MOTOR:
-                        self.on_serial_odom(message.split(' ')[1:])
+                        self.on_serial_odom(message.split(' ')[1:], False)
+                    elif message[0] == ODOM_WHEEL:
+                        self.on_serial_odom(message.split(' ')[1:], True)
                     elif message[0] == PERIPH_DECL:
                         self.on_serial_periph(message)
                     elif message[0] == CAPT_VAL:
@@ -173,7 +177,7 @@ class Ros2Serial(Node):
         msg.status = [reference]
         self.ros_diagnostics.publish(msg)
 
-    def on_serial_odom(self, args):
+    def on_serial_odom(self, args, wheel_message=False): #wheel_message change the topic of publisher, False -> odom, True -> odom_wheel
         #convertir les infor reçues au format ROS2
         msg = Odometry()
         msg.header.stamp = self.get_clock().now().to_msg()
@@ -198,7 +202,10 @@ class Ros2Serial(Node):
         msg.twist.twist.angular.z = float(args[4]) #receiving rad/s
 
         #envoyer les infos sur le bon topic
-        self.ros_odom.publish(msg)
+        if wheel_message:
+            self.ros_odom_wheel.publish(msg)
+        else:
+            self.ros_odom.publish(msg)
     
     def on_serial_periph(self, arg):
         #convertir les infor reçues au format ROS2
