@@ -354,7 +354,7 @@ class Strategy(Node):
         self.dont_do_shit_anymore = True
         self.send_periph_msg("p1", 0)
         self.send_periph_msg("p2", 0)
-        
+
     
     def is_fin(self):
         return ((time.time() - self.chrono) > self.end - 0.5)
@@ -442,13 +442,18 @@ class Strategy(Node):
         return True
 
     def push_carre(self):
-        pass
+        self.send_periph_msg("s1", 60)
+        self.time_push = time.time()
 
     def is_at_carre(self):
-        return True
+        return self.check_goal()
 
     def has_waited_some_time(self):
-        return True
+        if ((time.time() - self.time_push) > 1.0):
+            self.send_periph_msg("s1", 130)
+            return True
+        else:
+            return False
 
     #version normale plus bas
     def go_palet_rouge(self):
@@ -613,7 +618,7 @@ class Strategy(Node):
             should_pousse = self.periphs.get("LR", None) == 1
             self.carres[self.nombre_carres_done] = should_pousse
             if should_pousse:
-                self.send_periph_msg("s1", 90) #placeholder, peut être avoir repli auto?
+                self.send_periph_msg("s1", 60) #placeholder, peut être avoir repli auto?
                 if not self.pushed_at_least_one:
                     self.pushed_at_least_one = True
                     self.update_score("atleast1_carre", 5)
