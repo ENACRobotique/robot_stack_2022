@@ -15,11 +15,13 @@ docker run -it --rm --net=host -e DISPLAY --name club_robot --volume /home/robot
 
 --device=/dev/ldlidar --device=/dev/stm32 
 
-docker run -it --privileged --rm --name club_robot --net=host --pid=host -e DISPLAY -v /dev/bus/usb:/dev/bus/usb enacrobotique/enac-base:prod bash
+docker run -it --privileged --rm --name club_robot --net=host --pid=host -e DISPLAY -v /dev/bus/usb:/dev/bus/usb -v enacrobotique/enac-base:dev bash
 
 
 PI 4 with camera :
 docker run -it --privileged --rm --name club_robot --net=host --pid=host -e DISPLAY --device=/dev/ttyACM0 enacrobotique/enac-base:prod bash
+
+docker run -it --privileged --rm --name club_robot --net=host --pid=host -e DISPLAY --device=/dev/ttyACM0 enacrobotique/enac-base:dev bash
 
 ros2 run ros2serial ros2serial --ros-args -p serial_port:=/dev/ttyACM0 -p baudrate:=115200
 
