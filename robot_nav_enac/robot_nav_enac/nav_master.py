@@ -109,8 +109,8 @@ class Navigator(Node):
     def is_obstacle_on_table(self, distance_from_robot)-> bool:
         ennemy_pos = pol_to_cart(self.cur_position_wheel.x, self.cur_position_wheel.y, self.cur_position_wheel.rotation_rad,
         0.0,0.0,distance_from_robot) #TODO : angle_loc_lisdar not zero
-        if (ennemy_pos.x <= self.avoiding_margin  or ennemy_pos.x >= 3.0 - self.avoiding_margin
-            or ennemy_pos.y <= self.avoiding_margin or ennemy_pos.x >= 2.0 - self.avoiding_margin):
+        if (ennemy_pos[0] <= self.avoiding_margin  or ennemy_pos[0] >= 3.0 - self.avoiding_margin
+            or ennemy_pos[1] <= self.avoiding_margin or ennemy_pos[1] >= 2.0 - self.avoiding_margin):
             return False
         else:
             return True
@@ -122,13 +122,13 @@ class Navigator(Node):
         pass
 
     def on_front_distance(self, msg):
-        if msg.data <= 0.5 and not self.is_stopped and self.is_obstacle_on_table(msg.data): #object in front at less than 0.5m
+        if msg.data <= 0.3 and not self.is_stopped and self.is_obstacle_on_table(msg.data): #object in front at less than 0.5m
             self.last_nav_type = self.nav_type_int
             self.nav_type_int = 0
             self.navigation_type = self.stop
             self.is_stopped = True
             self.get_logger().warn(f"stopping nav due to obstacle at {0.5} m ")
-        if msg.data >= 0.5 and self.is_stopped: #resume navigation after proximity obstacle is leaving the vincinity of the robot
+        if msg.data >= 0.3 and self.is_stopped: #resume navigation after proximity obstacle is leaving the vincinity of the robot
             self.is_stopped = False
             self.nav_type_int = self.last_nav_type
             self.assign_navigation_from_int()
