@@ -166,7 +166,7 @@ class Navigator(Node):
 
         self.cur_position_wheel.updataOdomData(x, y, rotation)
         self.cur_speed_wheel.updataOdomData(msg.twist.twist.linear.x, 0, msg.twist.twist.angular.z)
-        if True:
+        if False:
             dt = 0.0
             if self.last_time_stamp == -1.0:
                 self.last_time_stamp = msg.header.stamp.sec + msg.header.stamp.nanosec * 1e-9
@@ -203,7 +203,7 @@ class Navigator(Node):
         self.cur_position.updataOdomData(x, y, rotation)
         self.cur_speed.updataOdomData(msg.twist.twist.linear.x, 0, msg.twist.twist.angular.z)
 
-        if False:
+        if True:
             dt = 0.0
             if self.last_time_stamp == -1.0:
                 self.last_time_stamp = msg.header.stamp.sec + msg.header.stamp.nanosec * 1e-9
