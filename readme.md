@@ -13,18 +13,13 @@ docker run -it --rm --net=host -e DISPLAY --name club_robot --volume /home/robot
 Ordi de gauche :
 docker run -it --rm --net=host -e DISPLAY --name club_robot --volume /home/robot/Documents/robot_stack/robot_stack_2022:/enac_ws/src --volume /home/robot/bag_files:/enac_ws/bag enacrobotique/enac-base:dev bash
 
-
-
 --device=/dev/ldlidar --device=/dev/stm32 
 
-docker run -it --privileged --rm --name club_robot --net=host --pid=host -e DISPLAY -v /dev/bus/usb:/dev/bus/usb -v enacrobotique/enac-base:dev bash
+docker run -it --privileged --rm --name club_robot --net=host --pid=host -e DISPLAY -v /dev/bus/usb:/dev/bus/usb enacrobotique/enac-base:prod bash
 
-docker run -it --privileged --rm --name club_robot --net=host --pid=host -e DISPLAY -v /dev/bus/usb:/dev/bus/usb -v /home/ubuntu/robot_stack_2022:/enac_ws/src enacrobotique/enac-base:dev bash
 
 PI 4 with camera :
 docker run -it --privileged --rm --name club_robot --net=host --pid=host -e DISPLAY --device=/dev/ttyACM0 enacrobotique/enac-base:prod bash
-
-docker run -it --privileged --rm --name club_robot --net=host --pid=host -e DISPLAY --device=/dev/ttyACM0 enacrobotique/enac-base:dev bash
 
 ros2 run ros2serial ros2serial --ros-args -p serial_port:=/dev/ttyACM0 -p baudrate:=115200
 
@@ -71,7 +66,7 @@ ipconfig
 obtenir l'addresse IP WSL
 
 ```
-docker run -it --rm -p "9090:9090" --name club_robot --volume D:\Sync\Code\Robotique\CDR2022\robot_stack_2022:/enac_ws/src --volume "C:\Users\Jonathan\Downloads\Aruco data":/enac_ws/bag enacrobotique/enac-base:dev bash
+docker run -it --rm -p "9090:9090" --name club_robot --gpus all --env="NVIDIA_DRIVER_CAPABILITIES=all" --env="DISPLAY=172.29.208.1:0.0" --env="QT_X11_NO_MITSHM=1" --env="LIBGL_ALWAYS_INDIRECT=0" --volume D:\Sync\Code\Robotique\CDR2022\robot_stack_2022:/enac_ws/src --volume "C:\Users\Jonathan\Downloads\Aruco data":/enac_ws/bag enacrobotique/enac-base:dev bash
 ```
 
 melvin environnement virtuel : 

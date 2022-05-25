@@ -67,13 +67,31 @@ class Strategy(Node):
         ### début partie générée automatiquement
 
         #generated using graph_compil v0.1
+        ProchainCarre = State("ProchainCarre")
+        LireCarre = State("LireCarre")
+        ColleAuMur = State("ColleAuMur")
         RecalageC = State("RecalageC")
         RecalageB = State("RecalageB")
         RecalageA = State("RecalageA")
         HasRentreAuBercail = State("HasRentreAuBercail")
-        Fin = State("Fin")
-        PushCarre = State("PushCarre")
-        GoCarre = State("GoCarre")
+        PousserSiBesoin = State("PousserSiBesoin")
+        QuitterMur = State("QuitterMur")
+        FinCarres = State("FinCarres")
+        DevantCarres = State("DevantCarres")
+        FinGalerie = State("FinGalerie")
+        HasDroppedBleuGalerie = State("HasDroppedBleuGalerie")
+        DevantGalerieBleuRetourne = State("DevantGalerieBleuRetourne")
+        HasDroppedVertGalerie = State("HasDroppedVertGalerie")
+        DevantGalerieVertRetourne = State("DevantGalerieVertRetourne")
+        HasDroppedRougeGalerie = State("HasDroppedRougeGalerie")
+        DevantGalerieRougeRetourne = State("DevantGalerieRougeRetourne")
+        HasRecupPaletBleu = State("HasRecupPaletBleu")
+        DevantPaletBleu = State("DevantPaletBleu")
+        HasRecupPaletVertAndStored = State("HasRecupPaletVertAndStored")
+        DevantPaletVert = State("DevantPaletVert")
+        RougeInBackHand = State("RougeInBackHand")
+        HasRecupPaletRougeAndStored = State("HasRecupPaletRougeAndStored")
+        DevantPaletRouge = State("DevantPaletRouge")
         HasDroppedStatuette = State("HasDroppedStatuette")
         AtVitrine = State("AtVitrine")
         HasDroppedReplique = State("HasDroppedReplique")
@@ -82,26 +100,31 @@ class Strategy(Node):
         AtStatuette = State("AtStatuette")
         IsRentringAuBercail = State("IsRentringAuBercail")
         Init = State("Init", self.on_init)
-        tr453775270ToIsRentringAuBercail = Transition("tr453775270ToIsRentringAuBercail", IsRentringAuBercail, self.go_bercail, self.quinze_dernieres_secondes)
-        AtStatuette.add_transition(tr453775270ToIsRentringAuBercail)
-        HasRecupStatuette.add_transition(tr453775270ToIsRentringAuBercail)
-        HasTurnedAroundReplique.add_transition(tr453775270ToIsRentringAuBercail)
-        HasDroppedReplique.add_transition(tr453775270ToIsRentringAuBercail)
-        AtVitrine.add_transition(tr453775270ToIsRentringAuBercail)
-        HasDroppedStatuette.add_transition(tr453775270ToIsRentringAuBercail)
-        GoCarre.add_transition(tr453775270ToIsRentringAuBercail)
-        PushCarre.add_transition(tr453775270ToIsRentringAuBercail)
-        tr25103878ToFin = Transition("tr25103878ToFin", Fin, self.tout_flinguer, self.is_fin)
-        AtStatuette.add_transition(tr25103878ToFin)
-        HasRecupStatuette.add_transition(tr25103878ToFin)
-        HasTurnedAroundReplique.add_transition(tr25103878ToFin)
-        HasDroppedReplique.add_transition(tr25103878ToFin)
-        AtVitrine.add_transition(tr25103878ToFin)
-        HasDroppedStatuette.add_transition(tr25103878ToFin)
-        GoCarre.add_transition(tr25103878ToFin)
-        PushCarre.add_transition(tr25103878ToFin)
-        IsRentringAuBercail.add_transition(tr25103878ToFin)
-        HasRentreAuBercail.add_transition(tr25103878ToFin)
+        tr139301719ToIsRentringAuBercail = Transition("tr139301719ToIsRentringAuBercail", IsRentringAuBercail, self.go_bercail, self.quinze_dernieres_secondes)
+        AtStatuette.add_transition(tr139301719ToIsRentringAuBercail)
+        HasRecupStatuette.add_transition(tr139301719ToIsRentringAuBercail)
+        HasTurnedAroundReplique.add_transition(tr139301719ToIsRentringAuBercail)
+        HasDroppedReplique.add_transition(tr139301719ToIsRentringAuBercail)
+        AtVitrine.add_transition(tr139301719ToIsRentringAuBercail)
+        HasDroppedStatuette.add_transition(tr139301719ToIsRentringAuBercail)
+        DevantPaletRouge.add_transition(tr139301719ToIsRentringAuBercail)
+        HasRecupPaletRougeAndStored.add_transition(tr139301719ToIsRentringAuBercail)
+        RougeInBackHand.add_transition(tr139301719ToIsRentringAuBercail)
+        DevantPaletVert.add_transition(tr139301719ToIsRentringAuBercail)
+        HasRecupPaletVertAndStored.add_transition(tr139301719ToIsRentringAuBercail)
+        DevantPaletBleu.add_transition(tr139301719ToIsRentringAuBercail)
+        HasRecupPaletBleu.add_transition(tr139301719ToIsRentringAuBercail)
+        DevantGalerieRougeRetourne.add_transition(tr139301719ToIsRentringAuBercail)
+        HasDroppedRougeGalerie.add_transition(tr139301719ToIsRentringAuBercail)
+        DevantGalerieVertRetourne.add_transition(tr139301719ToIsRentringAuBercail)
+        HasDroppedVertGalerie.add_transition(tr139301719ToIsRentringAuBercail)
+        DevantGalerieBleuRetourne.add_transition(tr139301719ToIsRentringAuBercail)
+        HasDroppedBleuGalerie.add_transition(tr139301719ToIsRentringAuBercail)
+        FinGalerie.add_transition(tr139301719ToIsRentringAuBercail)
+        DevantCarres.add_transition(tr139301719ToIsRentringAuBercail)
+        FinCarres.add_transition(tr139301719ToIsRentringAuBercail)
+        PousserSiBesoinToQuitterMur = Transition("PousserSiBesoinToQuitterMur", QuitterMur, self.quitter_mur_rentrer_poelon, self.quinze_dernieres_secondes)
+        PousserSiBesoin.add_transition(PousserSiBesoinToQuitterMur)
         IsRentringAuBercailToHasRentreAuBercail = Transition("IsRentringAuBercailToHasRentreAuBercail", HasRentreAuBercail, self.things_todo_at_bercail, self.is_at_bercail)
         IsRentringAuBercail.add_transition(IsRentringAuBercailToHasRentreAuBercail)
         InitToAtStatuette = Transition("InitToAtStatuette", AtStatuette, self.go_recup_statuette, self.is_tirette_activee)
@@ -122,12 +145,58 @@ class Strategy(Node):
         RecalageA.add_transition(RecalageAToRecalageB)
         RecalageBToRecalageC = Transition("RecalageBToRecalageC", RecalageC, self.recalage_c, self.has_recale_b)
         RecalageB.add_transition(RecalageBToRecalageC)
-        RecalageCToGoCarre = Transition("RecalageCToGoCarre", GoCarre, self.go_carre, self.has_recale_c)
-        RecalageC.add_transition(RecalageCToGoCarre)
-        GoCarreToPushCarre = Transition("GoCarreToPushCarre", PushCarre, self.push_carre, self.is_at_carre)
-        GoCarre.add_transition(GoCarreToPushCarre)
-        PushCarreToIsRentringAuBercail = Transition("PushCarreToIsRentringAuBercail", IsRentringAuBercail, self.go_bercail, self.has_waited_some_time)
-        PushCarre.add_transition(PushCarreToIsRentringAuBercail)
+        RecalageCToDevantPaletRouge = Transition("RecalageCToDevantPaletRouge", DevantPaletRouge, self.go_palet_rouge, self.is_prio_galerie)
+        RecalageC.add_transition(RecalageCToDevantPaletRouge)
+        tr443085219ToHasRecupPaletRougeAndStored = Transition("tr443085219ToHasRecupPaletRougeAndStored", HasRecupPaletRougeAndStored, self.recup_rouge_stocker, self.is_at_palet_rouge)
+        DevantPaletRouge.add_transition(tr443085219ToHasRecupPaletRougeAndStored)
+        tr224422110ToRougeInBackHand = Transition("tr224422110ToRougeInBackHand", RougeInBackHand, self.put_back_rouge, self.has_stored_rouge)
+        HasRecupPaletRougeAndStored.add_transition(tr224422110ToRougeInBackHand)
+        RougeInBackHandToDevantPaletVert = Transition("RougeInBackHandToDevantPaletVert", DevantPaletVert, self.go_palet_vert, self.has_backhand_rouge)
+        RougeInBackHand.add_transition(RougeInBackHandToDevantPaletVert)
+        tr487924451ToHasRecupPaletVertAndStored = Transition("tr487924451ToHasRecupPaletVertAndStored", HasRecupPaletVertAndStored, self.recup_vert_stocker, self.is_at_palet_vert)
+        DevantPaletVert.add_transition(tr487924451ToHasRecupPaletVertAndStored)
+        tr226431985ToDevantPaletBleu = Transition("tr226431985ToDevantPaletBleu", DevantPaletBleu, self.go_palet_bleu, self.has_stored_vert)
+        HasRecupPaletVertAndStored.add_transition(tr226431985ToDevantPaletBleu)
+        DevantPaletBleuToHasRecupPaletBleu = Transition("DevantPaletBleuToHasRecupPaletBleu", HasRecupPaletBleu, self.recup_bleu, self.is_at_palet_bleu)
+        DevantPaletBleu.add_transition(DevantPaletBleuToHasRecupPaletBleu)
+        tr298394497ToDevantGalerieRougeRetourne = Transition("tr298394497ToDevantGalerieRougeRetourne", DevantGalerieRougeRetourne, self.go_galerie_rouge, self.has_recup_bleu)
+        HasRecupPaletBleu.add_transition(tr298394497ToDevantGalerieRougeRetourne)
+        tr156138794ToHasDroppedRougeGalerie = Transition("tr156138794ToHasDroppedRougeGalerie", HasDroppedRougeGalerie, self.depot_rouge_arriere, self.is_at_galerie_rouge_retourne)
+        DevantGalerieRougeRetourne.add_transition(tr156138794ToHasDroppedRougeGalerie)
+        tr1003384989ToDevantGalerieVertRetourne = Transition("tr1003384989ToDevantGalerieVertRetourne", DevantGalerieVertRetourne, self.go_galerie_vert, self.has_dropped_rouge)
+        HasDroppedRougeGalerie.add_transition(tr1003384989ToDevantGalerieVertRetourne)
+        tr168523427ToHasDroppedVertGalerie = Transition("tr168523427ToHasDroppedVertGalerie", HasDroppedVertGalerie, self.destore_drop_vert_arriere, self.is_at_galerie_vert_retourne)
+        DevantGalerieVertRetourne.add_transition(tr168523427ToHasDroppedVertGalerie)
+        tr210589313ToDevantGalerieBleuRetourne = Transition("tr210589313ToDevantGalerieBleuRetourne", DevantGalerieBleuRetourne, self.store_bleu_from_front_hand_and_go_galerie_bleu, self.has_dropped_vert)
+        HasDroppedVertGalerie.add_transition(tr210589313ToDevantGalerieBleuRetourne)
+        tr432180998ToHasDroppedBleuGalerie = Transition("tr432180998ToHasDroppedBleuGalerie", HasDroppedBleuGalerie, self.destore_drop_bleu_arriere, self.is_at_galerie_bleu)
+        DevantGalerieBleuRetourne.add_transition(tr432180998ToHasDroppedBleuGalerie)
+        HasDroppedBleuGalerieToFinGalerie = Transition("HasDroppedBleuGalerieToFinGalerie", FinGalerie, self.do_nothing, self.has_dropped_bleu)
+        HasDroppedBleuGalerie.add_transition(HasDroppedBleuGalerieToFinGalerie)
+        FinGalerieToDevantCarres = Transition("FinGalerieToDevantCarres", DevantCarres, self.go_carres, self.pas_deja_fait_carres)
+        FinGalerie.add_transition(FinGalerieToDevantCarres)
+        FinGalerieToIsRentringAuBercail = Transition("FinGalerieToIsRentringAuBercail", IsRentringAuBercail, self.go_bercail, self.has_deja_fait_carres)
+        FinGalerie.add_transition(FinGalerieToIsRentringAuBercail)
+        HasDroppedStatuetteToDevantCarres = Transition("HasDroppedStatuetteToDevantCarres", DevantCarres, self.go_carres, self.is_prio_carres)
+        HasDroppedStatuette.add_transition(HasDroppedStatuetteToDevantCarres)
+        DevantCarresToColleAuMur = Transition("DevantCarresToColleAuMur", ColleAuMur, self.se_coller_au_mur_deployer_poelon, self.is_devant_carres)
+        DevantCarres.add_transition(DevantCarresToColleAuMur)
+        ColleAuMurToLireCarre = Transition("ColleAuMurToLireCarre", LireCarre, self.lire_carre_si_besoin, self.is_au_mur)
+        ColleAuMur.add_transition(ColleAuMurToLireCarre)
+        LireCarreToPousserSiBesoin = Transition("LireCarreToPousserSiBesoin", PousserSiBesoin, self.pousser_si_besoin, self.has_lu_carre_si_besoin)
+        LireCarre.add_transition(LireCarreToPousserSiBesoin)
+        PousserSiBesoinToQuitterMur = Transition("PousserSiBesoinToQuitterMur", QuitterMur, self.quitter_mur_rentrer_poelon, self.tous_carres_lus)
+        PousserSiBesoin.add_transition(PousserSiBesoinToQuitterMur)
+        PousserSiBesoinToProchainCarre = Transition("PousserSiBesoinToProchainCarre", ProchainCarre, self.go_prochain_carre, self.has_checked_carre)
+        PousserSiBesoin.add_transition(PousserSiBesoinToProchainCarre)
+        ProchainCarreToLireCarre = Transition("ProchainCarreToLireCarre", LireCarre, self.lire_carre_si_besoin, self.is_at_prochain)
+        ProchainCarre.add_transition(ProchainCarreToLireCarre)
+        QuitterMurToFinCarres = Transition("QuitterMurToFinCarres", FinCarres, self.do_nothing, self.has_quitte_mur)
+        QuitterMur.add_transition(QuitterMurToFinCarres)
+        FinCarresToIsRentringAuBercail = Transition("FinCarresToIsRentringAuBercail", IsRentringAuBercail, self.go_bercail, self.has_deja_fait_galerie)
+        FinCarres.add_transition(FinCarresToIsRentringAuBercail)
+        FinCarresToDevantPaletRouge = Transition("FinCarresToDevantPaletRouge", DevantPaletRouge, self.go_palet_rouge_depuis_mur, self.pas_deja_fait_galerie)
+        FinCarres.add_transition(FinCarresToDevantPaletRouge)
         self.EnacStrat = StateMachine(Init)
 
         ### fin partie générée automatiquement
@@ -349,16 +418,6 @@ class Strategy(Node):
     def on_init(self):
         pass
 
-    def tout_flinguer(self):
-        self.send_nav_msg(0, 0, 0, 0)
-        self.dont_do_shit_anymore = True
-        self.send_periph_msg("p1", 0)
-        self.send_periph_msg("p2", 0)
-
-    
-    def is_fin(self):
-        return ((time.time() - self.chrono) > self.end - 0.5)
-
     def go_recup_statuette(self):
         print("Strategy: tirette activée")
         self.chrono = time.time()
@@ -432,32 +491,6 @@ class Strategy(Node):
     def has_recale_b(self):
         return True
 
-    def go_carre(self):
-        if self.color_is_jaune():
-            self.send_nav_msg(1, 0.8525, 0.2, math.radians(180))
-        else:
-            self.send_nav_msg(1, 3.0-0.8525, 0.2, math.radians(180))
-
-    def has_recale_c(self):
-        return True
-
-    def push_carre(self):
-        self.update_score("atleast1_carre", 5)
-        self.update_score("carre_1", 5)
-        self.send_periph_msg("s1", 60)
-        self.time_push = time.time()
-
-    def is_at_carre(self):
-        return self.check_goal()
-
-    def has_waited_some_time(self):
-        if ((time.time() - self.time_push) > 1.0):
-            self.send_periph_msg("s1", 130)
-            return True
-        else:
-            return False
-
-    #version normale plus bas
     def go_palet_rouge(self):
         self.done_galerie = True
         if self.color_is_jaune():
@@ -620,7 +653,7 @@ class Strategy(Node):
             should_pousse = self.periphs.get("LR", None) == 1
             self.carres[self.nombre_carres_done] = should_pousse
             if should_pousse:
-                self.send_periph_msg("s1", 60) #placeholder, peut être avoir repli auto?
+                self.send_periph_msg("s1", 90) #placeholder, peut être avoir repli auto?
                 if not self.pushed_at_least_one:
                     self.pushed_at_least_one = True
                     self.update_score("atleast1_carre", 5)

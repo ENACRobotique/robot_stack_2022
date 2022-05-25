@@ -4,13 +4,19 @@ from lidar_location.Point import Point
 import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import LaserScan
-from std_msgs.msg import Float32
+from std_msgs.msg import Float32, Bool
 from lidar_location.Triangle import Triangle
 from geometry_msgs.msg import TransformStamped, Transform
+
 import math
 import timeit
 
 import numpy as np
+
+from interfaces_enac.msg import _periph_value, _pid
+
+PeriphValue = _periph_value.PeriphValue
+Pid = _pid.Pid
 
 
 def quaternion_from_euler(roll, pitch, yaw):
@@ -33,12 +39,16 @@ class lidarlocation(Node):
             'scan',
             self.listener_callback,
             10)
+        
+        self.ros_periph_listener = self.create_subscription(PeriphValue, '/peripherals', self.on_ros_periph_cmd, 10)
         self.subscription
         self.publisher_ = self.create_publisher(LaserScan, 'filtered_scan', 10)
         self.publisher_map = self.create_publisher(
             TransformStamped, 'carte_coins', 10)
         self.publish_position = self.create_publisher(
             TransformStamped, 'robot_position', 10)
+        self.publish_position_alert = self.create_publisher(
+            Bool, 'alert_robot_position_instable', 10)
         ## CRITICAL CODE AHEAD : DO NOT TOUCH
         self.publisher_proximity_warning = self.create_publisher(Float32, 'front_distance', 10)
         self.proximity_distance = 0.35 #CRITICAL: Trigger distance of the proximity sensor
@@ -46,10 +56,21 @@ class lidarlocation(Node):
         self.proximity_threshold_counter = 0 # CRITICAL: Counts the number of detections before raising a stop
         ## END OF CRITICAL CODE
         self.timer = self.create_timer(1, self.test)
-        self.positions = [[0,0],[0,0],[0,0],[0,0],[0,0]] # Defines a list of positions to be evened out
+        self.positions = [[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0]] # Defines a list of positions to be evened out
         self.pos_counter = 0 #Incremented at every new position to return the median value
         self.last_good = 0 # Used in determiner_position for abborhent values
         self.start = timeit.default_timer()
+        self.sens_table = 1 # 0 = jaune, 1 = violet
+
+    def on_ros_periph_cmd(self, msg):
+        if (msg.header.frame_id == "stm32"):#to prevent looping from self messages
+            id = msg.periph_name[:2]
+            cmd = msg.value
+            if id == "co":
+                if int(cmd) == 0:
+                    self.sens_table = 0
+                else:
+                    self.sens_table = 1
 
     def test(self):
         msg_out = TransformStamped()
@@ -370,14 +391,18 @@ class lidarlocation(Node):
         # This "constant" defines the maximum distance at which the robot will be at the end of a run. 
         # Rn this number is 14cm plus a margin of 6cm        
         max_distance_between_runs = 0.20
+        
+        # Incertititude message
+        incert = Bool()
+        incert.data = False
 
         self.pos_counter += 1
         self.pos_counter = self.pos_counter % size_of_memory # The modulo is the total number of positions to hold in memory
 
         if self.pos_counter >= len(self.positions):
-            self.positions.append([x,y])
+            self.positions.append([x,y, orientation])
         else:
-            self.positions[self.pos_counter] = [x, y] # adds the latest position to the list ofp ositions
+            self.positions[self.pos_counter] = [x, y, orientation] # adds the latest position to the list ofp ositions
             
         # This part implements the position drop for abborhent values
         self.last_good += 1
@@ -391,7 +416,15 @@ class lidarlocation(Node):
         else: #Otherwise return the last good position
             x = self.positions[(self.pos_counter-self.last_good) % size_of_memory][0]
             y = self.positions[(self.pos_counter-self.last_good) % size_of_memory][1]
+            orientation = self.positions[(self.pos_counter-self.last_good) % size_of_memory][2]
+            incert.data = True
 
+        if self.sens_table == 0: #jaune
+            x = 3 - x
+            y = 3 - y
+            
+        self.publish_position_alert.publish(incert) # Publishes incertain position
+            
         return [x, y, orientation]
         
 
