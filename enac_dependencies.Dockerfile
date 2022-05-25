@@ -35,16 +35,16 @@ RUN apt-get install -y python3-setuptools &&\
 
 #install visual/image processing tools
 
-RUN apt install -y python3-opencv
+#RUN apt install -y python3-opencv
 
-RUN apt install -y ros-galactic-cv-bridge
+#RUN apt install -y ros-galactic-cv-bridge
 
 # disabled due to taking ~600 mo
 # RUN apt install -y ros-galactic-navigation2
 
 #install camera tools
 
-RUN apt-get install -y ros-galactic-v4l2-camera
+#RUN apt-get install -y ros-galactic-v4l2-camera
 
 #TODO : more proper camera_calibration, or check if package has been fixed https://github.com/ros-perception/image_pipeline/issues/713
 #adding build tools but removing them just after
@@ -76,7 +76,7 @@ RUN apt-get install -y ros-galactic-v4l2-camera
 
 #RUN sudo apt install -y ros-galactic-camera-calibration
     
-RUN sudo apt install -y libcanberra-gtk-module libcanberra-gtk3-module
+#RUN sudo apt install -y libcanberra-gtk-module libcanberra-gtk3-module
 
 #add connection through rosbridge
 
@@ -84,7 +84,7 @@ RUN apt install -y ros-galactic-rosbridge-suite
 
 #install robot_localization EKF - add ~200MB
 
-RUN apt install -y ros-galactic-robot-localization
+#RUN apt install -y ros-galactic-robot-localization
 
 
 RUN echo "source /opt/ros/galactic/setup.bash" >> ~/.bashrc
