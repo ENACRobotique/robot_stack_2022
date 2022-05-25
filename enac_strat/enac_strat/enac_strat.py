@@ -67,11 +67,12 @@ class Strategy(Node):
         ### début partie générée automatiquement
 
         #generated using graph_compil v0.1
-        PushCarre = State("PushCarre")
         RecalageC = State("RecalageC")
         RecalageB = State("RecalageB")
         RecalageA = State("RecalageA")
         HasRentreAuBercail = State("HasRentreAuBercail")
+        Fin = State("Fin")
+        PushCarre = State("PushCarre")
         GoCarre = State("GoCarre")
         HasDroppedStatuette = State("HasDroppedStatuette")
         AtVitrine = State("AtVitrine")
@@ -81,14 +82,26 @@ class Strategy(Node):
         AtStatuette = State("AtStatuette")
         IsRentringAuBercail = State("IsRentringAuBercail")
         Init = State("Init", self.on_init)
-        tr562258789ToIsRentringAuBercail = Transition("tr562258789ToIsRentringAuBercail", IsRentringAuBercail, self.go_bercail, self.quinze_dernieres_secondes)
-        AtStatuette.add_transition(tr562258789ToIsRentringAuBercail)
-        HasRecupStatuette.add_transition(tr562258789ToIsRentringAuBercail)
-        HasTurnedAroundReplique.add_transition(tr562258789ToIsRentringAuBercail)
-        HasDroppedReplique.add_transition(tr562258789ToIsRentringAuBercail)
-        AtVitrine.add_transition(tr562258789ToIsRentringAuBercail)
-        HasDroppedStatuette.add_transition(tr562258789ToIsRentringAuBercail)
-        GoCarre.add_transition(tr562258789ToIsRentringAuBercail)
+        tr453775270ToIsRentringAuBercail = Transition("tr453775270ToIsRentringAuBercail", IsRentringAuBercail, self.go_bercail, self.quinze_dernieres_secondes)
+        AtStatuette.add_transition(tr453775270ToIsRentringAuBercail)
+        HasRecupStatuette.add_transition(tr453775270ToIsRentringAuBercail)
+        HasTurnedAroundReplique.add_transition(tr453775270ToIsRentringAuBercail)
+        HasDroppedReplique.add_transition(tr453775270ToIsRentringAuBercail)
+        AtVitrine.add_transition(tr453775270ToIsRentringAuBercail)
+        HasDroppedStatuette.add_transition(tr453775270ToIsRentringAuBercail)
+        GoCarre.add_transition(tr453775270ToIsRentringAuBercail)
+        PushCarre.add_transition(tr453775270ToIsRentringAuBercail)
+        tr25103878ToFin = Transition("tr25103878ToFin", Fin, self.tout_flinguer, self.is_fin)
+        AtStatuette.add_transition(tr25103878ToFin)
+        HasRecupStatuette.add_transition(tr25103878ToFin)
+        HasTurnedAroundReplique.add_transition(tr25103878ToFin)
+        HasDroppedReplique.add_transition(tr25103878ToFin)
+        AtVitrine.add_transition(tr25103878ToFin)
+        HasDroppedStatuette.add_transition(tr25103878ToFin)
+        GoCarre.add_transition(tr25103878ToFin)
+        PushCarre.add_transition(tr25103878ToFin)
+        IsRentringAuBercail.add_transition(tr25103878ToFin)
+        HasRentreAuBercail.add_transition(tr25103878ToFin)
         IsRentringAuBercailToHasRentreAuBercail = Transition("IsRentringAuBercailToHasRentreAuBercail", HasRentreAuBercail, self.things_todo_at_bercail, self.is_at_bercail)
         IsRentringAuBercail.add_transition(IsRentringAuBercailToHasRentreAuBercail)
         InitToAtStatuette = Transition("InitToAtStatuette", AtStatuette, self.go_recup_statuette, self.is_tirette_activee)
@@ -336,6 +349,16 @@ class Strategy(Node):
     def on_init(self):
         pass
 
+    def tout_flinguer(self):
+        self.send_nav_msg(0, 0, 0, 0)
+        self.dont_do_shit_anymore = True
+        self.send_periph_msg("p1", 0)
+        self.send_periph_msg("p2", 0)
+        
+    
+    def is_fin(self):
+        return ((time.time() - self.chrono) > self.end - 0.5)
+
     def go_recup_statuette(self):
         print("Strategy: tirette activée")
         self.chrono = time.time()
@@ -410,7 +433,10 @@ class Strategy(Node):
         return True
 
     def go_carre(self):
-        pass
+        if self.color_is_jaune():
+            self.send_nav_msg(1, 0.8525, 0.2, math.radians(180))
+        else:
+            self.send_nav_msg(1, 3.0-0.8525, 0.2, math.radians(180))
 
     def has_recale_c(self):
         return True

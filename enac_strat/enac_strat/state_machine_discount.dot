@@ -3,10 +3,13 @@ digraph EnacStrat {
     Init [comment="on_init"]
     //retour au bercail en cas de pb de temps
     {AtStatuette HasRecupStatuette HasTurnedAroundReplique HasDroppedReplique AtVitrine HasDroppedStatuette
-        GoCarre
+        GoCarre PushCarre
     } -> IsRentringAuBercail
         [label="go_bercail/quinze_dernieres_secondes"]
-    {}
+    {AtStatuette HasRecupStatuette HasTurnedAroundReplique HasDroppedReplique AtVitrine HasDroppedStatuette
+        GoCarre PushCarre IsRentringAuBercail HasRentreAuBercail
+    } -> Fin
+        [label="tout_flinguer/is_fin"]
     
     IsRentringAuBercail -> HasRentreAuBercail [label="things_todo_at_bercail/is_at_bercail"]
 

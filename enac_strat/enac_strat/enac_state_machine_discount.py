@@ -1,11 +1,12 @@
 #generated using graph_compil v0.1
 from statemachine import State, Transition, StateMachine
 
-PushCarre = State("PushCarre")
 RecalageC = State("RecalageC")
 RecalageB = State("RecalageB")
 RecalageA = State("RecalageA")
 HasRentreAuBercail = State("HasRentreAuBercail")
+Fin = State("Fin")
+PushCarre = State("PushCarre")
 GoCarre = State("GoCarre")
 HasDroppedStatuette = State("HasDroppedStatuette")
 AtVitrine = State("AtVitrine")
@@ -15,14 +16,26 @@ HasRecupStatuette = State("HasRecupStatuette")
 AtStatuette = State("AtStatuette")
 IsRentringAuBercail = State("IsRentringAuBercail")
 Init = State("Init", self.on_init)
-tr562258789ToIsRentringAuBercail = Transition("tr562258789ToIsRentringAuBercail", IsRentringAuBercail, self.go_bercail, self.quinze_dernieres_secondes)
-AtStatuette.add_transition(tr562258789ToIsRentringAuBercail)
-HasRecupStatuette.add_transition(tr562258789ToIsRentringAuBercail)
-HasTurnedAroundReplique.add_transition(tr562258789ToIsRentringAuBercail)
-HasDroppedReplique.add_transition(tr562258789ToIsRentringAuBercail)
-AtVitrine.add_transition(tr562258789ToIsRentringAuBercail)
-HasDroppedStatuette.add_transition(tr562258789ToIsRentringAuBercail)
-GoCarre.add_transition(tr562258789ToIsRentringAuBercail)
+tr453775270ToIsRentringAuBercail = Transition("tr453775270ToIsRentringAuBercail", IsRentringAuBercail, self.go_bercail, self.quinze_dernieres_secondes)
+AtStatuette.add_transition(tr453775270ToIsRentringAuBercail)
+HasRecupStatuette.add_transition(tr453775270ToIsRentringAuBercail)
+HasTurnedAroundReplique.add_transition(tr453775270ToIsRentringAuBercail)
+HasDroppedReplique.add_transition(tr453775270ToIsRentringAuBercail)
+AtVitrine.add_transition(tr453775270ToIsRentringAuBercail)
+HasDroppedStatuette.add_transition(tr453775270ToIsRentringAuBercail)
+GoCarre.add_transition(tr453775270ToIsRentringAuBercail)
+PushCarre.add_transition(tr453775270ToIsRentringAuBercail)
+tr25103878ToFin = Transition("tr25103878ToFin", Fin, self.tout_flinguer, self.is_fin)
+AtStatuette.add_transition(tr25103878ToFin)
+HasRecupStatuette.add_transition(tr25103878ToFin)
+HasTurnedAroundReplique.add_transition(tr25103878ToFin)
+HasDroppedReplique.add_transition(tr25103878ToFin)
+AtVitrine.add_transition(tr25103878ToFin)
+HasDroppedStatuette.add_transition(tr25103878ToFin)
+GoCarre.add_transition(tr25103878ToFin)
+PushCarre.add_transition(tr25103878ToFin)
+IsRentringAuBercail.add_transition(tr25103878ToFin)
+HasRentreAuBercail.add_transition(tr25103878ToFin)
 IsRentringAuBercailToHasRentreAuBercail = Transition("IsRentringAuBercailToHasRentreAuBercail", HasRentreAuBercail, self.things_todo_at_bercail, self.is_at_bercail)
 IsRentringAuBercail.add_transition(IsRentringAuBercailToHasRentreAuBercail)
 InitToAtStatuette = Transition("InitToAtStatuette", AtStatuette, self.go_recup_statuette, self.is_tirette_activee)
@@ -57,6 +70,12 @@ def go_bercail(self):
     pass
 
 def quinze_dernieres_secondes(self):
+    return True
+
+def tout_flinguer(self):
+    pass
+
+def is_fin(self):
     return True
 
 def things_todo_at_bercail(self):
