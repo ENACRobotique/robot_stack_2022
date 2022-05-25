@@ -442,6 +442,8 @@ class Strategy(Node):
         return True
 
     def push_carre(self):
+        self.update_score("atleast1_carre", 5)
+        self.update_score("carre_1", 5)
         self.send_periph_msg("s1", 60)
         self.time_push = time.time()
 
