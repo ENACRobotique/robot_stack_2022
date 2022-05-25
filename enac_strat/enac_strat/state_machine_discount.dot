@@ -1,0 +1,47 @@
+//init Init
+digraph EnacStrat {
+    Init [comment="on_init"]
+    //retour au bercail en cas de pb de temps
+    {AtStatuette HasRecupStatuette HasTurnedAroundReplique HasDroppedReplique AtVitrine HasDroppedStatuette
+        GoCarre
+    } -> IsRentringAuBercail
+        [label="go_bercail/quinze_dernieres_secondes"]
+    {}
+    
+    IsRentringAuBercail -> HasRentreAuBercail [label="things_todo_at_bercail/is_at_bercail"]
+
+    //sequence: depot de la replique et recuperation de la statuette
+    Init -> AtStatuette
+        [label="go_recup_statuette/is_tirette_activee"]
+    AtStatuette -> HasRecupStatuette
+        [label="recup_statuette/is_at_statuette"]
+    HasRecupStatuette -> HasTurnedAroundReplique
+        [label="turn_around_replique/has_gotten_statuette"]
+    HasTurnedAroundReplique -> HasDroppedReplique
+        [label="drop_replique/has_turned_around_replique"]
+    HasDroppedReplique -> AtVitrine
+        [label="go_vitrine/has_dropped_replique"]
+    AtVitrine -> HasDroppedStatuette
+        [label="drop_statuette/is_at_vitrine"]
+
+    HasDroppedStatuette -> RecalageA
+        [label="recalage_a/has_dropped_stat"]
+
+    RecalageA -> RecalageB
+        [label="recalage_b/has_recale_a"]
+    
+    RecalageB -> RecalageC
+        [label="recalage_c/has_recale_b"]
+    
+    //sequence: recuperation des palets et depot sur la galerie
+    //recuperation des 3 palets
+    RecalageC -> GoCarre
+        [label="go_carre/has_recale_c"]
+    
+    GoCarre -> PushCarre
+        [label="push_carre/is_at_carre"]
+    
+    PushCarre -> IsRentringAuBercail
+        [label="go_bercail/has_waited_some_time"]
+
+}

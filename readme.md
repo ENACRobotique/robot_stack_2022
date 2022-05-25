@@ -17,6 +17,7 @@ docker run -it --rm --net=host -e DISPLAY --name club_robot --volume /home/robot
 
 docker run -it --privileged --rm --name club_robot --net=host --pid=host -e DISPLAY -v /dev/bus/usb:/dev/bus/usb enacrobotique/enac-base:prod bash
 
+docker run -it --privileged --rm --name club_robot --net=host --pid=host -e DISPLAY -v /dev/bus/usb:/dev/bus/usb -v /home/ubuntu/robot_stack_2022:/enac_ws/src enacrobotique/enac-base:dev bash
 
 PI 4 with camera :
 docker run -it --privileged --rm --name club_robot --net=host --pid=host -e DISPLAY --device=/dev/ttyACM0 enacrobotique/enac-base:prod bash
