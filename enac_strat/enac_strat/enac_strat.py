@@ -374,6 +374,7 @@ class Strategy(Node):
         return (self.periphs.get("TI", None) is not None)
 
     def recup_statuette(self):
+        self.send_nav_msg(0, 0, 0, 0)
         self.send_periph_msg("mj", 0) # récup statuette arrière
         pass
         #TODO: il faut faire qqch d'autre ici?
@@ -394,6 +395,7 @@ class Strategy(Node):
         return (self.periphs.get("mr", None) == 16) #FIXME: coder l'état de neutre avec statuette en bas niveau et le renseigner ici
 
     def drop_replique(self):
+        self.send_nav_msg(0, 0, 0, 0)
         self.send_periph_msg("mk", 0) #drop stat/repl avant
 
     def has_turned_around_replique(self):
@@ -412,6 +414,7 @@ class Strategy(Node):
         return (self.periphs.get("mv", None) == 1) #la state_machine avant est revenue en position neutre sans charge
 
     def drop_statuette(self):
+        self.send_nav_msg(0, 0, 0, 0)
         self.send_periph_msg("ml", 0) #drop stat arriere
         self.update_score("stat_vitr", 15)
 
@@ -458,11 +461,12 @@ class Strategy(Node):
         return True
 
     def has_waited_some_time(self):
-        if ((time.time() - self.time_push) > 1.0):
-            self.send_periph_msg("s1", 130)
-            return True
-        else:
-            return False
+        #if ((time.time() - self.time_push) > 1.0):
+        #    self.send_periph_msg("s1", 130)
+        #    return True
+        #else:
+        #    return False
+        return True
 
     # version normale plus bas
     def go_palet_rouge(self):
@@ -476,6 +480,7 @@ class Strategy(Node):
         return (True ) and (self.prio_galerie == True) #remplacer le premier True par has_recale_c
 
     def recup_rouge_stocker(self):
+        self.send_nav_msg(0, 0, 0, 0)
         self.send_periph_msg("ma", 0)
         self.send_periph_msg("mc", 0)
 
@@ -483,6 +488,7 @@ class Strategy(Node):
         return self.check_goal()
 
     def put_back_rouge(self):
+        self.send_nav_msg(0, 0, 0, 0)
         self.send_periph_msg("mf", 0)
 
     def has_stored_rouge(self):
@@ -498,6 +504,7 @@ class Strategy(Node):
         return (self.periphs.get("mr", None) == 3)
 
     def recup_vert_stocker(self):
+        self.send_nav_msg(0, 0, 0, 0)
         self.send_periph_msg("ma", 0)
         self.send_periph_msg("mc", 0)
 
@@ -514,6 +521,7 @@ class Strategy(Node):
         return (self.periphs.get("sc", None) == 1)
 
     def recup_bleu(self):
+        self.send_nav_msg(0, 0, 0, 0)
         self.send_periph_msg("ma", 0)
 
     def is_at_palet_bleu(self):
@@ -530,6 +538,7 @@ class Strategy(Node):
 
     def depot_rouge_arriere(self):
         #TODO: code bas-niveau
+        self.send_nav_msg(0, 0, 0, 0)
         self.send_periph_msg("mh", 0) #placeholder pour dépôt arrière sur galerie ->force les AX12 comme un bourrin
         self.send_periph_msg("mf", 0)
 
@@ -547,6 +556,7 @@ class Strategy(Node):
         return (self.periphs.get("mr", None) == 1)
 
     def destore_drop_vert_arriere(self):
+        self.send_nav_msg(0, 0, 0, 0)
         self.send_periph_msg("mh", 0) #placeholder pour dépôt arrière sur galerie ->force les AX12 comme un bourrin
 
     def is_at_galerie_vert_retourne(self):
