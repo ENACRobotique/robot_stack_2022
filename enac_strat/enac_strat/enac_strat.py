@@ -126,7 +126,7 @@ class Strategy(Node):
         GoCarre.add_transition(GoCarreToPushCarre)
         PushCarreToIsRentringAuBercail = Transition("PushCarreToIsRentringAuBercail", IsRentringAuBercail, self.go_bercail, self.has_waited_some_time)
         PushCarre.add_transition(PushCarreToIsRentringAuBercail)
-        EnacStrat = StateMachine(Init)
+        self.EnacStrat = StateMachine(Init)
 
         ### fin partie générée automatiquement
 
