@@ -177,7 +177,7 @@ class lidarlocation(Node):
             print(f"erreur : type incorrect pour msg_prox.data {closest_element}")
             msg_prox.data = 5.0
         self.publisher_proximity_warning.publish(msg_prox)
-        print("AIRPROX", distance)
+        #print("AIRPROX", distance)
 
         self.proximity_threshold_counter -= 1
         ## END OF CRITICAL CODE ##
@@ -253,7 +253,7 @@ class lidarlocation(Node):
                 self.send_position(position)
                 calc = timeit.default_timer() - self.start
                 #print(calc)
-                #print(position[1])
+                print(position[0], ";", position[1], ";", position[2])
         
         # Trier la liste par angle modulo pi
         list_pts = []
