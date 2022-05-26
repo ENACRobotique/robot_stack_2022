@@ -16,8 +16,8 @@ digraph EnacStrat {
     //sequence: depot de la replique et recuperation de la statuette
     Init -> AtStatuette
         [label="go_recup_statuette/is_tirette_activee"]
-    AtStatuette -> HasRecupStatuette
-        [label="recup_statuette/is_at_statuette"]
+    //AtStatuette -> HasRecupStatuette
+    //    [label="recup_statuette/is_at_statuette"]
     HasRecupStatuette -> HasTurnedAroundReplique
         [label="turn_around_replique/has_gotten_statuette"]
     HasTurnedAroundReplique -> HasDroppedReplique
