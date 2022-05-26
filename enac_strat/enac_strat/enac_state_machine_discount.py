@@ -40,6 +40,8 @@ IsRentringAuBercailToHasRentreAuBercail = Transition("IsRentringAuBercailToHasRe
 IsRentringAuBercail.add_transition(IsRentringAuBercailToHasRentreAuBercail)
 InitToAtStatuette = Transition("InitToAtStatuette", AtStatuette, self.go_recup_statuette, self.is_tirette_activee)
 Init.add_transition(InitToAtStatuette)
+AtStatuetteToHasRecupStatuette = Transition("AtStatuetteToHasRecupStatuette", HasRecupStatuette, self.recup_statuette, self.is_at_statuette)
+AtStatuette.add_transition(AtStatuetteToHasRecupStatuette)
 tr581141130ToHasTurnedAroundReplique = Transition("tr581141130ToHasTurnedAroundReplique", HasTurnedAroundReplique, self.turn_around_replique, self.has_gotten_statuette)
 HasRecupStatuette.add_transition(tr581141130ToHasTurnedAroundReplique)
 tr86346170ToHasDroppedReplique = Transition("tr86346170ToHasDroppedReplique", HasDroppedReplique, self.drop_replique, self.has_turned_around_replique)
@@ -86,6 +88,12 @@ def go_recup_statuette(self):
     pass
 
 def is_tirette_activee(self):
+    return True
+
+def recup_statuette(self):
+    pass
+
+def is_at_statuette(self):
     return True
 
 def turn_around_replique(self):

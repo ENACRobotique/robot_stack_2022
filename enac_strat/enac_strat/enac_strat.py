@@ -106,6 +106,8 @@ class Strategy(Node):
         IsRentringAuBercail.add_transition(IsRentringAuBercailToHasRentreAuBercail)
         InitToAtStatuette = Transition("InitToAtStatuette", AtStatuette, self.go_recup_statuette, self.is_tirette_activee)
         Init.add_transition(InitToAtStatuette)
+        AtStatuetteToHasRecupStatuette = Transition("AtStatuetteToHasRecupStatuette", HasRecupStatuette, self.recup_statuette, self.is_at_statuette)
+        AtStatuette.add_transition(AtStatuetteToHasRecupStatuette)
         tr581141130ToHasTurnedAroundReplique = Transition("tr581141130ToHasTurnedAroundReplique", HasTurnedAroundReplique, self.turn_around_replique, self.has_gotten_statuette)
         HasRecupStatuette.add_transition(tr581141130ToHasTurnedAroundReplique)
         tr86346170ToHasDroppedReplique = Transition("tr86346170ToHasDroppedReplique", HasDroppedReplique, self.drop_replique, self.has_turned_around_replique)
@@ -127,7 +129,6 @@ class Strategy(Node):
         PushCarreToIsRentringAuBercail = Transition("PushCarreToIsRentringAuBercail", IsRentringAuBercail, self.go_bercail, self.has_waited_some_time)
         PushCarre.add_transition(PushCarreToIsRentringAuBercail)
         self.EnacStrat = StateMachine(Init)
-
         ### fin partie générée automatiquement
 
         #paramétrage ROS
@@ -363,17 +364,17 @@ class Strategy(Node):
         print("Strategy: tirette activée")
         self.chrono = time.time()
         if self.color_is_jaune():
-            #self.send_nav_msg(1, 0.39, 0.39, math.radians(45))
-            self.send_nav_msg(1, 0.6, 1.14, math.radians(0))
+            self.send_nav_msg(1, 0.39, 0.39, math.radians(45))
+            #shlag self.send_nav_msg(1, 0.6, 1.14, math.radians(0))
         else:
-            #self.send_nav_msg(1, 3.0-0.39, 0.39, math.radians(45+90))
-            self.send_nav_msg(1, 3.0-0.6, 1.14, math.radians(180))
+            self.send_nav_msg(1, 3.0-0.39, 0.39, math.radians(45+90))
+            #shlag self.send_nav_msg(1, 3.0-0.6, 1.14, math.radians(180))
 
     def is_tirette_activee(self):
         return (self.periphs.get("TI", None) is not None)
 
     def recup_statuette(self):
-        #self.send_periph_msg("mj", 0) # récup statuette arrière
+        self.send_periph_msg("mj", 0) # récup statuette arrière
         pass
         #TODO: il faut faire qqch d'autre ici?
 
