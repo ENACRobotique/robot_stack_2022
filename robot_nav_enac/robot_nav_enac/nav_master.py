@@ -1,3 +1,8 @@
+#TODO : subscribe au lidar
+
+#TODO : recalage lidar &  recalage mur
+#recalage lidar au début?
+#TODO : macro avancement
 import numpy as np
 
 import math
@@ -6,7 +11,7 @@ import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import Twist, Pose, TransformStamped
 from nav_msgs.msg import Odometry
-from std_msgs.msg import Float32
+from std_msgs.msg import Float32, String
 
 from interfaces_enac.msg import _set_navigation
 from interfaces_enac.msg import _obstacles
@@ -18,6 +23,7 @@ from robot_nav_enac.PurePursuit import PurePursuit
 from robot_nav_enac.WallStop import WallStop
 from robot_nav_enac.WallFollower import WallFollower
 from robot_nav_enac.NavigationType import OdomData
+
 
 SetNavigation = _set_navigation.SetNavigation
 Obstacles = _obstacles.Obstacles
@@ -64,10 +70,13 @@ class Navigator(Node):
         self.target_position = OdomData(0, 0, 0) #TODO : set it to initial position from state machine on beggining
         self.cur_position = OdomData(0, 0, 0)
         self.cur_position_wheel = OdomData(0,0,0)
+        self.cur_position_lidar = OdomData(0,0,0)
         self.cur_speed = OdomData(0,0,0)
         self.cur_speed_wheel = OdomData(0,0,0)
         self.fixed_obstacle = [] #TODO : to fill on init
         self.dynamic_obstacle = [] 
+
+        self.avoiding_margin = 0.1
 
         self.capteur_1 = False
         self.capteur_2 = False
@@ -79,10 +88,13 @@ class Navigator(Node):
         self.wall_follower = WallFollower(self.get_logger().info, lambda: self.capteur_1, lambda: self.capteur_2, 0.2)
         self.wall_stop = WallStop(self.get_logger().info, lambda: self.cur_speed_wheel.x, 0.2)
         self.wall_stop_backward = WallStop(self.get_logger().info, lambda: self.cur_speed_wheel.x, -0.2)
+        #self.wall_stop = WallStop(self.get_logger().info, lambda: self.cur_speed.x, 0.2)
+        #self.wall_stop_backward = WallStop(self.get_logger().info, lambda: self.cur_speed.x, -0.2)
 
         self.navigation_type = self.stop #default navigation_type by safety
         self.nav_type_int = 0 #used to detect if navigation_type has changed
 
+        self.get_logger().info("navigation node started !")
 
         # subscribe to nav
         navigation_subscriber = self.create_subscription(
@@ -100,6 +112,11 @@ class Navigator(Node):
             Obstacles, 'obstacles', self.on_obstacle_callback, 10)
         proximity_warning_sbuscriber = self.create_subscription(
             Float32, 'front_distance', self.on_front_distance, 10)
+            
+
+        lidar_position_sub = self.create_subscription( 
+                Odometry, 'lidar_position', self.on_odom_lidar_callback, 10)
+        self.ros_send_serial = self.create_publisher(String, "/send_serial", 10) #msg sent to robot
 
         
         #publish to velocity
@@ -124,6 +141,13 @@ class Navigator(Node):
             self.navigation_type.set_target(self.target_position) #restart the ramp for straightPath
             self.get_logger().info("resuming nav")
 
+    def recaler_robot(self, x=-1.0, y=-1.0, theta=-100.0):
+        x = x if x != -1.0 else self.cur_position.x
+        y = y if y != -1.0 else self.cur_position.y
+        theta = theta if theta != -100.0 else self.cur_position.theta
+        theta = theta / 1000
+        self.ros_send_serial(f"@ {x} {y} {theta}")
+
     def on_nav_callback(self, msg):
         #switch nav type if changed
         if self.nav_type_int != msg.navigation_type:
@@ -144,6 +168,17 @@ class Navigator(Node):
 
         self.get_logger().info(f"receiving nav_cons to target ({x}, {y}) and angle {rotation}")
 
+    def on_odom_lidar_callback(self, msg):
+        x = msg.pose.pose.position.x
+        y = msg.pose.pose.position.y
+        rotation = z_euler_from_quaternions(msg.pose.pose.orientation.x,
+        									msg.pose.pose.orientation.y,
+        									msg.pose.pose.orientation.z,
+        									msg.pose.pose.orientation.w)
+
+        self.cur_position_lidar.updataOdomData(x, y, rotation)
+        #if le robot est à faible vitesse (pour éviter pb de timestamp ) ET pas d'alerte valeur abbérante
+        #recaler avec lidar recaler_robot
 
     def on_odom_wheel_callback(self, msg):
         x = msg.pose.pose.position.x
