@@ -253,7 +253,7 @@ class lidarlocation(Node):
                 self.send_position(position)
                 calc = timeit.default_timer() - self.start
                 #print(calc)
-                #print(position[1])
+                print(position[0], ";", position[1], ";", position[2])
         
         # Trier la liste par angle modulo pi
         list_pts = []
