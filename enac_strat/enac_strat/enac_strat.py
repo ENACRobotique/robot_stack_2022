@@ -348,6 +348,7 @@ class Strategy(Node):
         pass
 
     def tout_flinguer(self):
+        self.send_periph_msg("d", self.score)
         self.send_nav_msg(0, 0, 0, 0)
         self.dont_do_shit_anymore = True
         self.send_periph_msg("p1", 0)
