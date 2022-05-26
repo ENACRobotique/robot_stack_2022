@@ -434,22 +434,25 @@ class Strategy(Node):
         return True
 
     def go_carre(self):
-        if self.color_is_jaune():
-            self.send_nav_msg(1, 0.8525, 0.2, math.radians(180))
-        else:
-            self.send_nav_msg(1, 3.0-0.8525, 0.2, math.radians(180))
+        #if self.color_is_jaune():
+        #    self.send_nav_msg(1, 0.8525, 0.2, math.radians(180))
+        #else:
+        #    self.send_nav_msg(1, 3.0-0.8525, 0.2, math.radians(180))
+        pass
 
     def has_recale_c(self):
         return True
 
     def push_carre(self):
-        self.update_score("atleast1_carre", 5)
-        self.update_score("carre_1", 5)
-        self.send_periph_msg("s1", 60)
-        self.time_push = time.time()
+        #self.update_score("atleast1_carre", 5)
+        #self.update_score("carre_1", 5)
+        #self.send_periph_msg("s1", 60)
+        #self.time_push = time.time()
+        pass
 
     def is_at_carre(self):
-        return self.check_goal()
+        #return self.check_goal()
+        return True
 
     def has_waited_some_time(self):
         if ((time.time() - self.time_push) > 1.0):
