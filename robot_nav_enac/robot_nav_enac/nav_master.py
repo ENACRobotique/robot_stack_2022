@@ -81,6 +81,8 @@ class Navigator(Node):
         self.capteur_1 = False
         self.capteur_2 = False
 
+        self.moyenne = []
+
         #instantiate nav types available
         self.stop = Stop()
         self.straight_path = StraightPath(self.get_logger().info)
@@ -93,6 +95,8 @@ class Navigator(Node):
 
         self.navigation_type = self.stop #default navigation_type by safety
         self.nav_type_int = 0 #used to detect if navigation_type has changed
+
+        self.has_recaled_lidar = False
 
         self.get_logger().info("navigation node started !")
 
@@ -142,11 +146,14 @@ class Navigator(Node):
             self.get_logger().info("resuming nav")
 
     def recaler_robot(self, x=-1.0, y=-1.0, theta=-100.0):
-        x = x if x != -1.0 else self.cur_position.x
-        y = y if y != -1.0 else self.cur_position.y
-        theta = theta if theta != -100.0 else self.cur_position.theta
-        theta = theta / 1000
-        self.ros_send_serial(f"@ {x} {y} {theta}")
+        if x != -1.0 or y != -1.0 or theta != -100.0:
+            x = x if x != -1.0 else self.cur_position.x
+            y = y if y != -1.0 else self.cur_position.y
+            theta = theta if theta != -100.0 else self.cur_position.theta
+            x *= 1000
+            y *= 1000  #meter to mm
+            theta *= 1000 #rad to milli rad
+            self.ros_send_serial(f"@ {x} {y} {theta}")
 
     def on_nav_callback(self, msg):
         #switch nav type if changed
@@ -177,7 +184,28 @@ class Navigator(Node):
         									msg.pose.pose.orientation.w)
 
         self.cur_position_lidar.updataOdomData(x, y, rotation)
-        #if le robot est à faible vitesse (pour éviter pb de timestamp ) ET pas d'alerte valeur abbérante
+        if self.cur_speed.x >= 0.01 and self.cur_speed.rotation_rad >= 0.01:
+            self.has_recaled_lidar = False
+            self.moyenne = []
+            
+
+        if not self.has_recaled_lidar and self.cur_speed.x <= 0.005 and self.cur_speed.rotation_rad <= 0.005:
+            self.moyenne += (x, y, rotation)
+            if len(self.moyenne) >= 3:
+                pos_moyennee = []
+                for pos in self.moyenne:
+                    pos_moyennee[0] += pos[0]
+                    pos_moyennee[1] += pos[1]
+                    pos_moyennee[2] += pos[2]
+                pos_moyennee[0] = pos_moyennee[0] / len(self.moyenne)
+                pos_moyennee[1] = pos_moyennee[1] / len(self.moyenne)
+                pos_moyennee[2] = pos_moyennee[2] / len(self.moyenne)
+
+                self.recaler_robot(pos_moyennee[0], pos_moyennee[1], pos_moyennee[2])
+
+                self.has_recaled_lidar = True
+                self.get_logger.info(f"recalage lidar effectué à {(pos_moyennee[0], pos_moyennee[1], pos_moyennee[2])}")
+         #if le robot est à faible vitesse (pour éviter pb de timestamp ) ET pas d'alerte valeur abbérante
         #recaler avec lidar recaler_robot
 
     def on_odom_wheel_callback(self, msg):

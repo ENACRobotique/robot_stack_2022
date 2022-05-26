@@ -41,7 +41,6 @@ class lidarlocation(Node):
             10)
         
         self.ros_periph_listener = self.create_subscription(PeriphValue, '/peripherals', self.on_ros_periph_cmd, 10)
-        self.subscription
         self.publisher_ = self.create_publisher(LaserScan, 'filtered_scan', 10)
         self.publisher_map = self.create_publisher(
             TransformStamped, 'carte_coins', 10)
@@ -314,9 +313,9 @@ class lidarlocation(Node):
         phi = math.pi/2 - \
             get_gamma(tri.pt_list[i], tri.pt_list[j],
                     get_beta(tri.pt_list[i], tri.pt_list[j]))
-        x = math.cos(teta)*tri.pt_list[j].distance - 0.1
-        x2 = math.cos(phi)*tri.pt_list[i].distance - 0.1
-        y = math.sin(teta)*tri.pt_list[j].distance + 0.05
+        x = math.cos(teta)*tri.pt_list[j].distance# - 0.1 #COrrection chelou
+        x2 = math.cos(phi)*tri.pt_list[i].distance #- 0.1
+        y = math.sin(teta)*tri.pt_list[j].distance# + 0.05
         y2 = 1.95 - math.sin(phi)*tri.pt_list[i].distance
 
         # voir ou qu'il pense qu'elles sont les balises
