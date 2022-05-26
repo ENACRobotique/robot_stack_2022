@@ -50,10 +50,6 @@ def pol_to_cart(x_rob, y_rob, theta_rob, offset_lidar, angle_loc_obst, dist_obst
     offset_obst_y = dist_obst * math.sin(angle_loc_obst - offset_lidar + theta_rob)
     return (x_rob + offset_obst_x, y_rob + offset_obst_y)
 
-def is_obstacle_on_table(distance_from_robot):
-    #suppose que l'obstacle est parfaitement devant le robot
-    
-    pass
 class Navigator(Node):
     def __init__(self):
         super().__init__('navigator')
@@ -126,19 +122,28 @@ class Navigator(Node):
         #publish to velocity
         self.velocity_publisher = self.create_publisher(Twist, 'cmd_vel', 10)
         
-
+    def is_obstacle_on_table(self, distance_from_robot):
+    #suppose que l'obstacle est parfaitement devant le robot
+        ennemy_pos = pol_to_cart(self.cur_position_wheel.x, self.cur_position_wheel.y, self.cur_position_wheel.rotation_rad,
+        0.0,0.0,distance_from_robot) #TODO : angle_loc_lisdar not zero
+        if (ennemy_pos[0] <= self.avoiding_margin  or ennemy_pos[0] >= 3.0 - self.avoiding_margin
+            or ennemy_pos[1] <= self.avoiding_margin or ennemy_pos[1] >= 2.0 - self.avoiding_margin):
+            return False
+        else:
+            return True
+    
     def on_obstacle_callback(self, msg):
         #TODO : maintain a list of dynamic obstacles and send it to PurePursuit astar planification on callback
         pass
 
     def on_front_distance(self, msg):
-        if msg.data <= 0.5 and not self.is_stopped: #object in front at less than 0.5m
+        if msg.data <= 0.3 and not self.is_stopped and self.is_obstacle_on_table(msg.data): #object in front at less than 0.5m
             self.last_nav_type = self.nav_type_int
             self.nav_type_int = 0
             self.navigation_type = self.stop
             self.is_stopped = True
             self.get_logger().warn(f"stopping nav due to obstacle at {0.5} m ")
-        if msg.data >= 0.5 and self.is_stopped: #resume navigation after proximity obstacle is leaving the vincinity of the robot
+        if msg.data >= 0.3 and self.is_stopped: #resume navigation after proximity obstacle is leaving the vincinity of the robot
             self.is_stopped = False
             self.nav_type_int = self.last_nav_type
             self.assign_navigation_from_int()
